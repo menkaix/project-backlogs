@@ -17,13 +17,21 @@ package com.menkaix.backlogs.main;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.menkaix.backlogs.entities.Project;
+import com.menkaix.backlogs.repositories.ProjectRepisitory;
+import org.assertj.core.api.Assertions;
+import org.junit.Assert;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.domain.Example;
 
@@ -31,52 +39,31 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+
+
 @SpringBootTest
-@Testcontainers
 public class ClientRepositoryTests {
-//
-//	@Container
-//	@ServiceConnection
-//	static MongoDBContainer container = new MongoDBContainer("mongo:7.0.2");
-//
-//	@Autowired
-//	ClientRepository repository;
-//
-//	Client dave, oliver, carter;
-//
-//	@BeforeEach
-//	public void setUp() {
-//
-//		repository.deleteAll();
-//
-//		dave = repository.save(new Client("Dave", "Matthews"));
-//		oliver = repository.save(new Client("Oliver August", "Matthews"));
-//		carter = repository.save(new Client("Carter", "Beauford"));
-//	}
-//
-//	@Test
-//	public void setsIdOnSave() {
-//
-//		Client dave = repository.save(new Client("Dave", "Matthews"));
-//
-//		assertThat(dave.id).isNotNull();
-//	}
-//
-//	@Test
-//	public void findsByLastName() {
-//
-//		List<Client> result = repository.findByLastName("Beauford");
-//
-//		assertThat(result).hasSize(1).extracting("firstName").contains("Carter");
-//	}
-//
-//	@Test
-//	public void findsByExample() {
-//
-//		Client probe = new Client(null, "Matthews");
-//
-//		List<Client> result = repository.findAll(Example.of(probe));
-//
-//		assertThat(result).hasSize(2).extracting("firstName").contains("Dave", "Oliver August");
-//	}
+
+    @MockBean
+    ProjectRepisitory projectRepisitory ;
+
+
+    @BeforeEach
+    public void configureTest(){
+
+        ArrayList<Project> prjs = new ArrayList<>() ;
+        prjs.add(new Project("test"));
+        Mockito.when(projectRepisitory.findByName("test")).thenReturn(prjs);
+
+    }
+
+
+    @Test
+    public void ShouldFindProjectByName(){
+
+        List<Project> list = projectRepisitory.findByName("test");
+
+        Assert.assertEquals(1,list.size());
+    }
+
 }
