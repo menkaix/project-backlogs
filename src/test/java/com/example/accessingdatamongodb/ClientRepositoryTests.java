@@ -34,7 +34,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest
 @Testcontainers
 public class ClientRepositoryTests {
-
+//
 //	@Container
 //	@ServiceConnection
 //	static MongoDBContainer container = new MongoDBContainer("mongo:7.0.2");

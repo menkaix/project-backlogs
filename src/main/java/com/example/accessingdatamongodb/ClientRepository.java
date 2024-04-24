@@ -8,7 +8,7 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 @RepositoryRestController(path = "clients",value = "clients")
 public interface ClientRepository extends MongoRepository<Client, String> {
 
-	public Client findByFirstName(String firstName);
-	public List<Client> findByLastName(String lastName);
+	
+	public List<Client> findByName(String lastName);
 
 }
