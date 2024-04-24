@@ -33,31 +33,31 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest
 @Testcontainers
-public class CustomerRepositoryTests {
+public class ClientRepositoryTests {
 
 	@Container
 	@ServiceConnection
 	static MongoDBContainer container = new MongoDBContainer("mongo:7.0.2");
 
 	@Autowired
-	CustomerRepository repository;
+	ClientRepository repository;
 
-	Customer dave, oliver, carter;
+	Client dave, oliver, carter;
 
 	@BeforeEach
 	public void setUp() {
 
 		repository.deleteAll();
 
-		dave = repository.save(new Customer("Dave", "Matthews"));
-		oliver = repository.save(new Customer("Oliver August", "Matthews"));
-		carter = repository.save(new Customer("Carter", "Beauford"));
+		dave = repository.save(new Client("Dave", "Matthews"));
+		oliver = repository.save(new Client("Oliver August", "Matthews"));
+		carter = repository.save(new Client("Carter", "Beauford"));
 	}
 
 	@Test
 	public void setsIdOnSave() {
 
-		Customer dave = repository.save(new Customer("Dave", "Matthews"));
+		Client dave = repository.save(new Client("Dave", "Matthews"));
 
 		assertThat(dave.id).isNotNull();
 	}
@@ -65,7 +65,7 @@ public class CustomerRepositoryTests {
 	@Test
 	public void findsByLastName() {
 
-		List<Customer> result = repository.findByLastName("Beauford");
+		List<Client> result = repository.findByLastName("Beauford");
 
 		assertThat(result).hasSize(1).extracting("firstName").contains("Carter");
 	}
@@ -73,9 +73,9 @@ public class CustomerRepositoryTests {
 	@Test
 	public void findsByExample() {
 
-		Customer probe = new Customer(null, "Matthews");
+		Client probe = new Client(null, "Matthews");
 
-		List<Customer> result = repository.findAll(Example.of(probe));
+		List<Client> result = repository.findAll(Example.of(probe));
 
 		assertThat(result).hasSize(2).extracting("firstName").contains("Dave", "Oliver August");
 	}

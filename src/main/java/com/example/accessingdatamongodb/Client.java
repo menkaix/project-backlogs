@@ -3,7 +3,7 @@ package com.example.accessingdatamongodb;
 import org.springframework.data.annotation.Id;
 
 
-public class Customer {
+public class Client {
 
 	@Id
 	public String id;
@@ -11,9 +11,9 @@ public class Customer {
 	public String firstName;
 	public String lastName;
 
-	public Customer() {}
+	public Client() {}
 
-	public Customer(String firstName, String lastName) {
+	public Client(String firstName, String lastName) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 	}
