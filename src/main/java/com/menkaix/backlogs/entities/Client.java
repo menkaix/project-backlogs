@@ -1,4 +1,4 @@
-package com.example.accessingdatamongodb;
+package com.menkaix.backlogs.entities;
 
 import org.springframework.data.annotation.Id;
 

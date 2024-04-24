@@ -1,4 +1,4 @@
-package com.example.accessingdatamongodb;
+package com.menkaix.backlogs.main;
 /*
  * Copyright 2016 the original author or authors.
  *
