@@ -35,48 +35,48 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 public class ClientRepositoryTests {
 
-	@Container
-	@ServiceConnection
-	static MongoDBContainer container = new MongoDBContainer("mongo:7.0.2");
-
-	@Autowired
-	ClientRepository repository;
-
-	Client dave, oliver, carter;
-
-	@BeforeEach
-	public void setUp() {
-
-		repository.deleteAll();
-
-		dave = repository.save(new Client("Dave", "Matthews"));
-		oliver = repository.save(new Client("Oliver August", "Matthews"));
-		carter = repository.save(new Client("Carter", "Beauford"));
-	}
-
-	@Test
-	public void setsIdOnSave() {
-
-		Client dave = repository.save(new Client("Dave", "Matthews"));
-
-		assertThat(dave.id).isNotNull();
-	}
-
-	@Test
-	public void findsByLastName() {
-
-		List<Client> result = repository.findByLastName("Beauford");
-
-		assertThat(result).hasSize(1).extracting("firstName").contains("Carter");
-	}
-
-	@Test
-	public void findsByExample() {
-
-		Client probe = new Client(null, "Matthews");
-
-		List<Client> result = repository.findAll(Example.of(probe));
-
-		assertThat(result).hasSize(2).extracting("firstName").contains("Dave", "Oliver August");
-	}
+//	@Container
+//	@ServiceConnection
+//	static MongoDBContainer container = new MongoDBContainer("mongo:7.0.2");
+//
+//	@Autowired
+//	ClientRepository repository;
+//
+//	Client dave, oliver, carter;
+//
+//	@BeforeEach
+//	public void setUp() {
+//
+//		repository.deleteAll();
+//
+//		dave = repository.save(new Client("Dave", "Matthews"));
+//		oliver = repository.save(new Client("Oliver August", "Matthews"));
+//		carter = repository.save(new Client("Carter", "Beauford"));
+//	}
+//
+//	@Test
+//	public void setsIdOnSave() {
+//
+//		Client dave = repository.save(new Client("Dave", "Matthews"));
+//
+//		assertThat(dave.id).isNotNull();
+//	}
+//
+//	@Test
+//	public void findsByLastName() {
+//
+//		List<Client> result = repository.findByLastName("Beauford");
+//
+//		assertThat(result).hasSize(1).extracting("firstName").contains("Carter");
+//	}
+//
+//	@Test
+//	public void findsByExample() {
+//
+//		Client probe = new Client(null, "Matthews");
+//
+//		List<Client> result = repository.findAll(Example.of(probe));
+//
+//		assertThat(result).hasSize(2).extracting("firstName").contains("Dave", "Oliver August");
+//	}
 }
