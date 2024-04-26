@@ -19,9 +19,11 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.menkaix.backlogs.entities.Project;
 import com.menkaix.backlogs.repositories.ProjectRepisitory;
+import com.menkaix.backlogs.services.ProjectService;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
@@ -47,7 +49,8 @@ public class ClientRepositoryTests {
     @MockBean
     ProjectRepisitory projectRepisitory ;
     
-   
+    @Autowired
+    ProjectService service ;
 
 
     @BeforeEach
@@ -56,8 +59,12 @@ public class ClientRepositoryTests {
         ArrayList<Project> prjs = new ArrayList<>() ;
         Project project = new Project("test");
         project.id = "abcd1234" ;
+        project.code = "TST" ;
         prjs.add(project);
         Mockito.when(projectRepisitory.findByName("test")).thenReturn(prjs);
+        Mockito.when(projectRepisitory.findByCode("TST")).thenReturn(prjs);
+        Optional<Project> oPrj = Optional.of(project) ;
+        Mockito.when(projectRepisitory.findById("abcd1234")).thenReturn(oPrj);
 
     }
 
@@ -65,9 +72,25 @@ public class ClientRepositoryTests {
     @Test
     public void ShouldFindProjectByName(){
 
-        List<Project> list = projectRepisitory.findByName("test");
+        Project prj = service.findProject("test");
 
-        Assert.assertEquals(1,list.size());
+        Assert.assertEquals("abcd1234",prj.id);
+    }
+
+    @Test
+    public void ShouldFindProjectByCode(){
+
+        Project prj = service.findProject("TST");
+
+        Assert.assertEquals("abcd1234",prj.id);
+    }
+
+    @Test
+    public void ShouldFindProjectById(){
+
+        Project prj = service.findProject("abcd1234");
+
+        Assert.assertEquals("TST",prj.code);
     }
 
 }
