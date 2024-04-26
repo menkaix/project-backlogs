@@ -1,6 +1,7 @@
 package com.menkaix.backlogs.services;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public class ProjectService {
 		}
 	}
 
-	public Project findByNameOrCode(String in) {
+	public Project findProject(String in) {
 
 		List<Project> prjs = repo.findByName(in);
 		if (prjs.size() > 0) {
@@ -48,8 +49,14 @@ public class ProjectService {
 			if (prjs.size() > 0) {
 				return prjs.get(0);
 			} else {
-				logger.warn("no project found with " + in);
-				return null;
+				try {
+					Project p = repo.findById(in).get();
+					return p ;
+				} catch (NoSuchElementException e) {
+					logger.warn("no project found with " + in);
+					return null;
+				}
+
 			}
 		}
 

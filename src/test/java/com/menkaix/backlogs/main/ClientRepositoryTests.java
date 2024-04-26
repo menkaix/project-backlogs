@@ -46,13 +46,17 @@ public class ClientRepositoryTests {
 
     @MockBean
     ProjectRepisitory projectRepisitory ;
+    
+   
 
 
     @BeforeEach
     public void configureTest(){
 
         ArrayList<Project> prjs = new ArrayList<>() ;
-        prjs.add(new Project("test"));
+        Project project = new Project("test");
+        project.id = "abcd1234" ;
+        prjs.add(project);
         Mockito.when(projectRepisitory.findByName("test")).thenReturn(prjs);
 
     }
