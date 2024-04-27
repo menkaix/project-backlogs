@@ -59,6 +59,19 @@ public class FeatureCommandController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND) ;
         }
 
+    }
+
+    @PostMapping("/{parent}/adopt/{child}")
+    public ResponseEntity<Feature> setChild(@PathVariable("parent")String parent, @PathVariable("child")String child){
+        Feature ans = null;
+        try {
+            ans = featureService.addToParent(parent, child);
+            return new ResponseEntity<>(ans, HttpStatus.CREATED) ;
+        } catch (EntityNotFoundException e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND) ;
+        }
+
 
 
     }

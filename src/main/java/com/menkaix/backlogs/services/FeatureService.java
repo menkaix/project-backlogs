@@ -43,4 +43,18 @@ public class FeatureService {
 
         return  featureRepository.save(feature) ;
     }
+
+    public Feature addToParent(String parentId, String childId) throws EntityNotFoundException {
+
+        Feature parent = featureRepository.findById(parentId).get() ;
+        Feature child = featureRepository.findById(childId).get() ;
+
+        if(parent ==  null) throw new EntityNotFoundException("Feature not found with id "+parentId);
+        if(child ==  null) throw new EntityNotFoundException("Feature not found with id "+childId);
+
+        child.parentID = parent.id ;
+
+        return  featureRepository.save(child) ;
+
+    }
 }
