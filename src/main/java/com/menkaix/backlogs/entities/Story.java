@@ -11,7 +11,6 @@ public class Story {
 
     public String action ;
 
-
     public String objective ;
 
     public String scenario ;
