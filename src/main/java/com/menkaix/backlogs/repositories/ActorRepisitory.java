@@ -10,8 +10,8 @@ import java.util.List;
 @RepositoryRestController(path = "actors",value = "actors")
 public interface ActorRepisitory extends MongoRepository<Actor, String>  {
 
-	public List<Project> findByName(String name);
-	public List<Project> findByProjectName(String name);
+	public List<Actor> findByName(String name);
+	public List<Actor> findByProjectName(String name);
 
 	
 }
