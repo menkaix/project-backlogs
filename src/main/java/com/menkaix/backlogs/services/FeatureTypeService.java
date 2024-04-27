@@ -16,7 +16,7 @@ public class FeatureTypeService {
     @Autowired
     FeatureTypeRepository repo ;
 
-    @PostConstruct
+
     public void build(){
         logger.info("rebuilding featureTypes");
         repo.deleteAll();
