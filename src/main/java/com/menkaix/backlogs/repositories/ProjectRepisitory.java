@@ -1,7 +1,8 @@
-package com.example.accessingdatamongodb;
+package com.menkaix.backlogs.repositories;
 
 import java.util.List;
 
+import com.menkaix.backlogs.entities.Project;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 
