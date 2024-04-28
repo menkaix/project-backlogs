@@ -10,6 +10,6 @@ import java.util.List;
 @RepositoryRestController(path = "stories",value = "stories")
 public interface StoryRepository extends MongoRepository<Story, String>  {
 
-
+    List<Story> findByActorRef(String ref) ;
 
 }
