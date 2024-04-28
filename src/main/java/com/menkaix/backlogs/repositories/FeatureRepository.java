@@ -11,6 +11,6 @@ import java.util.List;
 public interface FeatureRepository extends MongoRepository<Feature, String> {
 
 	
-	public List<Feature> findByName(String lastName);
+	public List<Feature> findByStoryId(String feature);
 
 }

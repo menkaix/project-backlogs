@@ -3,6 +3,12 @@ package com.menkaix.backlogs.services;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import com.menkaix.backlogs.entities.Actor;
+import com.menkaix.backlogs.entities.Feature;
+import com.menkaix.backlogs.entities.Story;
+import com.menkaix.backlogs.repositories.ActorRepisitory;
+import com.menkaix.backlogs.repositories.FeatureRepository;
+import com.menkaix.backlogs.repositories.StoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +26,15 @@ public class ProjectService {
 
 	@Autowired
 	private ProjectRepisitory repo;
+
+	@Autowired
+	private ActorRepisitory actorRepisitory ;
+
+	@Autowired
+	private StoryRepository storyRepository ;
+
+	@Autowired
+	private FeatureRepository featureRepository ;
 
 	public void safeCreateProject(Project projectCanditate) throws DataConflictException, DataDefinitionException {
 		List<Project> prjs = null;
@@ -39,6 +54,7 @@ public class ProjectService {
 		}
 	}
 
+	//finds a project by name, code, or id
 	public Project findProject(String in) {
 
 		List<Project> prjs = repo.findByName(in);
@@ -62,4 +78,35 @@ public class ProjectService {
 
 	}
 
+    public String tree(String projectRef) {
+
+		Project p = findProject(projectRef) ;
+		if(p==null) {
+			return "the project where not found" ;
+		}
+
+		String ans = p.name + ": " + p.id + "\n" ;
+
+		List<Actor> actors = actorRepisitory.findByProjectName(p.name) ;
+		for(Actor a : actors){
+
+			ans += "\t"+a.name + ": " + a.id + "\n" ;
+
+			List<Story> stories = storyRepository.findByActorRef(p.name+"/"+a.name) ;
+			for(Story s : stories){
+				ans += "\t\t"+s.action + ": " + s.id + "\n" ;
+
+				List<Feature> features = featureRepository.findByStoryId(s.id) ;
+				for(Feature f : features){
+
+					ans+="\t\t\t"+f.name+": "+f.id ;
+
+				}
+
+			}
+			ans += "\n" ;
+		}
+
+		return ans ;
+    }
 }
