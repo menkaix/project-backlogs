@@ -56,6 +56,10 @@ public class FeatureTypeService {
         nodeType.name = "node";
         nodeType.isContainer = true ;
         repo.save(nodeType) ;
+        
+        FeatureType rgType = new FeatureType();
+        rgType.name = "business-rule";
+        repo.save(rgType);
 
     }
 
