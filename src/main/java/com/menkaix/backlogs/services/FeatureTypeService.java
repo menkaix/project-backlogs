@@ -45,11 +45,11 @@ public class FeatureTypeService {
         FeatureType formType = new FeatureType();
         formType.name = "form";
         formType.isContainer = true ;
+        formType.keyFeatures.add("action");
         repo.save(formType) ;
 
         FeatureType fieldType = new FeatureType();
         fieldType.name = "field";
-        fieldType.keyFeatures.add("type");
         repo.save(fieldType) ;
 
         FeatureType nodeType = new FeatureType();
@@ -64,6 +64,14 @@ public class FeatureTypeService {
         FeatureType restType = new FeatureType();
         restType.name = "rest-api";
         repo.save(restType);
+        
+        FeatureType procedureType = new FeatureType();
+        procedureType.name = "procedure";
+        repo.save(procedureType);
+        
+        FeatureType behaviour = new FeatureType();
+        behaviour.name = "behaviour";
+        repo.save(behaviour);
 
     }
 
