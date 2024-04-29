@@ -60,6 +60,10 @@ public class FeatureTypeService {
         FeatureType rgType = new FeatureType();
         rgType.name = "business-rule";
         repo.save(rgType);
+        
+        FeatureType restType = new FeatureType();
+        restType.name = "rest-api";
+        repo.save(restType);
 
     }
 
