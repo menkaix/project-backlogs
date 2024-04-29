@@ -5,6 +5,7 @@ public enum ActorType {
     USER,
     TECHNICAL,
     BOT,
-    SYSTEM
+    SYSTEM,
+    REQUIREMENTS
 
 }
