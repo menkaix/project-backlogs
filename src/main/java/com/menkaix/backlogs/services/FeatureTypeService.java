@@ -76,6 +76,10 @@ public class FeatureTypeService {
         FeatureType restClientType = new FeatureType();
         restClientType.name = "rest-client";
         repo.save(restClientType);
+        
+        FeatureType displayType = new FeatureType();
+        displayType.name = "dispaly";
+        repo.save(displayType);
 
     }
 
