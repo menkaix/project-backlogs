@@ -99,7 +99,7 @@ public class ProjectService {
 				List<Feature> features = featureRepository.findByStoryId(s.id) ;
 				for(Feature f : features){
 
-					ans+="\t\t\t"+f.name+": "+f.id + "\n";
+					ans+="\t\t\t["+f.type+"]"+f.name+": "+f.id + "\n";
 
 				}
 
