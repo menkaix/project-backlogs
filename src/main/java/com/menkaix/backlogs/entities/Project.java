@@ -2,12 +2,11 @@ package com.menkaix.backlogs.entities;
 
 import org.springframework.data.annotation.Id;
 
-public class Project {
+public class Project  extends AbstractEntity {
 	
 	@Id
 	public String id;
 	
-	public String name ;
 	public String code ;
 	public String clientName ;
 	

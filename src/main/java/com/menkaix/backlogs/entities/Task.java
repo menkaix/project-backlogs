@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 
-public class Task {
+public class Task  extends AbstractEntity {
 	
 	@Id
     public String id;
@@ -14,8 +14,6 @@ public class Task {
 	public String title ;
 	
 	public String description ;
-	
-	public Date creationDate = new Date() ;
 	
 	public Date dueDate ;
 	

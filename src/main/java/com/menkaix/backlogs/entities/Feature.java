@@ -4,13 +4,11 @@ import org.springframework.data.annotation.Id;
 
 import java.util.WeakHashMap;
 
-public class Feature {
+public class Feature  extends AbstractEntity {
 
     @Id
     public String id;
-
-    public String name;
-
+    
     public String description;
 
     public String type;
