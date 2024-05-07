@@ -3,12 +3,10 @@ package com.menkaix.backlogs.entities;
 import org.springframework.data.annotation.Id;
 
 
-public class Client {
+public class Client  extends AbstractEntity{
 
 	@Id
 	public String id;
-
-	public String name;
 
 	public Client() {}
 

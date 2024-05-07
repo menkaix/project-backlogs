@@ -2,7 +2,7 @@ package com.menkaix.backlogs.entities;
 
 import org.springframework.data.annotation.Id;
 
-public class Story {
+public class Story  extends AbstractEntity {
 
     @Id
     public String id;
