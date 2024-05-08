@@ -26,6 +26,7 @@ public class ActorCommandController {
         return "WIP" ;
     }
 
+    @Deprecated(forRemoval = true)
     @PostMapping("/{project}/add")
     public ResponseEntity<Actor> addActor(@PathVariable("project")String project, @RequestBody Actor actor){
 

@@ -1,6 +1,8 @@
 package com.menkaix.backlogs.controllers;
 
+import com.menkaix.backlogs.entities.Actor;
 import com.menkaix.backlogs.entities.Feature;
+import com.menkaix.backlogs.services.ActorService;
 import com.menkaix.backlogs.services.FeatureService;
 import com.menkaix.backlogs.services.FeatureTypeService;
 import com.menkaix.backlogs.services.ProjectService;
@@ -18,6 +20,8 @@ public class ProjectCommandController {
 
     static Logger logger = LoggerFactory.getLogger(ProjectCommandController.class) ;
 
+    @Autowired
+    ActorService actorService ;
 
     @Autowired
     private FeatureService featureService ;
@@ -34,6 +38,18 @@ public class ProjectCommandController {
         return projectService.tree(projectRef) ;
     }
 
+    @PostMapping("/{project}/add-actor")
+    public ResponseEntity<Actor> addActor(@PathVariable("project")String project, @RequestBody Actor actor){
+
+        try {
+            Actor ans = actorService.addNew(project, actor);
+            return new ResponseEntity<>(ans, HttpStatus.CREATED) ;
+        } catch (EntityNotFoundException e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
+        }
+
+    }
 
 
 
