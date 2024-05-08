@@ -21,7 +21,7 @@ public class ActorCommandController {
     ActorService actorService ;
 
 
-    @GetMapping("/help")
+    @GetMapping({"/help","/hello"})
     public String help(){
         return "WIP" ;
     }
