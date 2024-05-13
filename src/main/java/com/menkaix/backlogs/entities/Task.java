@@ -11,6 +11,8 @@ public class Task  extends AbstractEntity {
 	
 	public String projectId ;
 	
+	public String reference ;
+	
 	public String title ;
 	
 	public String description ;
