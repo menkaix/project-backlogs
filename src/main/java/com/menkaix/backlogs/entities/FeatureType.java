@@ -13,6 +13,7 @@ public class FeatureType {
     public String name ;
 
     public ArrayList<String> keyFeatures = new ArrayList<>() ;
+    public WeakHashMap<String, String> usualTask = new WeakHashMap<>() ;
 
     public boolean isContainer = false ;
 

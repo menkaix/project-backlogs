@@ -1,6 +1,7 @@
 package com.menkaix.backlogs.services;
 
 import com.menkaix.backlogs.entities.Feature;
+import com.menkaix.backlogs.entities.FeatureType;
 import com.menkaix.backlogs.entities.Story;
 import com.menkaix.backlogs.repositories.FeatureRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;
@@ -17,7 +18,10 @@ public class FeatureService {
 
     @Autowired
     private  FeatureRepository featureRepository ;
-
+    
+    @Autowired
+    private TaskService taskService ;
+    
     //TODO change to service
     @Autowired
     private StoryRepository storyRepository ;
@@ -25,12 +29,17 @@ public class FeatureService {
     public Feature addToStory(String storyId, Feature feature) throws EntityNotFoundException {
 
         Story story = storyRepository.findById(storyId).get();
+        
 
         if(story == null) throw new EntityNotFoundException("story not found with id "+storyId);
-
+        
         feature.storyId = story.id ;
+        
+        Feature ans =  featureRepository.save(feature) ;
+        
+        taskService.createUsualTasks(ans);
 
-        return  featureRepository.save(feature) ;
+        return  ans ;
     }
 
     public Feature addToParent(String parentId, Feature feature) throws EntityNotFoundException {

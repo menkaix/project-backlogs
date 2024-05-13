@@ -21,11 +21,12 @@ public class ActorCommandController {
     ActorService actorService ;
 
 
-    @GetMapping("/help")
+    @GetMapping({"/help","/hello"})
     public String help(){
         return "WIP" ;
     }
 
+    @Deprecated(forRemoval = true)
     @PostMapping("/{project}/add")
     public ResponseEntity<Actor> addActor(@PathVariable("project")String project, @RequestBody Actor actor){
 
