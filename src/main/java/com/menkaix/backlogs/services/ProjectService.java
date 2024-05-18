@@ -1,5 +1,6 @@
 package com.menkaix.backlogs.services;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -35,6 +36,9 @@ public class ProjectService {
 
 	@Autowired
 	private FeatureRepository featureRepository ;
+	
+	@Autowired
+	GeminiService geminiService ;
 
 	public void safeCreateProject(Project projectCanditate) throws DataConflictException, DataDefinitionException {
 		List<Project> prjs = null;
@@ -109,4 +113,19 @@ public class ProjectService {
 
 		return ans ;
     }
+
+	public String ingestStory(String string) {
+		
+		String str = "Ecris un objet json contenant les proprietes suivants "
+				+ "'acteur' qui représente celui qui parle, "
+				+ "et 'action' l'action qu'il voudrait faire "
+				+ "et optionnellement 'objectif' son benefice attendu, a partir de la phrase suivante : " +string+".";
+		
+		try {
+			return geminiService.predictFunction(str);
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			return e.getMessage() ;
+		}
+	}
 }
