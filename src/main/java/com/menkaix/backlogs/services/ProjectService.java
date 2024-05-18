@@ -122,7 +122,7 @@ public class ProjectService {
 				+ "et optionnellement 'objectif' son benefice attendu, a partir de la phrase suivante : " +string+".";
 		
 		try {
-			return geminiService.textInput(str);
+			return geminiService.predictFunction(str);
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 			return e.getMessage() ;
