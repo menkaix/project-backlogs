@@ -7,7 +7,7 @@ public class Story  extends AbstractEntity {
     @Id
     public String id;
 
-    public String actorRef; // projectName/actorName
+    public String actorId;
 
     public String action ;
 

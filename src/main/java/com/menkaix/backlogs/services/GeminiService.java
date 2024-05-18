@@ -118,13 +118,21 @@ public class GeminiService {
 
 			List<Value> predictions = predictResponse.getPredictionsList() ;
 
-			String ans = "begin "+predictResponse.getPredictionsCount()+"\n" ;
+			String tmp = "" ;
 
 			if(predictResponse.getPredictionsCount()>0){
-				ans += predictResponse.getPredictions(0).getStructValue().getFieldsOrThrow("content").getStringValue();
+				tmp += predictResponse.getPredictions(0).getStructValue().getFieldsOrThrow("content").getStringValue();
 			}
 
-			ans += "end." ;
+			String [] tokens = tmp.split("\n") ;
+
+			String ans =  "" ;
+
+			for (String token: tokens ) {
+				if(!token.startsWith("```")){
+					ans += token ;
+				}
+			}
 
 			return ans ;
 
