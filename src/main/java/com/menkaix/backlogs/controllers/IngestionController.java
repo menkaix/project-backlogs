@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -17,10 +18,10 @@ public class IngestionController {
 	@Autowired
 	private ProjectService projectService ;
 	
-	@PostMapping("/ingest-story")
-	public ResponseEntity<String> ingestStrory(@RequestBody WeakHashMap<String, String> inputData){
+	@PostMapping("/ingest-story/{project}")
+	public ResponseEntity<String> ingestStrory(@RequestBody WeakHashMap<String, String> inputData, @PathVariable String project){
 		
-		String ans = projectService.ingestStory(inputData.get("data"));
+		String ans = projectService.ingestStory(project, inputData.get("data"));
 		
 		return new ResponseEntity<>(ans, HttpStatus.OK);
 	}

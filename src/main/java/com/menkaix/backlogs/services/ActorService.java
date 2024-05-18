@@ -50,7 +50,7 @@ public class ActorService {
 
         for (Actor a: actors) {
             if(a.name.equalsIgnoreCase(name)){
-                story.actorRef = prj.name +"/"+a.name ;
+                story.actorId = a.id ;
                 return storyRepository.save(story) ;
             }
         }
