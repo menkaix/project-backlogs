@@ -2,6 +2,7 @@ package com.menkaix.backlogs.controllers;
 
 import com.menkaix.backlogs.entities.Actor;
 import com.menkaix.backlogs.entities.Feature;
+import com.menkaix.backlogs.entities.Project;
 import com.menkaix.backlogs.services.ActorService;
 import com.menkaix.backlogs.services.FeatureService;
 import com.menkaix.backlogs.services.FeatureTypeService;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/project-command")
@@ -36,6 +39,14 @@ public class ProjectCommandController {
     public String tree(@PathVariable("project") String projectRef){
 
         return projectService.tree(projectRef) ;
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Project>> getAll(){
+
+        List<Project> ans = projectService.getAll() ;
+
+        return new ResponseEntity<>(ans, HttpStatus.OK) ;
     }
 
     @PostMapping("/{project}/add-actor")
