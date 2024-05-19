@@ -9,7 +9,7 @@ import com.google.gson.GsonBuilder;
 import com.menkaix.backlogs.entities.Actor;
 import com.menkaix.backlogs.entities.Feature;
 import com.menkaix.backlogs.entities.Story;
-import com.menkaix.backlogs.models.UserStoryDTO;
+import com.menkaix.backlogs.models.*;
 import com.menkaix.backlogs.repositories.ActorRepisitory;
 import com.menkaix.backlogs.repositories.FeatureRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;
@@ -89,32 +89,64 @@ public class ProjectService {
 
 		Project p = findProject(projectRef) ;
 		if(p==null) {
-			return "the project where not found" ;
+			return "project not found" ;
 		}
 
-		String ans = p.name + ": " + p.id + "\n" ;
+		FullProjectDTO projectDTO = new FullProjectDTO() ;
+		projectDTO.id = p.id ;
+		projectDTO.name = p.name ;
+		projectDTO.description = p.description ;
+		projectDTO.clientName = p.clientName ;
+		projectDTO.creationDate = p.creationDate ;
+		projectDTO.code = p.code ;
 
 		List<Actor> actors = actorRepisitory.findByProjectName(p.name) ;
 		for(Actor a : actors){
 
-			ans += "\t"+a.name + ": " + a.id + "\n" ;
-
 			List<Story> stories = storyRepository.findByActorId(a.id) ;
+
+			FullActorDTO actorDTO = new FullActorDTO();
+			actorDTO.id = a.id ;
+			actorDTO.name = a.name ;
+			actorDTO.description = a.description ;
+			actorDTO.type = a.type ;
+
 			for(Story s : stories){
-				ans += "\t\t"+s.action + ": " + s.id + "\n" ;
+
+				FullStoryDTO storyDTO = new FullStoryDTO() ;
+
+				storyDTO.id = s.id ;
+				storyDTO.action = s.action ;
+				storyDTO.objective = s.objective ;
+				storyDTO.scenario = s.scenario ;
 
 				List<Feature> features = featureRepository.findByStoryId(s.id) ;
 				for(Feature f : features){
 
-					ans+="\t\t\t["+f.type+"] "+f.name+": "+f.id + "\n";
+					FullFeatureDTO fullFeatureDTO = new FullFeatureDTO() ;
+
+					fullFeatureDTO.id=f.id;
+					fullFeatureDTO.name =f.name;
+					fullFeatureDTO.description=f.description;
+					fullFeatureDTO.type=f.type;
+					fullFeatureDTO.parentID=f.parentID;
+
+					storyDTO.features.add(fullFeatureDTO);
 
 				}
 
+				actorDTO.stories.add(storyDTO) ;
+
 			}
-			ans += "\n" ;
+
+
+			projectDTO.actors.add(actorDTO) ;
+;
 		}
 
-		return ans ;
+		Gson gson = new GsonBuilder().setPrettyPrinting().create() ;
+
+		return gson.toJson(projectDTO) ;
     }
 
 	public String ingestStory(String project, String prompt) {
