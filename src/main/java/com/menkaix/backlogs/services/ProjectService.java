@@ -43,6 +43,12 @@ public class ProjectService {
 	@Autowired
 	GeminiService geminiService ;
 
+	public List<Project> getAll() {
+
+		return repo.findAll() ;
+
+	}
+
 	public void safeCreateProject(Project projectCanditate) throws DataConflictException, DataDefinitionException {
 		List<Project> prjs = null;
 		if (projectCanditate.name != null) {
@@ -231,4 +237,6 @@ public class ProjectService {
 
 		return String.format(str, description, prompt) ;
 	}
+
+
 }
