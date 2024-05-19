@@ -152,7 +152,7 @@ public class ProjectService {
 
 		Gson gson = new GsonBuilder()
 				.setPrettyPrinting()
-				.setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+				.setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 				.create() ;
 
 		return gson.toJson(projectDTO) ;
