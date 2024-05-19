@@ -35,7 +35,7 @@ public class ProjectCommandController {
     @Autowired
     private ProjectService projectService ;
 
-    @GetMapping({"/tree/{project}","/{project}/tree"})
+    @GetMapping({"/{project}/tree"})
     public String tree(@PathVariable("project") String projectRef){
 
         return projectService.tree(projectRef) ;
