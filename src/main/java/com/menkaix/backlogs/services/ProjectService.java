@@ -150,7 +150,10 @@ public class ProjectService {
 ;
 		}
 
-		Gson gson = new GsonBuilder().setPrettyPrinting().create() ;
+		Gson gson = new GsonBuilder()
+				.setPrettyPrinting()
+				.setDateFormat("yyyy-MM-dd'T'HH:mm:ssz")
+				.create() ;
 
 		return gson.toJson(projectDTO) ;
     }
