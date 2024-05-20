@@ -46,7 +46,6 @@ public class StoryService {
         if(a==null) return  null ;
         storyDTO.actorName = a.name ;
 
-
         List<Project> projects = projectRepisitory.findByName(a.projectName);
         if(projects.size()>0){
             storyDTO.projectCode = projects.get(0).code ;

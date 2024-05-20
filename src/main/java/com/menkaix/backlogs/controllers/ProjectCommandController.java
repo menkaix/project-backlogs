@@ -62,6 +62,19 @@ public class ProjectCommandController {
 
     }
 
+    @GetMapping("/{project}/list-actors")
+    public ResponseEntity<List<Actor>> listActor(@PathVariable("project")String project, @RequestBody Actor actor){
+
+        try {
+            List<Actor> ans = actorService.listActors(project);
+            return new ResponseEntity<>(ans, HttpStatus.CREATED) ;
+        } catch (EntityNotFoundException e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
+        }
+
+    }
+
 
 
 

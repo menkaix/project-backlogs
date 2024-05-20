@@ -57,4 +57,13 @@ public class ActorService {
 
         return null ;
     }
+
+    public List<Actor> listActors(String project) throws EntityNotFoundException {
+
+        Project prj = projectService.findProject(project) ;
+        if(prj == null) throw new EntityNotFoundException("no project found with reference "+project);
+
+        return actorRepisitory.findByProjectName(prj.name) ;
+
+    }
 }
