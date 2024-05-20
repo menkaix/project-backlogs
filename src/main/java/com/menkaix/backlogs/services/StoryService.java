@@ -13,6 +13,7 @@ import com.menkaix.backlogs.repositories.StoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -29,6 +30,9 @@ public class StoryService {
 
     @Autowired
     private FeatureRepository featureRepository ;
+
+    @Autowired
+    private  ProjectService projectService ;
 
     public FullStoryDTO storyTree(String storyID){
 
@@ -69,4 +73,32 @@ public class StoryService {
         return  storyDTO ;
     }
 
+    public FullStoryDTO updateStory(FullStoryDTO storyDTO) {
+
+        Story story = storyRepository.findById(storyDTO.id).orElse(new Story()) ;
+
+        Project project = projectService.findProject(storyDTO.projectCode);
+
+        if(project==null) return  null ;
+
+        List<Actor> actors = actorRepisitory.findByProjectName(project.name) ;
+
+        for (Actor actor:actors) {
+            if(actor.name.equalsIgnoreCase(storyDTO.actorName)){
+                story.actorId = actor.id;
+            }
+        }
+
+        story.objective = storyDTO.objective ;
+        story.action = storyDTO.action ;
+        story.scenario = storyDTO.scenario ;
+
+        story.lastUpdateDate = new Date() ;
+
+        storyRepository.save(story) ;
+
+        storyDTO.id = story.id ;
+
+        return  storyDTO ;
+    }
 }
