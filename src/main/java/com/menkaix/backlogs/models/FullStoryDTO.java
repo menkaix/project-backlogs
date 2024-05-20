@@ -7,7 +7,9 @@ public class FullStoryDTO {
 
     public String id;
 
-    public String actorId;
+    public String projectCode ;
+
+    public String actorName;
 
     public String action ;
 

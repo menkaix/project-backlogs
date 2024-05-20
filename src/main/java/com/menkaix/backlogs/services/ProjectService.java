@@ -122,6 +122,8 @@ public class ProjectService {
 				FullStoryDTO storyDTO = new FullStoryDTO() ;
 
 				storyDTO.id = s.id ;
+				storyDTO.projectCode = projectDTO.code ;
+				storyDTO.actorName = actorDTO.name ;
 				storyDTO.action = s.action ;
 				storyDTO.objective = s.objective ;
 				storyDTO.scenario = s.scenario ;
