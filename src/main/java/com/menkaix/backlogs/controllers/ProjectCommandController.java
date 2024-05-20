@@ -63,7 +63,7 @@ public class ProjectCommandController {
     }
 
     @GetMapping("/{project}/list-actors")
-    public ResponseEntity<List<Actor>> listActor(@PathVariable("project")String project, @RequestBody Actor actor){
+    public ResponseEntity<List<Actor>> listActor(@PathVariable("project")String project){
 
         try {
             List<Actor> ans = actorService.listActors(project);
