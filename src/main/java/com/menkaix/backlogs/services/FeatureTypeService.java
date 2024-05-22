@@ -111,6 +111,16 @@ public class FeatureTypeService {
         listType.usualTask.put("integration-element", "integration d'un élémement de la liste %s");
         listType.usualTask.put("dev", "dynamisation de la liste %s");
         repo.save(listType);
+        
+        FeatureType draggableType = new FeatureType();
+        draggableType.name = "draggable";
+        draggableType.usualTask.put("dev", "developpement du draggable sur %s");
+        repo.save(draggableType);
+        
+        FeatureType dropZoneType = new FeatureType();
+        dropZoneType.name = "dropzone";
+        dropZoneType.usualTask.put("dev", "developpement de la drop zone sur %s");
+        repo.save(dropZoneType);
 
     }
 
