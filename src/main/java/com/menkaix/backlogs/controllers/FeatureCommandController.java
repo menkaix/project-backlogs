@@ -37,7 +37,7 @@ public class FeatureCommandController {
 
         Feature ans = null;
         try {
-            ans = featureService.addToStory(story, feature);
+            ans = featureService.addFeatureToStory(story, feature);
             return new ResponseEntity<>(ans, HttpStatus.CREATED) ;
         } catch (EntityNotFoundException e) {
             logger.error(e.getMessage());

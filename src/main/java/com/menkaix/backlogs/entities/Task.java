@@ -21,4 +21,6 @@ public class Task  extends AbstractEntity {
 	
 	public Date doneDate ;
 
+	public String idReference;
+
 }

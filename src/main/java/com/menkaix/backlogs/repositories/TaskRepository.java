@@ -11,6 +11,8 @@ import com.menkaix.backlogs.entities.Task;
 public interface TaskRepository extends MongoRepository<Task, String>  {
 
     List<Task> findByProjectId(String project) ;
+
+	List<Task> findByIdReference(String id);
     
     //WTF ?
 

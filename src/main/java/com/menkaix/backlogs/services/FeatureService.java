@@ -26,7 +26,7 @@ public class FeatureService {
     @Autowired
     private StoryRepository storyRepository ;
 
-    public Feature addToStory(String storyId, Feature feature) throws EntityNotFoundException {
+    public Feature addFeatureToStory(String storyId, Feature feature) throws EntityNotFoundException {
 
         Story story = storyRepository.findById(storyId).get();
         

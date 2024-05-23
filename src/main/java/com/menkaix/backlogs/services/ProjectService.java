@@ -1,6 +1,7 @@
 package com.menkaix.backlogs.services;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -9,10 +10,13 @@ import com.google.gson.GsonBuilder;
 import com.menkaix.backlogs.entities.Actor;
 import com.menkaix.backlogs.entities.Feature;
 import com.menkaix.backlogs.entities.Story;
+import com.menkaix.backlogs.entities.Task;
 import com.menkaix.backlogs.models.*;
 import com.menkaix.backlogs.repositories.ActorRepisitory;
 import com.menkaix.backlogs.repositories.FeatureRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;
+import com.menkaix.backlogs.repositories.TaskRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +46,9 @@ public class ProjectService {
 	
 	@Autowired
 	GeminiService geminiService ;
+	
+	@Autowired
+	TaskRepository taskRepository ;
 
 	public List<Project> getAll() {
 
@@ -138,6 +145,27 @@ public class ProjectService {
 					fullFeatureDTO.description=f.description;
 					fullFeatureDTO.type=f.type;
 					fullFeatureDTO.parentID=f.parentID;
+					
+					List<Task> tasks = taskRepository.findByIdReference("feature/"+fullFeatureDTO.id) ;
+					
+					for (Task task : tasks) {
+						FullTaskDTO taskDTO = new FullTaskDTO() ;
+						
+						taskDTO.id=task.id;
+						taskDTO.projectId=task.projectId;
+						taskDTO.reference=task.reference;
+						taskDTO.title=task.title;
+						taskDTO.description=task.description;
+						taskDTO.dueDate=task.dueDate;
+						taskDTO.doneDate=task.doneDate;						
+						taskDTO.idReference=task.idReference;
+						
+						fullFeatureDTO.tasks.add(taskDTO);						
+						
+					}
+					
+					
+					
 
 					storyDTO.features.add(fullFeatureDTO);
 

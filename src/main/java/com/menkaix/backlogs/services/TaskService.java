@@ -29,6 +29,7 @@ public class TaskService {
 			for (String taskKey : featureType.usualTask.keySet()) {
 
 				Task task = new Task();
+				task.idReference = "feature/"+feature.id ;
 				task.reference = "feature/" + feature.id + "/" + taskKey;
 				task.title = String.format(featureType.usualTask.get(taskKey), feature.name);
 
