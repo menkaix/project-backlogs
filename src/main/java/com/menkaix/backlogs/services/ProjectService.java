@@ -160,6 +160,10 @@ public class ProjectService {
 						taskDTO.doneDate=task.doneDate;						
 						taskDTO.idReference=task.idReference;
 						
+						taskDTO.name=task.name;
+						taskDTO.creationDate= task.creationDate;
+						taskDTO.lastUpdateDate= task.lastUpdateDate;
+						
 						fullFeatureDTO.tasks.add(taskDTO);						
 						
 					}
