@@ -113,8 +113,6 @@ public class ProjectService {
 		projectDTO.creationDate = p.creationDate ;
 		projectDTO.code = p.code ;
 
-
-
 		List<Actor> actors = actorRepisitory.findByProjectName(p.name) ;
 		for(Actor a : actors){
 
@@ -168,12 +166,8 @@ public class ProjectService {
 						taskDTO.lastUpdateDate= task.lastUpdateDate;
 						
 						fullFeatureDTO.tasks.add(taskDTO);						
-						
 
 					}
-
-
-
 
 					storyDTO.features.add(fullFeatureDTO);
 

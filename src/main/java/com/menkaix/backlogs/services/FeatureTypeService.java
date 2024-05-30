@@ -132,6 +132,18 @@ public class FeatureTypeService {
         dropZoneType.usualTask.put("dev", "developpement de la drop zone sur %s");
         repo.save(dropZoneType);
 
+        FeatureType radioGroupType = new FeatureType();
+        radioGroupType.name = "radiogroup";
+        radioGroupType.usualTask.put("dev", "developpement de la radio group %s");
+        radioGroupType.usualTask.put("integration", "integration de la radio group %s");
+        repo.save(radioGroupType);
+
+        FeatureType optionGroupType = new FeatureType();
+        optionGroupType.name = "optiongroup";
+        optionGroupType.usualTask.put("dev", "developpement de la radio group %s");
+        optionGroupType.usualTask.put("integration", "integration de la radio group %s");
+        repo.save(optionGroupType);
+
     }
 
 
