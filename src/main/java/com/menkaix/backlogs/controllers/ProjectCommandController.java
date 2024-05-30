@@ -41,6 +41,14 @@ public class ProjectCommandController {
         return projectService.tree(projectRef) ;
     }
 
+
+    @GetMapping({"/{project}/csv"})
+    public String csv(@PathVariable("project") String projectRef){
+
+        return projectService.csv(projectRef) ;
+    }
+
+
     @GetMapping("/all")
     public ResponseEntity<List<Project>> getAll(){
 

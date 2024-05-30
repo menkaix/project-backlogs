@@ -98,11 +98,11 @@ public class ProjectService {
 
 	}
 
-    public String tree(String projectRef) {
+	private FullProjectDTO objectTree(String projectRef){
 
 		Project p = findProject(projectRef) ;
 		if(p==null) {
-			return "project not found" ;
+			return null ;
 		}
 
 		FullProjectDTO projectDTO = new FullProjectDTO() ;
@@ -112,6 +112,8 @@ public class ProjectService {
 		projectDTO.clientName = p.clientName ;
 		projectDTO.creationDate = p.creationDate ;
 		projectDTO.code = p.code ;
+
+
 
 		List<Actor> actors = actorRepisitory.findByProjectName(p.name) ;
 		for(Actor a : actors){
@@ -145,27 +147,27 @@ public class ProjectService {
 					fullFeatureDTO.description=f.description;
 					fullFeatureDTO.type=f.type;
 					fullFeatureDTO.parentID=f.parentID;
-					
+
 					List<Task> tasks = taskRepository.findByIdReference("feature/"+fullFeatureDTO.id) ;
-					
+
 					for (Task task : tasks) {
 						FullTaskDTO taskDTO = new FullTaskDTO() ;
-						
+
 						taskDTO.id=task.id;
 						taskDTO.projectId=task.projectId;
 						taskDTO.reference=task.reference;
 						taskDTO.title=task.title;
 						taskDTO.description=task.description;
 						taskDTO.dueDate=task.dueDate;
-						taskDTO.doneDate=task.doneDate;						
+						taskDTO.doneDate=task.doneDate;
 						taskDTO.idReference=task.idReference;
-						
-						fullFeatureDTO.tasks.add(taskDTO);						
-						
+
+						fullFeatureDTO.tasks.add(taskDTO);
+
 					}
-					
-					
-					
+
+
+
 
 					storyDTO.features.add(fullFeatureDTO);
 
@@ -177,15 +179,23 @@ public class ProjectService {
 
 
 			projectDTO.actors.add(actorDTO) ;
-;
+
 		}
+
+		return projectDTO ;
+	}
+
+    public String tree(String projectRef) {
+
+		FullProjectDTO tAns = objectTree(projectRef) ;
+
 
 		Gson gson = new GsonBuilder()
 				.setPrettyPrinting()
 				.setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 				.create() ;
 
-		return gson.toJson(projectDTO) ;
+		return gson.toJson(tAns) ;
     }
 
 	public String ingestStory(String project, String prompt) {
@@ -272,4 +282,62 @@ public class ProjectService {
 	}
 
 
+
+
+
+	public String csv(String projectRef) {
+
+		FullProjectDTO project = objectTree(projectRef);
+
+		String ans = "" ;
+
+		for (FullActorDTO actor: project.actors ) {
+			ans += actorToCsv(actor) + "\n";
+		}
+
+
+
+		return ans ;
+
+	}
+
+	private String actorToCsv(FullActorDTO actor) {
+
+		String ans = "" ;
+
+		if(actor.stories.size()>0){
+			for (FullStoryDTO story: actor.stories) {
+				String tStoryPart =  "\""+story.actorName + "\", \"" + story.action+"\", \""+story.scenario+"\"" ;
+
+				if(story.features.size()>0){
+
+					for (FullFeatureDTO feature:story.features) {
+
+						String featurePart = tStoryPart +", \"[" + feature.type+"] " + feature.name + "\"" ;
+
+						if(feature.tasks.size()>0){
+							for (FullTaskDTO task : feature.tasks) {
+								ans += featurePart + ", \""+task.title +"\"" + "\n" ;
+							}
+						}
+						else {
+							ans += featurePart + "\n" ;
+						}
+					}
+
+				}
+				else{
+					ans += tStoryPart + "\n";
+				}
+			}
+		}
+		else {
+			ans = "\""+actor.name+"\" \n" ;
+		}
+
+
+
+
+		return  ans ;
+	}
 }
