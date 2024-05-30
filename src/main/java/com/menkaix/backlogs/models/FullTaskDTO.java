@@ -19,5 +19,9 @@ public class FullTaskDTO {
 	public Date doneDate;
 	
 	public String idReference;
+	
+	public String name;
+	public Date creationDate ;
+	public Date lastUpdateDate ;
 
 }

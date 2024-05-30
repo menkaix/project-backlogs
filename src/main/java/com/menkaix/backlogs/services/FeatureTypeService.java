@@ -117,6 +117,16 @@ public class FeatureTypeService {
         draggableType.usualTask.put("dev", "developpement du draggable sur %s");
         repo.save(draggableType);
         
+        FeatureType cliquableType = new FeatureType();
+        cliquableType.name = "clickable";
+        cliquableType.usualTask.put("dev", "developpement l'action du cliquable sur %s");
+        repo.save(cliquableType);
+        
+        FeatureType hoverType = new FeatureType();
+        hoverType.name = "hover";
+        hoverType.usualTask.put("dev", "developpement l'action du hover sur %s");
+        repo.save(hoverType);
+        
         FeatureType dropZoneType = new FeatureType();
         dropZoneType.name = "dropzone";
         dropZoneType.usualTask.put("dev", "developpement de la drop zone sur %s");
