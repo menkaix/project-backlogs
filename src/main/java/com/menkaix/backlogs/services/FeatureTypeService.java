@@ -29,10 +29,8 @@ public class FeatureTypeService {
         buttonType.name = "button" ;
         buttonType.keyFeatures.add("text");
         buttonType.keyFeatures.add("action");
-        
         buttonType.usualTask.put("integration", "integration du bouton %s");
         buttonType.usualTask.put("action", "développement de l'action pour le bouton bouton %s");
-        
         repo.save(buttonType) ;
 
         FeatureType valueType = new FeatureType();
@@ -42,17 +40,13 @@ public class FeatureTypeService {
 
         FeatureType functionType = new FeatureType();
         functionType.name = "function";
-        
         functionType.usualTask.put("dev", "développement de la fonction %s");
-        
         repo.save(functionType) ;
 
         FeatureType screenType = new FeatureType();
         screenType.name = "screen";
         screenType.isContainer = true ;
-        
         screenType.usualTask.put("integration", "integration de l'écran %s");
-        
         repo.save(screenType) ;
 
         FeatureType formType = new FeatureType();
@@ -101,7 +95,7 @@ public class FeatureTypeService {
         repo.save(restClientType);
         
         FeatureType displayType = new FeatureType();
-        displayType.name = "dispaly";
+        displayType.name = "display";
         displayType.usualTask.put("integration", "integration de l'affichage %s");
         repo.save(displayType);
         
