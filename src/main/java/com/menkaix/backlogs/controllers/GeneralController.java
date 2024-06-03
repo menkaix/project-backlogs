@@ -1,5 +1,6 @@
 package com.menkaix.backlogs.controllers;
 
+import com.menkaix.backlogs.entities.Feature;
 import com.menkaix.backlogs.entities.FeatureType;
 import com.menkaix.backlogs.entities.Task;
 import com.menkaix.backlogs.repositories.FeatureRepository;
@@ -24,6 +25,9 @@ public class GeneralController {
     @Autowired
     private TaskRepository taskRepository ;
 
+    @Autowired
+    private FeatureRepository featureRepository ;
+
     @GetMapping("/featuretypes")
     public ResponseEntity<List<FeatureType>> getFeatureTypes(){
 
@@ -41,6 +45,7 @@ public class GeneralController {
     	for (Task task : tasks) {
 			if(task.reference != null && task.reference.split("/").length == 3) {
 				task.idReference = task.reference.split("/")[0]+task.reference.split("/")[1] ;
+
 				taskRepository.save(task) ;
 			}
 		}

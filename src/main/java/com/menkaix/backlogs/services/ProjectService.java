@@ -45,10 +45,10 @@ public class ProjectService {
 	private FeatureRepository featureRepository ;
 	
 	@Autowired
-	GeminiService geminiService ;
+	private GeminiService geminiService ;
 	
 	@Autowired
-	TaskRepository taskRepository ;
+	private TaskRepository taskRepository ;
 
 	public List<Project> getAll() {
 
@@ -296,6 +296,46 @@ public class ProjectService {
 		}
 
 
+
+		return ans ;
+
+	}
+
+	public String csvTasks(String projectRef) {
+
+		Project prj = findProject(projectRef) ;
+
+		List<Task> tasks = taskRepository.findByProjectId(prj.id) ;
+
+		String ans = "" ;
+
+		for (Task task: tasks) {
+			ans += task.title + ", \"" + task.description + "\"\n" ;
+		}
+
+		List<Actor> actors = actorRepisitory.findByProjectName(prj.name) ;
+
+		for (Actor actor: actors) {
+
+			List<Story> stories = storyRepository.findByActorId(actor.id);
+			for (Story story: stories) {
+
+				List<Feature> features = featureRepository.findByStoryId(story.id) ;
+
+				for (Feature feature: features) {
+					List<Task> tasksOfFeature = taskRepository.findByIdReference("feature/"+feature.id);
+
+					for (Task taskOfFeature: tasksOfFeature) {
+
+						ans += taskOfFeature.title + ", \"" + taskOfFeature.description + "\"\n" ;
+
+					}
+
+				}
+
+			}
+
+		}
 
 		return ans ;
 

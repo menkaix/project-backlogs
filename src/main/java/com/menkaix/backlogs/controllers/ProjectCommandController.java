@@ -48,6 +48,12 @@ public class ProjectCommandController {
         return projectService.csv(projectRef) ;
     }
 
+    @GetMapping({"/{project}/csv-tasks"})
+    public String csvTasks(@PathVariable("project") String projectRef){
+
+        return projectService.csvTasks(projectRef) ;
+    }
+
 
     @GetMapping("/all")
     public ResponseEntity<List<Project>> getAll(){
