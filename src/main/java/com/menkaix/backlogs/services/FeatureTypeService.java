@@ -138,6 +138,12 @@ public class FeatureTypeService {
         optionGroupType.usualTask.put("integration", "integration de la radio group %s");
         repo.save(optionGroupType);
 
+        FeatureType selectType = new FeatureType();
+        selectType.name = "select";
+        selectType.usualTask.put("dev", "dynamisation de la liste de sélection %s");
+        selectType.usualTask.put("integration", "integration du select %s");
+        repo.save(optionGroupType);
+
     }
 
 
