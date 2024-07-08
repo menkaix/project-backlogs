@@ -49,6 +49,10 @@ public class FeatureService {
         if(parent ==  null) throw new EntityNotFoundException("Feature not found with id "+parentId);
 
         feature.parentID = parent.id ;
+        
+        if(feature.storyId == null || feature.storyId.length()==0) {
+        	feature.storyId = parent.storyId ;
+        }
 
         return  featureRepository.save(feature) ;
     }
@@ -62,6 +66,10 @@ public class FeatureService {
         if(child ==  null) throw new EntityNotFoundException("Feature not found with id "+childId);
 
         child.parentID = parent.id ;
+        
+        if(child.storyId == null || child.storyId.length()==0) {
+        	child.storyId = parent.storyId ;
+        }
 
         return  featureRepository.save(child) ;
 
