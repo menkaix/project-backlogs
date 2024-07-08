@@ -40,16 +40,20 @@ public class ProjectService {
 	private ActorRepisitory actorRepisitory ;
 
 	@Autowired
+	private TaskRepository taskRepository ;
+
+	@Autowired
 	private StoryRepository storyRepository ;
 
 	@Autowired
 	private FeatureRepository featureRepository ;
 	
 	@Autowired
-	private GeminiService geminiService ;
+	private FeatureService featureService ;
 	
+	@Deprecated
 	@Autowired
-	private TaskRepository taskRepository ;
+	private GeminiService geminiService ;
 
 	private FullProjectDTO objectTree(String projectRef){
 	
@@ -146,23 +150,6 @@ public class ProjectService {
 		return actorRepisitory.save(actor) ;
 	}
 
-	@Deprecated
-	private String buildFullPrompt(String description, String prompt){
-	
-		String str = "Tu es un Business Analyst, et ton travail est de décrire les systèmes informatiques et les logiciels " +
-				"de façon à ce que ce soit compréhensible par des personnes qui n'on pas de base de programmation." +
-				"Voici la description du projet sur lequel tu travailles : %s\n" +
-				"Ecris un objet json contenant les proprietés suivantes : \n" +
-				"- 'actor' : qui représente celui qui parle,  \n" +
-				"- 'action' : décrit l'action qu'il voudrait faire  \n" +
-				"- 'objectif' (optionnel) : décrit son benefice attendu, sa motivation, ou alors une nouvelle possibilité d'action à postériori \n" +
-				"- 'scenario' (optionnel) : une paragraphe qui décrit les étapes exécutées par l'acteur pour réaliser l'opération.\n" +
-				"Utilise en entrée, apres l'avoir reformulée pour qu'elle soit compréhensible par des personnes qui n'ont pas de notion de programmation, " +
-				"la phrase suivante : %s." ;
-	
-		return String.format(str, description, prompt) ;
-	}
-
 	private String actorToCsv(FullActorDTO actor) {
 	
 		String ans = "" ;
@@ -201,6 +188,23 @@ public class ProjectService {
 	
 	
 		return  ans ;
+	}
+
+	@Deprecated
+	private String buildFullPrompt(String description, String prompt){
+	
+		String str = "Tu es un Business Analyst, et ton travail est de décrire les systèmes informatiques et les logiciels " +
+				"de façon à ce que ce soit compréhensible par des personnes qui n'on pas de base de programmation." +
+				"Voici la description du projet sur lequel tu travailles : %s\n" +
+				"Ecris un objet json contenant les proprietés suivantes : \n" +
+				"- 'actor' : qui représente celui qui parle,  \n" +
+				"- 'action' : décrit l'action qu'il voudrait faire  \n" +
+				"- 'objectif' (optionnel) : décrit son benefice attendu, sa motivation, ou alors une nouvelle possibilité d'action à postériori \n" +
+				"- 'scenario' (optionnel) : une paragraphe qui décrit les étapes exécutées par l'acteur pour réaliser l'opération.\n" +
+				"Utilise en entrée, apres l'avoir reformulée pour qu'elle soit compréhensible par des personnes qui n'ont pas de notion de programmation, " +
+				"la phrase suivante : %s." ;
+	
+		return String.format(str, description, prompt) ;
 	}
 
 	public List<Project> getAll() {
@@ -359,6 +363,10 @@ public class ProjectService {
 	public List<FeatureTreeDTO> featureTree(String projectRef){
 		
 		ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
+		
+		Project prj = findProject(projectRef) ;
+		
+		List<Feature> features = featureService.getFeatures(prj);
 		
 		
 		

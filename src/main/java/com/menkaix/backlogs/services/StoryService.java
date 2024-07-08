@@ -13,8 +13,10 @@ import com.menkaix.backlogs.repositories.StoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StoryService {
@@ -101,4 +103,22 @@ public class StoryService {
 
         return  storyDTO ;
     }
+
+	public Optional<Story> findById(String storyId) {
+		
+		return storyRepository.findById(storyId);
+	}
+
+	public List<Story> findByProject(Project prj) {
+		
+		ArrayList<Story> ans = new ArrayList<>() ;
+		
+		List<Actor> actors = actorRepisitory.findByProjectName(prj.name);
+		
+		for (Actor actor : actors) {
+			ans.addAll(storyRepository.findByActorId(actor.id));
+		}
+		
+		return ans;
+	}
 }
