@@ -142,7 +142,7 @@ public class FeatureTypeService {
         selectType.name = "select";
         selectType.usualTask.put("dev", "dynamisation de la liste de sélection %s");
         selectType.usualTask.put("integration", "integration du select %s");
-        repo.save(optionGroupType);
+        repo.save(selectType);
 
     }
 
