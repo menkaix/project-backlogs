@@ -1,6 +1,7 @@
 package com.menkaix.backlogs.services;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -145,6 +146,7 @@ public class ProjectService {
 		return actorRepisitory.save(actor) ;
 	}
 
+	@Deprecated
 	private String buildFullPrompt(String description, String prompt){
 	
 		String str = "Tu es un Business Analyst, et ton travail est de décrire les systèmes informatiques et les logiciels " +
@@ -351,6 +353,21 @@ public class ProjectService {
 		return ans ;
 
 	}
+	
+	
+	
+	public List<FeatureTreeDTO> featureTree(String projectRef){
+		
+		ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
+		
+		
+		
+		return ans ;
+	}
+	
+	
+	
+	
 
 	@Deprecated
 	public String ingestStory(String project, String prompt) {

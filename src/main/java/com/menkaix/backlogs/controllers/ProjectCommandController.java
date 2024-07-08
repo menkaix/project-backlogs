@@ -3,6 +3,7 @@ package com.menkaix.backlogs.controllers;
 import com.menkaix.backlogs.entities.Actor;
 import com.menkaix.backlogs.entities.Feature;
 import com.menkaix.backlogs.entities.Project;
+import com.menkaix.backlogs.models.FeatureTreeDTO;
 import com.menkaix.backlogs.services.ActorService;
 import com.menkaix.backlogs.services.FeatureService;
 import com.menkaix.backlogs.services.FeatureTypeService;
@@ -39,6 +40,14 @@ public class ProjectCommandController {
     public String tree(@PathVariable("project") String projectRef){
 
         return projectService.tree(projectRef) ;
+    }
+    
+    @GetMapping({"/{project}/feature-tree"})
+    public ResponseEntity<List<FeatureTreeDTO>> featureTree(@PathVariable("project") String projectRef){
+
+        List<FeatureTreeDTO> ans =  projectService.featureTree(projectRef) ;
+        
+        return new ResponseEntity<List<FeatureTreeDTO>>(ans, HttpStatus.OK);
     }
 
 
