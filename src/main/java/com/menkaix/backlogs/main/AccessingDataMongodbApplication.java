@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 @ComponentScan(basePackages = {
 		"com.menkaix.backlogs.services",
-		"com.menkaix.backlogs.controllers"
+		"com.menkaix.backlogs.controllers",
+		"com.menkaix.backlogs.services.applicatif"
 })
 @EnableMongoRepositories("com.menkaix.backlogs.repositories")
 @CrossOrigin

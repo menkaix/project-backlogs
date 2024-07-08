@@ -5,17 +5,19 @@ import com.menkaix.backlogs.entities.Project;
 import com.menkaix.backlogs.entities.Story;
 import com.menkaix.backlogs.repositories.ActorRepisitory;
 import com.menkaix.backlogs.repositories.StoryRepository;
+import com.menkaix.backlogs.services.applicatif.DataAccessService;
 import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 
 @Service
 public class ActorService {
 
     @Autowired
-    ProjectService projectService ;
+    DataAccessService projectService ;
 
     @Autowired
     ActorRepisitory actorRepisitory ;

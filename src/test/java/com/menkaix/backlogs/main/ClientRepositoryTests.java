@@ -18,6 +18,7 @@ package com.menkaix.backlogs.main;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import com.menkaix.backlogs.services.applicatif.DataAccessService;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ public class ClientRepositoryTests {
 	ProjectRepisitory projectRepisitory;
 
 	@Autowired
-	ProjectService service;
+	DataAccessService service;
 
 	@BeforeEach
 	public void configureTest() {

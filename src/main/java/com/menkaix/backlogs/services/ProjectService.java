@@ -18,6 +18,7 @@ import com.menkaix.backlogs.repositories.FeatureRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;
 import com.menkaix.backlogs.repositories.TaskRepository;
 
+import com.menkaix.backlogs.services.applicatif.DataAccessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +56,13 @@ public class ProjectService {
 	@Autowired
 	private GeminiService geminiService ;
 
+
+	@Autowired
+	private DataAccessService accessService ;
+
 	private FullProjectDTO objectTree(String projectRef){
 	
-		Project p = findProject(projectRef) ;
+		Project p = accessService.findProject(projectRef) ;
 		if(p==null) {
 			return null ;
 		}
@@ -231,29 +236,7 @@ public class ProjectService {
 		}
 	}
 
-	//finds a project by name, code, or id
-	public Project findProject(String in) {
 
-		List<Project> prjs = repo.findByName(in);
-		if (prjs.size() > 0) {
-			return prjs.get(0);
-		} else {
-			prjs = repo.findByCode(in);
-			if (prjs.size() > 0) {
-				return prjs.get(0);
-			} else {
-				try {
-					Project p = repo.findById(in).get();
-					return p ;
-				} catch (NoSuchElementException e) {
-					logger.warn("no project found with " + in);
-					return null;
-				}
-
-			}
-		}
-
-	}
 
 	public String tree(String projectRef) {
 
@@ -320,7 +303,7 @@ public class ProjectService {
 
 	public String csvTasks(String projectRef) {
 
-		Project prj = findProject(projectRef) ;
+		Project prj = accessService.findProject(projectRef) ;
 
 		List<Task> tasks = taskRepository.findByProjectId(prj.id) ;
 
@@ -364,23 +347,99 @@ public class ProjectService {
 		
 		ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
 		
-		Project prj = findProject(projectRef) ;
+		Project prj = accessService.findProject(projectRef) ;
 		
 		List<Feature> features = featureService.getFeatures(prj);
-		
+
+		List<Feature> roots = new ArrayList<>() ;
+
+		for (Feature feature:features) {
+
+			if(feature.parentID == null || feature.parentID.length()==0){
+				roots.add(feature) ;
+			}
+
+		}
+
+		for (Feature feature: roots) {
+
+			FeatureTreeDTO dto = new FeatureTreeDTO() ;
+
+			dto.id = feature.id;
+			dto.name = feature.name;
+			dto.description = feature.description;
+			dto.type = feature.type;
+			dto.parentID = feature.parentID ;
+
+			ans.add(dto) ;
+		}
+
+		features.removeAll(roots) ;
+
+		int watchDog = 5 ;
+
+		while (features.size()>0){
+
+			List<Feature> toDel = new ArrayList<>() ;
+
+			for (Feature feature: features) {
+				if(isFitting(feature, ans)){
+					toDel.add(feature);
+				}
+			}
+
+			features.removeAll(toDel) ;
+
+			if(toDel.size()==0){
+				watchDog-- ;
+			}
+
+			if(watchDog<=0){
+				logger.warn("watchDog break");
+				break;
+			}
+
+		}
 		
 		
 		return ans ;
 	}
 	
-	
+	private boolean isFitting(Feature feature, List<FeatureTreeDTO> tree){
+
+		for (FeatureTreeDTO currentDto :tree ) {
+
+			if(currentDto.id.equals(feature.parentID)){
+				FeatureTreeDTO dto = new FeatureTreeDTO() ;
+
+				dto.id = feature.id;
+				dto.name = feature.name;
+				dto.description = feature.description;
+				dto.type = feature.type;
+				dto.parentID = feature.parentID ;
+
+				currentDto.children.add(dto) ;
+
+				return true ;
+
+			}
+			else{
+				if(currentDto.children.size()>0){
+					return  isFitting(feature,currentDto.children ) ;
+				}
+			}
+
+		}
+
+		return false ;
+	}
 	
 	
 
 	@Deprecated
 	public String ingestStory(String project, String prompt) {
 	
-		Project prj = findProject(project) ;
+		Project prj = accessService.findProject(project) ;
 	
 		if(prj==null){
 			return  null ;

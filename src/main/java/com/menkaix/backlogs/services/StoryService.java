@@ -10,6 +10,7 @@ import com.menkaix.backlogs.repositories.ActorRepisitory;
 import com.menkaix.backlogs.repositories.FeatureRepository;
 import com.menkaix.backlogs.repositories.ProjectRepisitory;
 import com.menkaix.backlogs.repositories.StoryRepository;
+import com.menkaix.backlogs.services.applicatif.DataAccessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,13 +29,13 @@ public class StoryService {
     private ActorRepisitory actorRepisitory ;
 
     @Autowired
-    private ProjectRepisitory projectRepisitory ;
+    private DataAccessService projectRepisitory ;
 
     @Autowired
     private FeatureRepository featureRepository ;
 
     @Autowired
-    private  ProjectService projectService ;
+    private  DataAccessService projectService ;
 
     public FullStoryDTO storyTree(String storyID){
 
@@ -52,7 +53,7 @@ public class StoryService {
         if(a==null) return  null ;
         storyDTO.actorName = a.name ;
 
-        List<Project> projects = projectRepisitory.findByName(a.projectName);
+        List<Project> projects = projectRepisitory.findProjectByName(a.projectName);
         if(projects.size()>0){
             storyDTO.projectCode = projects.get(0).code ;
         }
