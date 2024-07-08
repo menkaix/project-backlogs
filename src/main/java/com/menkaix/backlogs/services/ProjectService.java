@@ -1,6 +1,7 @@
 package com.menkaix.backlogs.services;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -39,16 +40,172 @@ public class ProjectService {
 	private ActorRepisitory actorRepisitory ;
 
 	@Autowired
+	private TaskRepository taskRepository ;
+
+	@Autowired
 	private StoryRepository storyRepository ;
 
 	@Autowired
 	private FeatureRepository featureRepository ;
 	
 	@Autowired
-	private GeminiService geminiService ;
+	private FeatureService featureService ;
 	
+	@Deprecated
 	@Autowired
-	private TaskRepository taskRepository ;
+	private GeminiService geminiService ;
+
+	private FullProjectDTO objectTree(String projectRef){
+	
+		Project p = findProject(projectRef) ;
+		if(p==null) {
+			return null ;
+		}
+	
+		FullProjectDTO projectDTO = new FullProjectDTO() ;
+		projectDTO.id = p.id ;
+		projectDTO.name = p.name ;
+		projectDTO.description = p.description ;
+		projectDTO.clientName = p.clientName ;
+		projectDTO.creationDate = p.creationDate ;
+		projectDTO.code = p.code ;
+	
+		List<Actor> actors = actorRepisitory.findByProjectName(p.name) ;
+		for(Actor a : actors){
+	
+			List<Story> stories = storyRepository.findByActorId(a.id) ;
+	
+			FullActorDTO actorDTO = new FullActorDTO();
+			actorDTO.id = a.id ;
+			actorDTO.name = a.name ;
+			actorDTO.description = a.description ;
+			actorDTO.type = a.type ;
+	
+			for(Story s : stories){
+	
+				FullStoryDTO storyDTO = new FullStoryDTO() ;
+	
+				storyDTO.id = s.id ;
+				storyDTO.projectCode = projectDTO.code ;
+				storyDTO.actorName = actorDTO.name ;
+				storyDTO.action = s.action ;
+				storyDTO.objective = s.objective ;
+				storyDTO.scenario = s.scenario ;
+	
+				List<Feature> features = featureRepository.findByStoryId(s.id) ;
+				for(Feature f : features){
+	
+					FullFeatureDTO fullFeatureDTO = new FullFeatureDTO() ;
+	
+					fullFeatureDTO.id=f.id;
+					fullFeatureDTO.name =f.name;
+					fullFeatureDTO.description=f.description;
+					fullFeatureDTO.type=f.type;
+					fullFeatureDTO.parentID=f.parentID;
+	
+					List<Task> tasks = taskRepository.findByIdReference("feature/"+fullFeatureDTO.id) ;
+	
+					for (Task task : tasks) {
+						FullTaskDTO taskDTO = new FullTaskDTO() ;
+	
+						taskDTO.id=task.id;
+						taskDTO.projectId=task.projectId;
+						taskDTO.reference=task.reference;
+						taskDTO.title=task.title;
+						taskDTO.description=task.description;
+						taskDTO.dueDate=task.dueDate;
+						taskDTO.doneDate=task.doneDate;
+						taskDTO.idReference=task.idReference;
+	
+						
+						taskDTO.name=task.name;
+						taskDTO.creationDate= task.creationDate;
+						taskDTO.lastUpdateDate= task.lastUpdateDate;
+						
+						fullFeatureDTO.tasks.add(taskDTO);						
+	
+					}
+	
+					storyDTO.features.add(fullFeatureDTO);
+	
+				}
+	
+				actorDTO.stories.add(storyDTO) ;
+	
+			}
+	
+	
+			projectDTO.actors.add(actorDTO) ;
+	
+		}
+	
+		return projectDTO ;
+	}
+
+	private Actor createActor(Project p, String actorName){
+		Actor actor = new Actor() ;
+		actor.projectName = p.name ;
+		actor.name = actorName.toLowerCase() ;
+	
+		return actorRepisitory.save(actor) ;
+	}
+
+	private String actorToCsv(FullActorDTO actor) {
+	
+		String ans = "" ;
+	
+		if(actor.stories.size()>0){
+			for (FullStoryDTO story: actor.stories) {
+				String tStoryPart =  "\""+story.actorName + "\", \"" + story.action+"\", \""+story.scenario+"\"" ;
+	
+				if(story.features.size()>0){
+	
+					for (FullFeatureDTO feature:story.features) {
+	
+						String featurePart = tStoryPart +", \"[" + feature.type+"] " + feature.name + "\"" ;
+	
+						if(feature.tasks.size()>0){
+							for (FullTaskDTO task : feature.tasks) {
+								ans += featurePart + ", \""+task.title +"\"" + "\n" ;
+							}
+						}
+						else {
+							ans += featurePart + "\n" ;
+						}
+					}
+	
+				}
+				else{
+					ans += tStoryPart + "\n";
+				}
+			}
+		}
+		else {
+			ans = "\""+actor.name+"\" \n" ;
+		}
+	
+	
+	
+	
+		return  ans ;
+	}
+
+	@Deprecated
+	private String buildFullPrompt(String description, String prompt){
+	
+		String str = "Tu es un Business Analyst, et ton travail est de décrire les systèmes informatiques et les logiciels " +
+				"de façon à ce que ce soit compréhensible par des personnes qui n'on pas de base de programmation." +
+				"Voici la description du projet sur lequel tu travailles : %s\n" +
+				"Ecris un objet json contenant les proprietés suivantes : \n" +
+				"- 'actor' : qui représente celui qui parle,  \n" +
+				"- 'action' : décrit l'action qu'il voudrait faire  \n" +
+				"- 'objectif' (optionnel) : décrit son benefice attendu, sa motivation, ou alors une nouvelle possibilité d'action à postériori \n" +
+				"- 'scenario' (optionnel) : une paragraphe qui décrit les étapes exécutées par l'acteur pour réaliser l'opération.\n" +
+				"Utilise en entrée, apres l'avoir reformulée pour qu'elle soit compréhensible par des personnes qui n'ont pas de notion de programmation, " +
+				"la phrase suivante : %s." ;
+	
+		return String.format(str, description, prompt) ;
+	}
 
 	public List<Project> getAll() {
 
@@ -98,94 +255,7 @@ public class ProjectService {
 
 	}
 
-	private FullProjectDTO objectTree(String projectRef){
-
-		Project p = findProject(projectRef) ;
-		if(p==null) {
-			return null ;
-		}
-
-		FullProjectDTO projectDTO = new FullProjectDTO() ;
-		projectDTO.id = p.id ;
-		projectDTO.name = p.name ;
-		projectDTO.description = p.description ;
-		projectDTO.clientName = p.clientName ;
-		projectDTO.creationDate = p.creationDate ;
-		projectDTO.code = p.code ;
-
-		List<Actor> actors = actorRepisitory.findByProjectName(p.name) ;
-		for(Actor a : actors){
-
-			List<Story> stories = storyRepository.findByActorId(a.id) ;
-
-			FullActorDTO actorDTO = new FullActorDTO();
-			actorDTO.id = a.id ;
-			actorDTO.name = a.name ;
-			actorDTO.description = a.description ;
-			actorDTO.type = a.type ;
-
-			for(Story s : stories){
-
-				FullStoryDTO storyDTO = new FullStoryDTO() ;
-
-				storyDTO.id = s.id ;
-				storyDTO.projectCode = projectDTO.code ;
-				storyDTO.actorName = actorDTO.name ;
-				storyDTO.action = s.action ;
-				storyDTO.objective = s.objective ;
-				storyDTO.scenario = s.scenario ;
-
-				List<Feature> features = featureRepository.findByStoryId(s.id) ;
-				for(Feature f : features){
-
-					FullFeatureDTO fullFeatureDTO = new FullFeatureDTO() ;
-
-					fullFeatureDTO.id=f.id;
-					fullFeatureDTO.name =f.name;
-					fullFeatureDTO.description=f.description;
-					fullFeatureDTO.type=f.type;
-					fullFeatureDTO.parentID=f.parentID;
-
-					List<Task> tasks = taskRepository.findByIdReference("feature/"+fullFeatureDTO.id) ;
-
-					for (Task task : tasks) {
-						FullTaskDTO taskDTO = new FullTaskDTO() ;
-
-						taskDTO.id=task.id;
-						taskDTO.projectId=task.projectId;
-						taskDTO.reference=task.reference;
-						taskDTO.title=task.title;
-						taskDTO.description=task.description;
-						taskDTO.dueDate=task.dueDate;
-						taskDTO.doneDate=task.doneDate;
-						taskDTO.idReference=task.idReference;
-
-						
-						taskDTO.name=task.name;
-						taskDTO.creationDate= task.creationDate;
-						taskDTO.lastUpdateDate= task.lastUpdateDate;
-						
-						fullFeatureDTO.tasks.add(taskDTO);						
-
-					}
-
-					storyDTO.features.add(fullFeatureDTO);
-
-				}
-
-				actorDTO.stories.add(storyDTO) ;
-
-			}
-
-
-			projectDTO.actors.add(actorDTO) ;
-
-		}
-
-		return projectDTO ;
-	}
-
-    public String tree(String projectRef) {
+	public String tree(String projectRef) {
 
 		FullProjectDTO tAns = objectTree(projectRef) ;
 
@@ -198,32 +268,7 @@ public class ProjectService {
 		return gson.toJson(tAns) ;
     }
 
-	public String ingestStory(String project, String prompt) {
-
-		Project prj = findProject(project) ;
-
-		if(prj==null){
-			return  null ;
-		}
-
-		String str = buildFullPrompt(prj.description, prompt) ;
-
-		try {
-			String json = geminiService.predictFunction(str);
-
-			Gson gson = new GsonBuilder().setPrettyPrinting().create() ;
-
-			UserStoryDTO storyDTO = gson.fromJson(json,UserStoryDTO.class) ;
-
-			return  createStory(prj, storyDTO) ;
-
-		} catch (IOException e) {
-			logger.error(e.getMessage());
-			return e.getMessage() ;
-		}
-	}
-
-	public String createStory(Project project, UserStoryDTO storyDTO){
+    public String createStory(Project project, UserStoryDTO storyDTO){
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create() ;
 
@@ -256,34 +301,6 @@ public class ProjectService {
 
 		return gson.toJson(ans) ;
 	}
-
-	private Actor createActor(Project p, String actorName){
-		Actor actor = new Actor() ;
-		actor.projectName = p.name ;
-		actor.name = actorName.toLowerCase() ;
-
-		return actorRepisitory.save(actor) ;
-	}
-
-	private String buildFullPrompt(String description, String prompt){
-
-		String str = "Tu es un Business Analyst, et ton travail est de décrire les systèmes informatiques et les logiciels " +
-				"de façon à ce que ce soit compréhensible par des personnes qui n'on pas de base de programmation." +
-				"Voici la description du projet sur lequel tu travailles : %s\n" +
-				"Ecris un objet json contenant les proprietés suivantes : \n" +
-				"- 'actor' : qui représente celui qui parle,  \n" +
-				"- 'action' : décrit l'action qu'il voudrait faire  \n" +
-				"- 'objectif' (optionnel) : décrit son benefice attendu, sa motivation, ou alors une nouvelle possibilité d'action à postériori \n" +
-				"- 'scenario' (optionnel) : une paragraphe qui décrit les étapes exécutées par l'acteur pour réaliser l'opération.\n" +
-				"Utilise en entrée, apres l'avoir reformulée pour qu'elle soit compréhensible par des personnes qui n'ont pas de notion de programmation, " +
-				"la phrase suivante : %s." ;
-
-		return String.format(str, description, prompt) ;
-	}
-
-
-
-
 
 	public String csv(String projectRef) {
 
@@ -340,44 +357,49 @@ public class ProjectService {
 		return ans ;
 
 	}
+	
+	
+	
+	public List<FeatureTreeDTO> featureTree(String projectRef){
+		
+		ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
+		
+		Project prj = findProject(projectRef) ;
+		
+		List<Feature> features = featureService.getFeatures(prj);
+		
+		
+		
+		return ans ;
+	}
+	
+	
+	
+	
 
-	private String actorToCsv(FullActorDTO actor) {
-
-		String ans = "" ;
-
-		if(actor.stories.size()>0){
-			for (FullStoryDTO story: actor.stories) {
-				String tStoryPart =  "\""+story.actorName + "\", \"" + story.action+"\", \""+story.scenario+"\"" ;
-
-				if(story.features.size()>0){
-
-					for (FullFeatureDTO feature:story.features) {
-
-						String featurePart = tStoryPart +", \"[" + feature.type+"] " + feature.name + "\"" ;
-
-						if(feature.tasks.size()>0){
-							for (FullTaskDTO task : feature.tasks) {
-								ans += featurePart + ", \""+task.title +"\"" + "\n" ;
-							}
-						}
-						else {
-							ans += featurePart + "\n" ;
-						}
-					}
-
-				}
-				else{
-					ans += tStoryPart + "\n";
-				}
-			}
+	@Deprecated
+	public String ingestStory(String project, String prompt) {
+	
+		Project prj = findProject(project) ;
+	
+		if(prj==null){
+			return  null ;
 		}
-		else {
-			ans = "\""+actor.name+"\" \n" ;
+	
+		String str = buildFullPrompt(prj.description, prompt) ;
+	
+		try {
+			String json = geminiService.predictFunction(str);
+	
+			Gson gson = new GsonBuilder().setPrettyPrinting().create() ;
+	
+			UserStoryDTO storyDTO = gson.fromJson(json,UserStoryDTO.class) ;
+	
+			return  createStory(prj, storyDTO) ;
+	
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			return e.getMessage() ;
 		}
-
-
-
-
-		return  ans ;
 	}
 }

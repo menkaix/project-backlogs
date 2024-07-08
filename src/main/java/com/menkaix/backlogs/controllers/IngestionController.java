@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.menkaix.backlogs.services.ProjectService;
 
+@Deprecated
 @Controller
 public class IngestionController {
 
