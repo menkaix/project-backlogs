@@ -350,88 +350,32 @@ public class ProjectService {
 		Project prj = accessService.findProject(projectRef) ;
 		
 		List<Feature> features = featureService.getFeatures(prj);
+		
+		List<FeatureTreeDTO> allDtos = new ArrayList<FeatureTreeDTO>();
 
-		List<Feature> roots = new ArrayList<>() ;
-
-		for (Feature feature:features) {
-
-			if(feature.parentID == null || feature.parentID.length()==0){
-				roots.add(feature) ;
-			}
-
-		}
-
-		for (Feature feature: roots) {
-
-			FeatureTreeDTO dto = new FeatureTreeDTO() ;
-
-			dto.id = feature.id;
-			dto.name = feature.name;
-			dto.description = feature.description;
-			dto.type = feature.type;
-			dto.parentID = feature.parentID ;
-
-			ans.add(dto) ;
-		}
-
-		features.removeAll(roots) ;
-
-		int watchDog = 5 ;
-
-		while (features.size()>0){
-
-			List<Feature> toDel = new ArrayList<>() ;
-
-			for (Feature feature: features) {
-				if(isFitting(feature, ans)){
-					toDel.add(feature);
-				}
-			}
-
-			features.removeAll(toDel) ;
-
-			if(toDel.size()==0){
-				watchDog-- ;
-			}
-
-			if(watchDog<=0){
-				logger.warn("watchDog break");
-				break;
-			}
-
+		for (Feature feature : features) {
+			
+			FeatureTreeDTO tmpDTO = new FeatureTreeDTO() ;
+			
+			tmpDTO.id= feature.id;
+			tmpDTO.name= feature.name;
+			tmpDTO.description=feature.description;
+			tmpDTO.parentID= feature.parentID;
+			tmpDTO.type= feature.type;
+			
+			allDtos.add(tmpDTO);
 		}
 		
-		
-		return ans ;
+		return order(allDtos) ;
 	}
 	
-	private boolean isFitting(Feature feature, List<FeatureTreeDTO> tree){
-
-		for (FeatureTreeDTO currentDto :tree ) {
-
-			if(currentDto.id.equals(feature.parentID)){
-				FeatureTreeDTO dto = new FeatureTreeDTO() ;
-
-				dto.id = feature.id;
-				dto.name = feature.name;
-				dto.description = feature.description;
-				dto.type = feature.type;
-				dto.parentID = feature.parentID ;
-
-				currentDto.children.add(dto) ;
-
-				return true ;
-
-			}
-			else{
-				if(currentDto.children.size()>0){
-					return  isFitting(feature,currentDto.children ) ;
-				}
-			}
-
-		}
-
-		return false ;
+	private List<FeatureTreeDTO> order(List<FeatureTreeDTO> in){
+		
+		ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
+		
+	
+		return ans ;
+	
 	}
 	
 	
