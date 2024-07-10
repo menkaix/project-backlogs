@@ -367,25 +367,42 @@ public class ProjectService {
 			tmpDTO.type= feature.type;
 			
 			allDtos.add(tmpDTO);
-			
-			//insert(ans, tmpDTO);
+
 		}
 
+		logger.info("all dto found "+allDtos.size());
+
 		for(int i = 0 ; i< allDtos.size() ; i++){
-			for(int j = allDtos.size()-1 ; j>i ; j--){
-				if(allDtos.get(i).parentID != null &&  allDtos.get(i).parentID.equals(allDtos.get(j).id)){
-					allDtos.get(j).children.add(allDtos.get(i));
+
+			FeatureTreeDTO prospectiveChild = allDtos.get(i);
+
+			if(prospectiveChild.parentID != null && prospectiveChild.parentID.length()>0){
+
+				for(int j = allDtos.size()-1 ; j>=0 ; j--){
+
+					FeatureTreeDTO prospectiveParent = allDtos.get(j);
+
+					if(prospectiveChild.parentID.equalsIgnoreCase(prospectiveParent.id)){
+						logger.info("adoption "+i+"/"+j);
+						prospectiveParent.children.add(prospectiveChild);
+
+					}
+					else{
+						logger.info("mismatch "+i+"/"+j);
+						//logger.info("mismatch");
+					}
+
+
 				}
 			}
-		}
-		for(int i = 0 ; i< allDtos.size() ; i++){
-			if(allDtos.get(i).parentID==null || allDtos.get(i).parentID.length()==0){
+			else {
+				logger.info("independant "+i);
 				ans.add(allDtos.get(i)) ;
 			}
 		}
 
+		//return allDtos ;
 		return ans ;
-		//return ans ;
 	}
 	
 	@Deprecated
