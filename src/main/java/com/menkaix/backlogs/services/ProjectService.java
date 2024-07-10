@@ -195,6 +195,51 @@ public class ProjectService {
 		return  ans ;
 	}
 
+	private List<FeatureTreeDTO> order(List<FeatureTreeDTO> in){
+		
+		ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
+		
+		int watchdog = 5 ;
+		int psize = in.size() ;
+		
+		while(in.size()>0) {
+			
+			for(int i = 0 ; i<in.size() ; i++) {
+				
+				if(in.get(i).parentID == null || in.get(i).parentID.length()==0) {
+					ans.add(in.get(i));
+					in.remove(i);
+					break ;
+				}else {
+					for (FeatureTreeDTO featureTreeDTO : ans) {
+						if(featureTreeDTO.id.equals(in.get(i).parentID)) {
+							featureTreeDTO.children.add(in.get(i));
+							in.remove(i);
+							break ;
+						}
+					}
+				}
+				
+			}
+			
+			if(psize == in.size()) {
+				watchdog-- ;
+			}
+			
+			psize = in.size() ;
+			
+			if(watchdog<=0) {
+				break ;
+			}
+			
+		}
+		
+		
+	
+		return ans ;
+	
+	}
+
 	@Deprecated
 	private String buildFullPrompt(String description, String prompt){
 	
@@ -369,39 +414,6 @@ public class ProjectService {
 		return order(allDtos) ;
 	}
 	
-	private List<FeatureTreeDTO> order(List<FeatureTreeDTO> in){
-		
-		ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
-		
-		while(in.size()>0) {
-			
-			for(int i = 0 ; i<in.size() ; i++) {
-				
-				if(in.get(i).parentID == null || in.get(i).parentID.length()==0) {
-					ans.add(in.get(i));
-					in.remove(i);
-					break ;
-				}else {
-					for (FeatureTreeDTO featureTreeDTO : ans) {
-						if(featureTreeDTO.id.equals(in.get(i).parentID)) {
-							ans.add(in.get(i));
-							in.remove(i);
-							break ;
-						}
-					}
-				}
-				
-			}
-			
-		}
-		
-	
-		return ans ;
-	
-	}
-	
-	
-
 	@Deprecated
 	public String ingestStory(String project, String prompt) {
 	
