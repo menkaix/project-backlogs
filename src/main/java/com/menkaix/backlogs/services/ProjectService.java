@@ -195,62 +195,7 @@ public class ProjectService {
 		return  ans ;
 	}
 	
-	
-	private boolean insert (List<FeatureTreeDTO> in, FeatureTreeDTO candidate){
-		//ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
-		
-		if(candidate.parentID == null || candidate.parentID.length()==0) {
-			in.add(candidate);
-		}
-		else {
-			for (FeatureTreeDTO featureTreeDTO : in) {
-				if(featureTreeDTO.id == candidate.parentID) {
-					featureTreeDTO.children.add(candidate);
-					return true ;
-				}else {					
-					if (insert(featureTreeDTO.children, candidate)) {
-						return true ;
-					}
-				}
-			}
-			
-		}
-		
-		return false ;
-	}
 
-	private List<FeatureTreeDTO> order(List<FeatureTreeDTO> in){
-		
-		ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
-		
-		int watchdog = 16 ;
-		int psize = in.size() ;
-		
-		while(in.size()>0) {
-			
-			for(int i =0 ; i< in.size() ; i++) {
-				if(insert(ans, in.get(i))) {
-					in.remove(i);
-					break ;
-				}
-			}
-			
-			if(psize == in.size()) {
-				watchdog-- ;
-			}
-			
-			
-			if(watchdog<=0) {
-				logger.error("watchdog break");
-				break ;
-			}
-			
-			psize = in.size() ;
-		}
-		
-		return ans ;
-	
-	}
 
 	@Deprecated
 	private String buildFullPrompt(String description, String prompt){
@@ -417,15 +362,35 @@ public class ProjectService {
 			tmpDTO.id= feature.id;
 			tmpDTO.name= feature.name;
 			tmpDTO.description=feature.description;
-			tmpDTO.parentID= feature.parentID;
+
+			if(feature.parentID != null){
+				Feature parentCandidate = featureRepository.findById(feature.parentID).get();
+				if(parentCandidate!=null){
+					tmpDTO.parentID= feature.parentID;
+				}
+			}
+
 			tmpDTO.type= feature.type;
 			
 			allDtos.add(tmpDTO);
 			
 			//insert(ans, tmpDTO);
 		}
-		
-		return order(allDtos) ;
+
+		for(int i = 0 ; i< allDtos.size() ; i++){
+			for(int j = allDtos.size()-1 ; j>i ; j--){
+				if(allDtos.get(i).parentID.equals(allDtos.get(j).id)){
+					allDtos.get(j).children.add(allDtos.get(i));
+				}
+			}
+		}
+		for(int i = 0 ; i< allDtos.size() ; i++){
+			if(allDtos.get(i).parentID==null || allDtos.get(i).parentID.length()==0){
+				ans.add(allDtos.get(i)) ;
+			}
+		}
+
+		return ans ;
 		//return ans ;
 	}
 	
