@@ -363,13 +363,7 @@ public class ProjectService {
 			tmpDTO.name= feature.name;
 			tmpDTO.description=feature.description;
 
-			if(feature.parentID != null){
-				Feature parentCandidate = featureRepository.findById(feature.parentID).get();
-				if(parentCandidate!=null){
-					tmpDTO.parentID= feature.parentID;
-				}
-			}
-
+			tmpDTO.parentID= feature.parentID;
 			tmpDTO.type= feature.type;
 			
 			allDtos.add(tmpDTO);
