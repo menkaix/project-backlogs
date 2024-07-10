@@ -373,6 +373,28 @@ public class ProjectService {
 		
 		ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
 		
+		while(in.size()>0) {
+			
+			for(int i = 0 ; i<in.size() ; i++) {
+				
+				if(in.get(i).parentID == null || in.get(i).parentID.length()==0) {
+					ans.add(in.get(i));
+					in.remove(i);
+					break ;
+				}else {
+					for (FeatureTreeDTO featureTreeDTO : ans) {
+						if(featureTreeDTO.id.equals(in.get(i).parentID)) {
+							ans.add(in.get(i));
+							in.remove(i);
+							break ;
+						}
+					}
+				}
+				
+			}
+			
+		}
+		
 	
 		return ans ;
 	
