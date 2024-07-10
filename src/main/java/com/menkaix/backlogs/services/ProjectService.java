@@ -379,7 +379,7 @@ public class ProjectService {
 
 		for(int i = 0 ; i< allDtos.size() ; i++){
 			for(int j = allDtos.size()-1 ; j>i ; j--){
-				if(allDtos.get(i).parentID.equals(allDtos.get(j).id)){
+				if(allDtos.get(i).parentID != null &&  allDtos.get(i).parentID.equals(allDtos.get(j).id)){
 					allDtos.get(j).children.add(allDtos.get(i));
 				}
 			}
