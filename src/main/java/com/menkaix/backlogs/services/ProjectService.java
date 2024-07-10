@@ -194,48 +194,60 @@ public class ProjectService {
 	
 		return  ans ;
 	}
+	
+	
+	private boolean insert (List<FeatureTreeDTO> in, FeatureTreeDTO candidate){
+		//ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
+		
+		if(candidate.parentID == null || candidate.parentID.length()==0) {
+			in.add(candidate);
+		}
+		else {
+			for (FeatureTreeDTO featureTreeDTO : in) {
+				if(featureTreeDTO.id == candidate.parentID) {
+					featureTreeDTO.children.add(candidate);
+					return true ;
+				}else {					
+					if (insert(featureTreeDTO.children, candidate)) {
+						return true ;
+					}
+				}
+			}
+			
+		}
+		
+		return false ;
+	}
 
 	private List<FeatureTreeDTO> order(List<FeatureTreeDTO> in){
 		
 		ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
 		
-		int watchdog = 5 ;
+		int watchdog = 16 ;
 		int psize = in.size() ;
 		
 		while(in.size()>0) {
 			
-			for(int i = 0 ; i<in.size() ; i++) {
-				
-				if(in.get(i).parentID == null || in.get(i).parentID.length()==0) {
-					ans.add(in.get(i));
+			for(int i =0 ; i< in.size() ; i++) {
+				if(insert(ans, in.get(i))) {
 					in.remove(i);
 					break ;
-				}else {
-					for (FeatureTreeDTO featureTreeDTO : ans) {
-						if(featureTreeDTO.id.equals(in.get(i).parentID)) {
-							featureTreeDTO.children.add(in.get(i));
-							in.remove(i);
-							break ;
-						}
-					}
 				}
-				
 			}
 			
 			if(psize == in.size()) {
 				watchdog-- ;
 			}
 			
-			psize = in.size() ;
 			
 			if(watchdog<=0) {
+				logger.error("watchdog break");
 				break ;
 			}
 			
+			psize = in.size() ;
 		}
 		
-		
-	
 		return ans ;
 	
 	}
@@ -409,9 +421,12 @@ public class ProjectService {
 			tmpDTO.type= feature.type;
 			
 			allDtos.add(tmpDTO);
+			
+			//insert(ans, tmpDTO);
 		}
 		
 		return order(allDtos) ;
+		//return ans ;
 	}
 	
 	@Deprecated
