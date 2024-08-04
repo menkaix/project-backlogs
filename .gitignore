@@ -14,3 +14,4 @@ gradlew.bat
 pom.xml
 /build
 /.idea
+.idx/dev.nix
