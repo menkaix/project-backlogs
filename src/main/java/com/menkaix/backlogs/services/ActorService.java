@@ -2,9 +2,7 @@ package com.menkaix.backlogs.services;
 
 import com.menkaix.backlogs.entities.Actor;
 import com.menkaix.backlogs.entities.Project;
-import com.menkaix.backlogs.entities.Raci;
 import com.menkaix.backlogs.entities.Story;
-import com.menkaix.backlogs.models.RaciDTO;
 import com.menkaix.backlogs.repositories.ActorRepisitory;
 import com.menkaix.backlogs.repositories.RaciRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;
@@ -13,9 +11,6 @@ import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.xml.crypto.Data;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

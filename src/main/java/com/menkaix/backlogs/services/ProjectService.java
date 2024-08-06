@@ -2,9 +2,7 @@ package com.menkaix.backlogs.services;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -470,13 +468,11 @@ public class ProjectService {
 
         if(b==null) return a ;
 
-        ArrayList<String>ans = new ArrayList<String>() ;
-        ans.addAll(a);
         for (String  c : b) {
-            if(!ans.contains(c)){
-                ans.add(c);
+            if(!a.contains(c)){
+                a.add(c);
             }
         }
-        return ans ;
+        return a ;
     }
 }

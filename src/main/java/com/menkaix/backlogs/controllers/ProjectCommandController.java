@@ -5,8 +5,6 @@ import com.menkaix.backlogs.entities.Project;
 import com.menkaix.backlogs.models.FeatureTreeDTO;
 import com.menkaix.backlogs.models.RaciDTO;
 import com.menkaix.backlogs.services.ActorService;
-import com.menkaix.backlogs.services.FeatureService;
-import com.menkaix.backlogs.services.FeatureTypeService;
 import com.menkaix.backlogs.services.ProjectService;
 import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
 import org.slf4j.Logger;
