@@ -25,9 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.menkaix.backlogs.entities.Project;
+import com.menkaix.backlogs.entities.Raci;
 import com.menkaix.backlogs.repositories.ProjectRepisitory;
+import com.menkaix.backlogs.repositories.RaciRepository;
 import com.menkaix.backlogs.utilities.exceptions.DataConflictException;
 import com.menkaix.backlogs.utilities.exceptions.DataDefinitionException;
+import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
 
 @Service
 public class ProjectService {
@@ -47,18 +50,21 @@ public class ProjectService {
 	private StoryRepository storyRepository ;
 
 	@Autowired
+    RaciRepository raciRepository ;
+
+	@Autowired
 	private FeatureRepository featureRepository ;
 	
 	@Autowired
 	private FeatureService featureService ;
+
+	@Autowired
+    DataAccessService accessService ;
 	
 	@Deprecated
 	@Autowired
 	private GeminiService geminiService ;
 
-
-	@Autowired
-	private DataAccessService accessService ;
 
 	private FullProjectDTO objectTree(String projectRef){
 	
@@ -430,4 +436,47 @@ public class ProjectService {
 			return e.getMessage() ;
 		}
 	}
+
+	public RaciDTO addRaci(String project, RaciDTO raciDTO) throws EntityNotFoundException {
+        
+        Project prj = accessService.findProject(project) ;
+
+        if(prj == null) throw new EntityNotFoundException(project);
+
+        Raci raci = raciRepository.findByprojectID(prj.code);
+
+        if(raci == null){
+            raci = new Raci() ;
+            raci.setprojectID(prj.code) ;
+        }
+
+        raci.setResponsible(merge(raci.getResponsible(), raciDTO.getR()));
+        raci.setAccountable(merge( raci.getAccountable(),raciDTO.getA()));
+        raci.setConsulted(merge(raci.getConsulted(), raciDTO.getC()));
+        raci.setInformed(merge(raci.getInformed(), raciDTO.getI()));
+
+        Raci saved = raciRepository.save(raci) ;
+
+        raciDTO.setProjectCode(prj.code);
+        raciDTO.setR(saved.getResponsible());
+        raciDTO.setA(saved.getAccountable());
+        raciDTO.setC(saved.getConsulted());
+        raciDTO.setI(saved.getInformed());
+
+        return raciDTO ;
+    }
+
+    private List<String> merge(List<String> a , List<String> b){
+
+        if(b==null) return a ;
+
+        ArrayList<String>ans = new ArrayList<String>() ;
+        ans.addAll(a);
+        for (String  c : b) {
+            if(!ans.contains(c)){
+                ans.add(c);
+            }
+        }
+        return ans ;
+    }
 }

@@ -83,7 +83,7 @@ public class ProjectCommandController {
     public ResponseEntity<RaciDTO> addRaci(@PathVariable("project")String project, @RequestBody RaciDTO raci){
 
         try {
-            RaciDTO ans = actorService.addRaci(project, raci);
+            RaciDTO ans = projectService.addRaci(project, raci);
             return new ResponseEntity<>(ans, HttpStatus.CREATED) ;
         } catch (EntityNotFoundException e) {
             logger.error(e.getMessage());
