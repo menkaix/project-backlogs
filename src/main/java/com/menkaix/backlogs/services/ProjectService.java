@@ -200,7 +200,7 @@ public class ProjectService {
 	}
 	
 
-
+/* 
 	@Deprecated
 	private String buildFullPrompt(String description, String prompt){
 	
@@ -217,7 +217,7 @@ public class ProjectService {
 	
 		return String.format(str, description, prompt) ;
 	}
-
+*/
 	public List<Project> getAll() {
 
 		return repo.findAll() ;
@@ -408,7 +408,7 @@ public class ProjectService {
 		//return allDtos ;
 		return ans ;
 	}
-	
+	/*
 	@Deprecated
 	public String ingestStory(String project, String prompt) {
 	
@@ -434,7 +434,7 @@ public class ProjectService {
 			return e.getMessage() ;
 		}
 	}
-
+*/
 	public RaciDTO addRaci(String project, RaciDTO raciDTO) throws EntityNotFoundException {
         
         Project prj = accessService.findProject(project) ;
@@ -464,7 +464,7 @@ public class ProjectService {
         return raciDTO ;
     }
 
-    private List<String> merge(List<String> a , List<String> b){
+    public List<String> merge(List<String> a , List<String> b){
 
         if(b==null) return a ;
 

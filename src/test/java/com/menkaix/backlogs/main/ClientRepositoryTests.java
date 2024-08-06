@@ -40,6 +40,9 @@ public class ClientRepositoryTests {
 	@Autowired
 	DataAccessService service;
 
+	@Autowired
+	ProjectService projectService ;
+
 	@BeforeEach
 	public void configureTest() {
 
@@ -64,6 +67,19 @@ public class ClientRepositoryTests {
 		Project prj = service.findProject("test");
 
 		Assert.assertEquals("abcd1234", prj.id);
+	}
+
+	@Test
+	public void ShouldMergeLists() {
+
+		ArrayList<String> initial = new ArrayList<>() ;
+		ArrayList<String> adendum = new ArrayList<>() ;
+
+		adendum.add("bla") ;
+
+		projectService.merge(initial, adendum);
+
+		Assert.assertEquals(1, initial.size());
 	}
 
 	@Test
