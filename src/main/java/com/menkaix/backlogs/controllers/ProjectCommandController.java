@@ -1,9 +1,9 @@
 package com.menkaix.backlogs.controllers;
 
 import com.menkaix.backlogs.entities.Actor;
-import com.menkaix.backlogs.entities.Feature;
 import com.menkaix.backlogs.entities.Project;
 import com.menkaix.backlogs.models.FeatureTreeDTO;
+import com.menkaix.backlogs.models.RaciDTO;
 import com.menkaix.backlogs.services.ActorService;
 import com.menkaix.backlogs.services.FeatureService;
 import com.menkaix.backlogs.services.FeatureTypeService;
@@ -26,12 +26,6 @@ public class ProjectCommandController {
 
     @Autowired
     ActorService actorService ;
-
-    @Autowired
-    private FeatureService featureService ;
-
-    @Autowired
-    private FeatureTypeService featureTypeService ;
 
     @Autowired
     private ProjectService projectService ;
@@ -81,6 +75,19 @@ public class ProjectCommandController {
         } catch (EntityNotFoundException e) {
             logger.error(e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
+        }
+
+    }
+
+    @PostMapping("/{project}/add-raci")
+    public ResponseEntity<RaciDTO> addRaci(@PathVariable("project")String project, @RequestBody RaciDTO raci){
+
+        try {
+            RaciDTO ans = actorService.addRaci(project, raci);
+            return new ResponseEntity<>(ans, HttpStatus.CREATED) ;
+        } catch (EntityNotFoundException e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
         }
 
     }
