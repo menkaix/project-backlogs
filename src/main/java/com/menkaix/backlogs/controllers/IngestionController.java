@@ -26,7 +26,7 @@ public class IngestionController {
 	
 	@Autowired
 	private ProjectService projectService ;
-	
+	/*
 	@PostMapping("/ingest-story/{project}")
 	public ResponseEntity<String> ingestStrory(@RequestBody Map<String, Object> inputData, @PathVariable String project){
 
@@ -61,5 +61,5 @@ public class IngestionController {
 		
 		return new ResponseEntity<>(ans, HttpStatus.OK);
 	}
-
+ */
 }
