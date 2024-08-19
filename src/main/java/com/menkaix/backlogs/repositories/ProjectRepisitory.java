@@ -10,6 +10,7 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 public interface ProjectRepisitory  extends MongoRepository<Project, String>  {
 
 	public List<Project> findByName(String name);
+	public List<Project> findByGroup(String name);
 	public List<Project> findByCode(String code);
 	public List<Project> findByClientName(String code);
 	

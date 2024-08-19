@@ -9,6 +9,7 @@ public class Project  extends AbstractEntity {
 	
 	public String code ;
 	public String clientName ;
+	public String group ;
 
 	public String description ;
 
