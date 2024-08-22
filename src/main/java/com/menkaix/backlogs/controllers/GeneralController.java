@@ -1,9 +1,9 @@
 package com.menkaix.backlogs.controllers;
 
-import com.menkaix.backlogs.entities.Feature;
+
 import com.menkaix.backlogs.entities.FeatureType;
 import com.menkaix.backlogs.entities.Task;
-import com.menkaix.backlogs.repositories.FeatureRepository;
+
 import com.menkaix.backlogs.repositories.FeatureTypeRepository;
 import com.menkaix.backlogs.repositories.TaskRepository;
 
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -25,8 +25,7 @@ public class GeneralController {
     @Autowired
     private TaskRepository taskRepository ;
 
-    @Autowired
-    private FeatureRepository featureRepository ;
+   
 
     @GetMapping("/featuretypes")
     public ResponseEntity<List<FeatureType>> getFeatureTypes(){
