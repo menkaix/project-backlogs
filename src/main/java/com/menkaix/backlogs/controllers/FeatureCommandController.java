@@ -1,6 +1,5 @@
 package com.menkaix.backlogs.controllers;
 
-
 import com.menkaix.backlogs.entities.Feature;
 import com.menkaix.backlogs.services.FeatureService;
 import com.menkaix.backlogs.services.FeatureTypeService;
@@ -75,9 +74,5 @@ public class FeatureCommandController {
 
 
     }
-
-
-
-
 
 }

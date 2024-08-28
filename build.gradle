@@ -18,16 +18,13 @@ dependencies {
 	
 	//implementation 'com.google.cloud:google-cloud-vertexai:0.4.0'
 
-	//https://cloud.google.com/vertex-ai/docs/start/client-libraries#java
+	implementation 'com.google.cloud:google-cloud-bigquery'
 	implementation 'com.google.cloud:google-cloud-aiplatform:3.35.0'
-
-	// https://mvnrepository.com/artifact/com.google.code.gson/gson
 	implementation 'com.google.code.gson:gson:2.10.1'
 
+	implementation 'net.sourceforge.plantuml:plantuml:8059'
+
 	implementation platform('com.google.cloud:libraries-bom:26.43.0')
-
-	implementation 'com.google.cloud:google-cloud-bigquery'
-
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
