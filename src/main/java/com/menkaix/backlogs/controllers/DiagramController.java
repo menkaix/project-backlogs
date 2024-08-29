@@ -22,28 +22,55 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import net.sourceforge.plantuml.SourceStringReader;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
-import java.net.URLEncoder ;
+import java.net.URLEncoder;
 
 @Controller
 public class DiagramController {
 
-    @GetMapping(path = "/diagram/{name}", produces = "text/plain")
-    public @ResponseBody String getImage(@PathVariable("name") String name) {
-        /*
-         * String source = "@startuml";
-         * source += "Bob -> Alice : hello";
-         * source += "@enduml";
-         */
+        @Autowired
+        private DiagramRepository diagramRepository;
 
-        
+        @GetMapping(path = "/diagram/{name}", produces = "image/png")
+        public @ResponseBody byte[] getImage(@PathVariable("name") String name) {
+                /*
+                 * String source = "@startuml\n";
+                 * source += "Bob -> Alice : hello Static\n";
+                 * source += "@enduml\n";
+                 */
 
+                String source = "Bob -> Alice : hello";
 
-        String source = "Bob -> Alice : hello";
+                List<Diagram> diagrams = diagramRepository.findByName(name);
 
-        String encodedString = PlantUMLEncoder.toHex(source);
+                for (Diagram diagram2 : diagrams) {
+                        source = diagram2.getDefinition() ;
+                        break ;
+                }
 
-        return encodedString;
-    }
+                String encodedString = PlantUMLEncoder.toHex(source);
+
+                OkHttpClient client = new OkHttpClient().newBuilder()
+                                .build();
+
+                Request request = new Request.Builder()
+                                .url("http://www.plantuml.com/plantuml/png/~h" + encodedString)
+                                .method("GET", null)
+                                .build();
+                try {
+                        Response response = client.newCall(request).execute();
+
+                        return response.body().bytes();
+
+                } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        return null;
+                }
+
+        }
 
 }
