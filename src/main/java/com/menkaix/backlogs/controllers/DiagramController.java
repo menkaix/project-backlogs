@@ -1,76 +1,59 @@
 package com.menkaix.backlogs.controllers;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.zip.Deflater;
-
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-
-import com.menkaix.backlogs.entities.Diagram;
-import com.menkaix.backlogs.repositories.DiagramRepository;
-import com.menkaix.backlogs.utilities.PlantUMLEncoder;
-
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import net.sourceforge.plantuml.SourceStringReader;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
-import java.net.URLEncoder;
+import com.menkaix.backlogs.entities.Diagram;
+import com.menkaix.backlogs.services.DiagramService;
 
 @Controller
+@RequestMapping("/diagram")
 public class DiagramController {
 
-        @Autowired
-        private DiagramRepository diagramRepository;
+	@Autowired
+	private DiagramService service;
 
-        @GetMapping(path = "/diagram/{name}", produces = "image/png")
-        public @ResponseBody byte[] getImage(@PathVariable("name") String name) {
-                /*
-                 * String source = "@startuml\n";
-                 * source += "Bob -> Alice : hello Static\n";
-                 * source += "@enduml\n";
-                 */
+	@GetMapping(path = "/png/{name}", produces = "image/png")
+	public @ResponseBody byte[] getImage(@PathVariable("name") String name) {
 
-                String source = "Bob -> Alice : hello";
+		String encoded = service.encodedDiagramDefinition(name);
 
-                List<Diagram> diagrams = diagramRepository.findByName(name);
+		return service.getDiagramPNG(encoded);
 
-                for (Diagram diagram2 : diagrams) {
-                        source = diagram2.getDefinition() ;
-                        break ;
-                }
+	}
 
-                String encodedString = PlantUMLEncoder.toHex(source);
+	@GetMapping(path = "/plant-url/{name}", produces = "text/plain")
+	public @ResponseBody String getPlantUrl(@PathVariable("name") String name) {
 
-                OkHttpClient client = new OkHttpClient().newBuilder()
-                                .build();
+		String encoded = service.encodedDiagramDefinition(name);
 
-                Request request = new Request.Builder()
-                                .url("http://www.plantuml.com/plantuml/png/~h" + encodedString)
-                                .method("GET", null)
-                                .build();
-                try {
-                        Response response = client.newCall(request).execute();
+		return "http://www.plantuml.com/plantuml/png/~h" + encoded;
 
-                        return response.body().bytes();
+	}
 
-                } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                        return null;
-                }
+	@RequestMapping(path = "/update/{name}", produces = "application/json", consumes = "text/plain", method = RequestMethod.PATCH)
+	public @ResponseBody Diagram updateDescription(@PathVariable("name") String name, @RequestBody String data) {
 
-        }
+		return service.updateDefinition(name, data);
+
+	}
+	
+	@RequestMapping(path = "/update-graphic/{name}", produces = "image/png", consumes = "text/plain", method = RequestMethod.PATCH)
+	public @ResponseBody byte[] updateDescriptionGraphics(@PathVariable("name") String name, @RequestBody String data) {
+
+		service.updateDefinition(name, data);
+		
+		String encoded = service.encodedDiagramDefinition(name);
+
+		return service.getDiagramPNG(encoded);
+		
+
+	}
 
 }
