@@ -37,6 +37,15 @@ public class DiagramController {
 
 	}
 
+	@GetMapping(path = "/plant-definition/{name}", produces = "text/plain")
+	public @ResponseBody String getPlantDefinition(@PathVariable("name") String name) {
+
+		String encoded = service.getDiagramDefinition(name);
+
+		return encoded;
+
+	}
+
 	@RequestMapping(path = "/update/{name}", produces = "application/json", consumes = "text/plain", method = RequestMethod.PATCH)
 	public @ResponseBody Diagram updateDescription(@PathVariable("name") String name, @RequestBody String data) {
 

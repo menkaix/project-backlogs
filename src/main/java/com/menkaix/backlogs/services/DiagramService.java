@@ -76,4 +76,15 @@ public class DiagramService {
 		return null;
 	}
 
+	public String getDiagramDefinition(String name) {
+
+		List<Diagram> diagrams = diagramRepository.findByName(name);
+
+		for (Diagram diagram2 : diagrams) {
+			return diagram2.getDefinition();
+		}
+		
+		return "" ;
+	}
+
 }
