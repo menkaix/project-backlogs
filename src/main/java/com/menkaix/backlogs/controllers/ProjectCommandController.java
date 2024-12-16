@@ -20,56 +20,54 @@ import java.util.List;
 @RequestMapping("/project-command")
 public class ProjectCommandController {
 
-    static Logger logger = LoggerFactory.getLogger(ProjectCommandController.class) ;
+    static Logger logger = LoggerFactory.getLogger(ProjectCommandController.class);
 
     @Autowired
-    ActorService actorService ;
+    ActorService actorService;
 
     @Autowired
-    private ProjectService projectService ;
+    private ProjectService projectService;
 
-    @GetMapping({"/{project}/tree"})
-    public String tree(@PathVariable("project") String projectRef){
+    @GetMapping({ "/{project}/tree" })
+    public String tree(@PathVariable("project") String projectRef) {
 
-        return projectService.tree(projectRef) ;
+        return projectService.tree(projectRef);
     }
-    
-    @GetMapping({"/{project}/feature-tree"})
-    public ResponseEntity<List<FeatureTreeDTO>> featureTree(@PathVariable("project") String projectRef){
 
-        List<FeatureTreeDTO> ans =  projectService.featureTree(projectRef) ;
-        
+    @GetMapping({ "/{project}/feature-tree" })
+    public ResponseEntity<List<FeatureTreeDTO>> featureTree(@PathVariable("project") String projectRef) {
+
+        List<FeatureTreeDTO> ans = projectService.featureTree(projectRef);
+
         return new ResponseEntity<List<FeatureTreeDTO>>(ans, HttpStatus.OK);
     }
 
+    @GetMapping({ "/{project}/csv" })
+    public String csv(@PathVariable("project") String projectRef) {
 
-    @GetMapping({"/{project}/csv"})
-    public String csv(@PathVariable("project") String projectRef){
-
-        return projectService.csv(projectRef) ;
+        return projectService.csv(projectRef);
     }
 
-    @GetMapping({"/{project}/csv-tasks"})
-    public String csvTasks(@PathVariable("project") String projectRef){
+    @GetMapping({ "/{project}/csv-tasks" })
+    public String csvTasks(@PathVariable("project") String projectRef) {
 
-        return projectService.csvTasks(projectRef) ;
+        return projectService.csvTasks(projectRef);
     }
-
 
     @GetMapping("/all")
-    public ResponseEntity<List<Project>> getAll(){
+    public ResponseEntity<List<Project>> getAll() {
 
-        List<Project> ans = projectService.getAll() ;
+        List<Project> ans = projectService.getAll();
 
-        return new ResponseEntity<>(ans, HttpStatus.OK) ;
+        return new ResponseEntity<>(ans, HttpStatus.OK);
     }
 
     @PostMapping("/{project}/add-actor")
-    public ResponseEntity<Actor> addActor(@PathVariable("project")String project, @RequestBody Actor actor){
+    public ResponseEntity<Actor> addActor(@PathVariable("project") String project, @RequestBody Actor actor) {
 
         try {
             Actor ans = actorService.addNew(project, actor);
-            return new ResponseEntity<>(ans, HttpStatus.CREATED) ;
+            return new ResponseEntity<>(ans, HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
             logger.error(e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
@@ -78,11 +76,11 @@ public class ProjectCommandController {
     }
 
     @PostMapping("/{project}/add-raci")
-    public ResponseEntity<RaciDTO> addRaci(@PathVariable("project")String project, @RequestBody RaciDTO raci){
+    public ResponseEntity<RaciDTO> addRaci(@PathVariable("project") String project, @RequestBody RaciDTO raci) {
 
         try {
             RaciDTO ans = projectService.addRaci(project, raci);
-            return new ResponseEntity<>(ans, HttpStatus.CREATED) ;
+            return new ResponseEntity<>(ans, HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
             logger.error(e.getMessage());
             return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
@@ -91,19 +89,16 @@ public class ProjectCommandController {
     }
 
     @GetMapping("/{project}/list-actors")
-    public ResponseEntity<List<Actor>> listActor(@PathVariable("project")String project){
+    public ResponseEntity<List<Actor>> listActor(@PathVariable("project") String project) {
 
         try {
             List<Actor> ans = actorService.listActors(project);
-            return new ResponseEntity<>(ans, HttpStatus.CREATED) ;
+            return new ResponseEntity<>(ans, HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
             logger.error(e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
         }
 
     }
-
-
-
 
 }

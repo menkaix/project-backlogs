@@ -24,9 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.menkaix.backlogs.entities.Project;
+import com.menkaix.backlogs.entities.Raci;
 import com.menkaix.backlogs.repositories.ProjectRepository;
+import com.menkaix.backlogs.repositories.RaciRepository;
 import com.menkaix.backlogs.utilities.exceptions.DataConflictException;
 import com.menkaix.backlogs.utilities.exceptions.DataDefinitionException;
+import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
 
 @Service
 public class ProjectService {
@@ -40,10 +43,12 @@ public class ProjectService {
 	private final FeatureService featureService;
 	private final DataAccessService accessService;
 
+	private final RaciRepository raciRepository;
+
 	@Autowired
 	public ProjectService(ProjectRepository repo, ActorRepository actorRepository, TaskRepository taskRepository,
 			StoryRepository storyRepository, FeatureRepository featureRepository, FeatureService featureService,
-			DataAccessService accessService) {
+			DataAccessService accessService, RaciRepository raciRepository) {
 		this.repo = repo;
 		this.actorRepository = actorRepository;
 		this.taskRepository = taskRepository;
@@ -51,6 +56,7 @@ public class ProjectService {
 		this.featureRepository = featureRepository;
 		this.featureService = featureService;
 		this.accessService = accessService;
+		this.raciRepository = raciRepository;
 	}
 
 	public ActorRepository getActorRepository() {
@@ -346,5 +352,46 @@ public class ProjectService {
 			ans.append("\"").append(actor.getName()).append("\" \n");
 		}
 		return ans.toString();
+	}
+
+	public void merge(ArrayList<String> initial, ArrayList<String> adendum) {
+
+		if (b == null)
+			return a;
+
+		for (String c : b) {
+			if (!a.contains(c)) {
+				a.add(c);
+			}
+		}
+		return a;
+	}
+
+	public RaciDTO addRaci(String project, RaciDTO raciDTO) throws EntityNotFoundException {
+		Project prj = accessService.findProject(project);
+
+		if (prj == null)
+			throw new EntityNotFoundException(project);
+
+		Raci raci = raciRepository.findByprojectID(prj.code);
+
+		if (raci == null) {
+			raci = new Raci();
+			raci.setprojectID(prj.code);
+		}
+
+		raci.setResponsible(merge(raci.getResponsible(), raciDTO.getR()));
+		raci.setAccountable(merge(raci.getAccountable(), raciDTO.getA()));
+		raci.setConsulted(merge(raci.getConsulted(), raciDTO.getC()));
+		raci.setInformed(merge(raci.getInformed(), raciDTO.getI()));
+
+		Raci saved = raciRepository.save(raci);
+
+		raciDTO.setProjectCode(prj.code);
+		raciDTO.setR(saved.getResponsible());
+		raciDTO.setA(saved.getAccountable());
+		raciDTO.setC(saved.getConsulted());
+		raciDTO.setI(saved.getInformed());
+
 	}
 }

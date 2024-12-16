@@ -18,6 +18,7 @@ package com.menkaix.backlogs.main;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import com.menkaix.backlogs.services.ProjectService;
 import com.menkaix.backlogs.services.applicatif.DataAccessService;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,7 @@ public class ClientRepositoryTests {
 	DataAccessService service;
 
 	@Autowired
-	ProjectService projectService ;
+	ProjectService projectService;
 
 	@BeforeEach
 	public void configureTest() {
@@ -71,10 +72,10 @@ public class ClientRepositoryTests {
 	@Test
 	public void ShouldMergeLists() {
 
-		ArrayList<String> initial = new ArrayList<>() ;
-		ArrayList<String> adendum = new ArrayList<>() ;
+		ArrayList<String> initial = new ArrayList<>();
+		ArrayList<String> adendum = new ArrayList<>();
 
-		adendum.add("bla") ;
+		adendum.add("bla");
 
 		projectService.merge(initial, adendum);
 
