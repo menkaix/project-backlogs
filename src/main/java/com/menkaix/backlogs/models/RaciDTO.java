@@ -3,55 +3,49 @@ package com.menkaix.backlogs.models;
 import java.util.List;
 
 public class RaciDTO {
-
-    private String ProjectCode ;
-
-    private List<String> R ;
-    private List<String> A ;
-    private List<String> C ;
-    private List<String> I ;
+    private String projectCode;
+    private List<String> r;
+    private List<String> a;
+    private List<String> c;
+    private List<String> i;
 
     public String getProjectCode() {
-        return this.ProjectCode;
-    }
-    
-    public void setProjectCode(String ProjectCode) {
-        this.ProjectCode = ProjectCode;
+        return projectCode;
     }
 
+    public void setProjectCode(String projectCode) {
+        this.projectCode = projectCode;
+    }
 
     public List<String> getR() {
-        return this.R;
+        return r;
     }
-    
-    public void setR(List<String> R) {
-        this.R = R;
+
+    public void setR(List<String> r) {
+        this.r = r;
     }
 
     public List<String> getA() {
-        return this.A;
+        return a;
     }
-    
-    public void setA(List<String> A) {
-        this.A = A;
+
+    public void setA(List<String> a) {
+        this.a = a;
     }
-    
+
     public List<String> getC() {
-        return this.C;
+        return c;
     }
-    
-    public void setC(List<String> C) {
-        this.C = C;
+
+    public void setC(List<String> c) {
+        this.c = c;
     }
-    
+
     public List<String> getI() {
-        return this.I;
+        return i;
     }
-    
-    public void setI(List<String> I) {
-        this.I = I;
+
+    public void setI(List<String> i) {
+        this.i = i;
     }
-    
-
-
 }

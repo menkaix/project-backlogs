@@ -1,8 +1,7 @@
 package com.menkaix.backlogs.services.applicatif;
 
 import com.menkaix.backlogs.entities.Project;
-import com.menkaix.backlogs.repositories.ProjectRepisitory;
-import com.menkaix.backlogs.services.ProjectService;
+import com.menkaix.backlogs.repositories.ProjectRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +14,14 @@ import java.util.NoSuchElementException;
 public class DataAccessService {
 
     private static Logger logger = LoggerFactory.getLogger(DataAccessService.class);
+    private final ProjectRepository repo;
+
     @Autowired
-    private ProjectRepisitory repo;
+    public DataAccessService(ProjectRepository repo) {
+        this.repo = repo;
+    }
 
-
-    //finds a project by name, code, or id
+    // finds a project by name, code, or id
     public Project findProject(String in) {
 
         List<Project> prjs = repo.findByName(in);
@@ -32,7 +34,7 @@ public class DataAccessService {
             } else {
                 try {
                     Project p = repo.findById(in).get();
-                    return p ;
+                    return p;
                 } catch (NoSuchElementException e) {
                     logger.warn("no project found with " + in);
                     return null;
@@ -45,7 +47,7 @@ public class DataAccessService {
 
     public List<Project> findProjectByName(String projectName) {
 
-        return repo.findByName(projectName) ;
+        return repo.findByName(projectName);
 
     }
 }

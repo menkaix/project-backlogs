@@ -17,8 +17,12 @@ import okhttp3.Response;
 @Service
 public class DiagramService {
 
+	private final DiagramRepository diagramRepository;
+
 	@Autowired
-	private DiagramRepository diagramRepository;
+	public DiagramService(DiagramRepository diagramRepository) {
+		this.diagramRepository = diagramRepository;
+	}
 
 	public String encodedDiagramDefinition(String name) {
 
@@ -35,44 +39,42 @@ public class DiagramService {
 
 		return encodedString;
 	}
-	
+
 	public byte[] getDiagramPNG(String encodedString) {
-		
 
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                        .build();
+		OkHttpClient client = new OkHttpClient().newBuilder()
+				.build();
 
-        Request request = new Request.Builder()
-                        .url("http://www.plantuml.com/plantuml/png/~h" + encodedString)
-                        .method("GET", null)
-                        .build();
-        try {
-                Response response = client.newCall(request).execute();
+		Request request = new Request.Builder()
+				.url("http://www.plantuml.com/plantuml/png/~h" + encodedString)
+				.method("GET", null)
+				.build();
+		try {
+			Response response = client.newCall(request).execute();
 
-                return response.body().bytes();
+			return response.body().bytes();
 
-        } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return null;
-        }
-		
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+
 	}
 
 	public Diagram updateDefinition(String name, String data) {
-		
+
 		List<Diagram> diagrams = diagramRepository.findByName(name);
 
 		for (Diagram diagram2 : diagrams) {
-			
+
 			diagram2.setDefinition(data);
-			
-			Diagram saved = diagramRepository.save(diagram2) ;
-			
-			return saved ;
+
+			Diagram saved = diagramRepository.save(diagram2);
+
+			return saved;
 		}
-		
-		
+
 		return null;
 	}
 
@@ -83,8 +85,8 @@ public class DiagramService {
 		for (Diagram diagram2 : diagrams) {
 			return diagram2.getDefinition();
 		}
-		
-		return "" ;
+
+		return "";
 	}
 
 }

@@ -28,14 +28,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.menkaix.backlogs.entities.Project;
-import com.menkaix.backlogs.repositories.ProjectRepisitory;
-import com.menkaix.backlogs.services.ProjectService;
+import com.menkaix.backlogs.repositories.ProjectRepository;
 
 @SpringBootTest
 public class ClientRepositoryTests {
 
 	@MockBean
-	ProjectRepisitory projectRepisitory;
+	ProjectRepository projectRepository;
 
 	@Autowired
 	DataAccessService service;
@@ -52,12 +51,12 @@ public class ClientRepositoryTests {
 		project.code = "TST";
 		prjs.add(project);
 
-		Mockito.when(projectRepisitory.findByName("test")).thenReturn(prjs);
-		Mockito.when(projectRepisitory.findByCode("TST")).thenReturn(prjs);
+		Mockito.when(projectRepository.findByName("test")).thenReturn(prjs);
+		Mockito.when(projectRepository.findByCode("TST")).thenReturn(prjs);
 
 		Optional<Project> oPrj = Optional.of(project);
 
-		Mockito.when(projectRepisitory.findById("abcd1234")).thenReturn(oPrj);
+		Mockito.when(projectRepository.findById("abcd1234")).thenReturn(oPrj);
 
 	}
 
