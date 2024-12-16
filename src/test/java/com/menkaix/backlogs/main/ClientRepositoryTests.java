@@ -28,14 +28,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.menkaix.backlogs.entities.Project;
-import com.menkaix.backlogs.repositories.ProjectRepisitory;
+import com.menkaix.backlogs.repositories.ProjectRepository;
 import com.menkaix.backlogs.services.ProjectService;
 
 @SpringBootTest
 public class ClientRepositoryTests {
 
 	@MockBean
-	ProjectRepisitory projectRepisitory;
+	ProjectRepository projectRepisitory;
 
 	@Autowired
 	DataAccessService service;

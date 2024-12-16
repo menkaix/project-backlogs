@@ -6,9 +6,9 @@ import com.menkaix.backlogs.entities.Project;
 import com.menkaix.backlogs.entities.Story;
 import com.menkaix.backlogs.models.FullFeatureDTO;
 import com.menkaix.backlogs.models.FullStoryDTO;
-import com.menkaix.backlogs.repositories.ActorRepisitory;
+import com.menkaix.backlogs.repositories.ActorRepository;
 import com.menkaix.backlogs.repositories.FeatureRepository;
-import com.menkaix.backlogs.repositories.ProjectRepisitory;
+import com.menkaix.backlogs.repositories.ProjectRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;
 import com.menkaix.backlogs.services.applicatif.DataAccessService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,18 +23,18 @@ import java.util.Optional;
 public class StoryService {
 
     private final StoryRepository storyRepository;
-    private final ActorRepisitory actorRepisitory;
-    private final DataAccessService projectRepisitory;
+    private final ActorRepository actorRepository;
+    private final DataAccessService projectRepository;
     private final FeatureRepository featureRepository;
     private final DataAccessService projectService;
 
     @Autowired
-    public StoryService(StoryRepository storyRepository, ActorRepisitory actorRepisitory,
+    public StoryService(StoryRepository storyRepository, ActorRepository actorRepisitory,
             DataAccessService projectRepisitory, FeatureRepository featureRepository,
             DataAccessService projectService) {
         this.storyRepository = storyRepository;
-        this.actorRepisitory = actorRepisitory;
-        this.projectRepisitory = projectRepisitory;
+        this.actorRepository = actorRepisitory;
+        this.projectRepository = projectRepisitory;
         this.featureRepository = featureRepository;
         this.projectService = projectService;
     }
@@ -52,12 +52,12 @@ public class StoryService {
         storyDTO.objective = s.objective;
         storyDTO.scenario = s.scenario;
 
-        Actor a = actorRepisitory.findById(s.actorId).get();
+        Actor a = actorRepository.findById(s.actorId).get();
         if (a == null)
             return null;
         storyDTO.actorName = a.name;
 
-        List<Project> projects = projectRepisitory.findProjectByName(a.projectName);
+        List<Project> projects = projectRepository.findProjectByName(a.projectName);
         if (projects.size() > 0) {
             storyDTO.projectCode = projects.get(0).code;
         }
@@ -89,7 +89,7 @@ public class StoryService {
         if (project == null)
             return null;
 
-        List<Actor> actors = actorRepisitory.findByProjectName(project.name);
+        List<Actor> actors = actorRepository.findByProjectName(project.name);
 
         for (Actor actor : actors) {
             if (actor.name.equalsIgnoreCase(storyDTO.actorName)) {
@@ -119,7 +119,7 @@ public class StoryService {
 
         ArrayList<Story> ans = new ArrayList<>();
 
-        List<Actor> actors = actorRepisitory.findByProjectName(prj.name);
+        List<Actor> actors = actorRepository.findByProjectName(prj.name);
 
         for (Actor actor : actors) {
             ans.addAll(storyRepository.findByActorId(actor.id));

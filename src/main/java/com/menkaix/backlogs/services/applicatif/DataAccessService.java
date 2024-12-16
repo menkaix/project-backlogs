@@ -1,7 +1,7 @@
 package com.menkaix.backlogs.services.applicatif;
 
 import com.menkaix.backlogs.entities.Project;
-import com.menkaix.backlogs.repositories.ProjectRepisitory;
+import com.menkaix.backlogs.repositories.ProjectRepository;
 import com.menkaix.backlogs.services.ProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +15,10 @@ import java.util.NoSuchElementException;
 public class DataAccessService {
 
     private static Logger logger = LoggerFactory.getLogger(DataAccessService.class);
-    private final ProjectRepisitory repo;
+    private final ProjectRepository repo;
 
     @Autowired
-    public DataAccessService(ProjectRepisitory repo) {
+    public DataAccessService(ProjectRepository repo) {
         this.repo = repo;
     }
 

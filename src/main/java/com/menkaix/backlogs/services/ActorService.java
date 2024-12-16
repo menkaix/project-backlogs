@@ -5,7 +5,7 @@ import com.menkaix.backlogs.entities.Project;
 import com.menkaix.backlogs.entities.Raci;
 import com.menkaix.backlogs.entities.Story;
 import com.menkaix.backlogs.models.RaciDTO;
-import com.menkaix.backlogs.repositories.ActorRepisitory;
+import com.menkaix.backlogs.repositories.ActorRepository;
 import com.menkaix.backlogs.repositories.RaciRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;
 import com.menkaix.backlogs.services.applicatif.DataAccessService;
@@ -22,12 +22,12 @@ import java.util.List;
 public class ActorService {
 
     private final DataAccessService projectService;
-    private final ActorRepisitory actorRepisitory;
+    private final ActorRepository actorRepisitory;
     private final StoryRepository storyRepository;
     private final RaciRepository raciRepository;
 
     @Autowired
-    public ActorService(DataAccessService projectService, ActorRepisitory actorRepisitory,
+    public ActorService(DataAccessService projectService, ActorRepository actorRepisitory,
             StoryRepository storyRepository, RaciRepository raciRepository) {
         this.projectService = projectService;
         this.actorRepisitory = actorRepisitory;
