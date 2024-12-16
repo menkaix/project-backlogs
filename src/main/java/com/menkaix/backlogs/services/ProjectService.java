@@ -55,20 +55,12 @@ public class ProjectService {
 		this.accessService = accessService;
 	}
 
-	public ProjectRepository getRepo() {
-		return repo;
-	}
-
 	public ActorRepository getActorRepository() {
 		return actorRepository;
 	}
 
-	public TaskRepository getTaskRepository() {
-		return taskRepository;
-	}
-
-	public StoryRepository getStoryRepository() {
-		return storyRepository;
+	public DataAccessService getAccessService() {
+		return accessService;
 	}
 
 	public FeatureRepository getFeatureRepository() {
@@ -79,132 +71,34 @@ public class ProjectService {
 		return featureService;
 	}
 
-	public DataAccessService getAccessService() {
-		return accessService;
+	public ProjectRepository getRepo() {
+		return repo;
 	}
 
-	private FullProjectDTO objectTree(String projectRef) {
-		Project p = accessService.findProject(projectRef);
-		if (p == null) {
-			return null;
+	public StoryRepository getStoryRepository() {
+		return storyRepository;
+	}
+
+	public TaskRepository getTaskRepository() {
+		return taskRepository;
+	}
+
+	public List<FeatureTreeDTO> featureTree(String projectRef) {
+		ArrayList<FeatureTreeDTO> ans = new ArrayList<>();
+		Project prj = accessService.findProject(projectRef);
+		List<Feature> features = featureService.getFeatures(prj);
+		List<FeatureTreeDTO> allDtos = new ArrayList<>();
+
+		for (Feature feature : features) {
+			FeatureTreeDTO tmpDTO = new FeatureTreeDTO();
+			tmpDTO.setId(feature.getId());
+			tmpDTO.setName(feature.getName());
+			tmpDTO.setDescription(feature.getDescription());
+			tmpDTO.setParentID(feature.getParentID());
+			tmpDTO.setType(feature.getType());
+			allDtos.add(tmpDTO);
 		}
-
-		FullProjectDTO projectDTO = mapProjectToDTO(p);
-		List<Actor> actors = actorRepository.findByProjectName(p.getName());
-		for (Actor a : actors) {
-			FullActorDTO actorDTO = mapActorToDTO(a, projectDTO.getCode());
-			projectDTO.getActors().add(actorDTO);
-		}
-		return projectDTO;
-	}
-
-	private FullProjectDTO mapProjectToDTO(Project p) {
-		FullProjectDTO projectDTO = new FullProjectDTO();
-		projectDTO.setId(p.getId());
-		projectDTO.setName(p.getName());
-		projectDTO.setDescription(p.getDescription());
-		projectDTO.setClientName(p.getClientName());
-		projectDTO.setCreationDate(p.getCreationDate());
-		projectDTO.setCode(p.getCode());
-		return projectDTO;
-	}
-
-	private FullActorDTO mapActorToDTO(Actor a, String projectCode) {
-		FullActorDTO actorDTO = new FullActorDTO();
-		actorDTO.setId(a.getId());
-		actorDTO.setName(a.getName());
-		actorDTO.setDescription(a.getDescription());
-		actorDTO.setType(a.getType());
-
-		List<Story> stories = storyRepository.findByActorId(a.getId());
-		for (Story s : stories) {
-			FullStoryDTO storyDTO = mapStoryToDTO(s, projectCode, actorDTO.getName());
-			actorDTO.getStories().add(storyDTO);
-		}
-		return actorDTO;
-	}
-
-	private FullStoryDTO mapStoryToDTO(Story s, String projectCode, String actorName) {
-		FullStoryDTO storyDTO = new FullStoryDTO();
-		storyDTO.setId(s.getId());
-		storyDTO.setProjectCode(projectCode);
-		storyDTO.setActorName(actorName);
-		storyDTO.setAction(s.getAction());
-		storyDTO.setObjective(s.getObjective());
-		storyDTO.setScenario(s.getScenario());
-
-		List<Feature> features = featureRepository.findByStoryId(s.getId());
-		for (Feature f : features) {
-			FullFeatureDTO fullFeatureDTO = mapFeatureToDTO(f);
-			storyDTO.getFeatures().add(fullFeatureDTO);
-		}
-		return storyDTO;
-	}
-
-	private FullFeatureDTO mapFeatureToDTO(Feature f) {
-		FullFeatureDTO fullFeatureDTO = new FullFeatureDTO();
-		fullFeatureDTO.setId(f.getId());
-		fullFeatureDTO.setName(f.getName());
-		fullFeatureDTO.setDescription(f.getDescription());
-		fullFeatureDTO.setType(f.getType());
-		fullFeatureDTO.setParentID(f.getParentID());
-
-		List<Task> tasks = taskRepository.findByIdReference("feature/" + fullFeatureDTO.getId());
-		for (Task task : tasks) {
-			FullTaskDTO taskDTO = mapTaskToDTO(task);
-			fullFeatureDTO.getTasks().add(taskDTO);
-		}
-		return fullFeatureDTO;
-	}
-
-	private FullTaskDTO mapTaskToDTO(Task task) {
-		FullTaskDTO taskDTO = new FullTaskDTO();
-		taskDTO.setId(task.getId());
-		taskDTO.setProjectId(task.getProjectId());
-		taskDTO.setReference(task.getReference());
-		taskDTO.setTitle(task.getTitle());
-		taskDTO.setDescription(task.getDescription());
-		taskDTO.setDueDate(task.getDueDate());
-		taskDTO.setDoneDate(task.getDoneDate());
-		taskDTO.setIdReference(task.getIdReference());
-		taskDTO.setName(task.getName());
-		taskDTO.setCreationDate(task.getCreationDate());
-		taskDTO.setLastUpdateDate(task.getLastUpdateDate());
-		return taskDTO;
-	}
-
-	private Actor createActor(Project p, String actorName) {
-		Actor actor = new Actor();
-		actor.setProjectName(p.getName());
-		actor.setName(actorName.toLowerCase());
-		return actorRepository.save(actor);
-	}
-
-	private String actorToCsv(FullActorDTO actor) {
-		StringBuilder ans = new StringBuilder();
-		if (actor.getStories().size() > 0) {
-			for (FullStoryDTO story : actor.getStories()) {
-				String tStoryPart = "\"" + story.getActorName() + "\", \"" + story.getAction() + "\", \""
-						+ story.getScenario() + "\"";
-				if (story.getFeatures().size() > 0) {
-					for (FullFeatureDTO feature : story.getFeatures()) {
-						String featurePart = tStoryPart + ", \"[" + feature.getType() + "] " + feature.getName() + "\"";
-						if (feature.getTasks().size() > 0) {
-							for (FullTaskDTO task : feature.getTasks()) {
-								ans.append(featurePart).append(", \"").append(task.getTitle()).append("\"\n");
-							}
-						} else {
-							ans.append(featurePart).append("\n");
-						}
-					}
-				} else {
-					ans.append(tStoryPart).append("\n");
-				}
-			}
-		} else {
-			ans.append("\"").append(actor.getName()).append("\" \n");
-		}
-		return ans.toString();
+		return order(allDtos);
 	}
 
 	public List<Project> getAll() {
@@ -227,15 +121,6 @@ public class ProjectService {
 		} else {
 			repo.save(projectCanditate);
 		}
-	}
-
-	public String tree(String projectRef) {
-		FullProjectDTO tAns = objectTree(projectRef);
-		Gson gson = new GsonBuilder()
-				.setPrettyPrinting()
-				.setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-				.create();
-		return gson.toJson(tAns);
 	}
 
 	public String createStory(Project project, UserStoryDTO storyDTO) {
@@ -299,25 +184,140 @@ public class ProjectService {
 		return ans.toString();
 	}
 
-	public List<FeatureTreeDTO> featureTree(String projectRef) {
-		ArrayList<FeatureTreeDTO> ans = new ArrayList<>();
-		Project prj = accessService.findProject(projectRef);
-		List<Feature> features = featureService.getFeatures(prj);
-		List<FeatureTreeDTO> allDtos = new ArrayList<>();
+	public String tree(String projectRef) {
+		FullProjectDTO tAns = objectTree(projectRef);
+		Gson gson = new GsonBuilder()
+				.setPrettyPrinting()
+				.setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+				.create();
+		return gson.toJson(tAns);
+	}
 
-		for (Feature feature : features) {
-			FeatureTreeDTO tmpDTO = new FeatureTreeDTO();
-			tmpDTO.setId(feature.getId());
-			tmpDTO.setName(feature.getName());
-			tmpDTO.setDescription(feature.getDescription());
-			tmpDTO.setParentID(feature.getParentID());
-			tmpDTO.setType(feature.getType());
-			allDtos.add(tmpDTO);
+	private Actor createActor(Project p, String actorName) {
+		Actor actor = new Actor();
+		actor.setProjectName(p.getName());
+		actor.setName(actorName.toLowerCase());
+		return actorRepository.save(actor);
+	}
+
+	private FullActorDTO mapActorToDTO(Actor a, String projectCode) {
+		FullActorDTO actorDTO = new FullActorDTO();
+		actorDTO.setId(a.getId());
+		actorDTO.setName(a.getName());
+		actorDTO.setDescription(a.getDescription());
+		actorDTO.setType(a.getType());
+
+		List<Story> stories = storyRepository.findByActorId(a.getId());
+		for (Story s : stories) {
+			FullStoryDTO storyDTO = mapStoryToDTO(s, projectCode, actorDTO.getName());
+			actorDTO.getStories().add(storyDTO);
 		}
-		return order(allDtos);
+		return actorDTO;
+	}
+
+	private FullFeatureDTO mapFeatureToDTO(Feature f) {
+		FullFeatureDTO fullFeatureDTO = new FullFeatureDTO();
+		fullFeatureDTO.setId(f.getId());
+		fullFeatureDTO.setName(f.getName());
+		fullFeatureDTO.setDescription(f.getDescription());
+		fullFeatureDTO.setType(f.getType());
+		fullFeatureDTO.setParentID(f.getParentID());
+
+		List<Task> tasks = taskRepository.findByIdReference("feature/" + fullFeatureDTO.getId());
+		for (Task task : tasks) {
+			FullTaskDTO taskDTO = mapTaskToDTO(task);
+			fullFeatureDTO.getTasks().add(taskDTO);
+		}
+		return fullFeatureDTO;
+	}
+
+	private FullProjectDTO mapProjectToDTO(Project p) {
+		FullProjectDTO projectDTO = new FullProjectDTO();
+		projectDTO.setId(p.getId());
+		projectDTO.setName(p.getName());
+		projectDTO.setDescription(p.getDescription());
+		projectDTO.setClientName(p.getClientName());
+		projectDTO.setCreationDate(p.getCreationDate());
+		projectDTO.setCode(p.getCode());
+		return projectDTO;
+	}
+
+	private FullStoryDTO mapStoryToDTO(Story s, String projectCode, String actorName) {
+		FullStoryDTO storyDTO = new FullStoryDTO();
+		storyDTO.setId(s.getId());
+		storyDTO.setProjectCode(projectCode);
+		storyDTO.setActorName(actorName);
+		storyDTO.setAction(s.getAction());
+		storyDTO.setObjective(s.getObjective());
+		storyDTO.setScenario(s.getScenario());
+
+		List<Feature> features = featureRepository.findByStoryId(s.getId());
+		for (Feature f : features) {
+			FullFeatureDTO fullFeatureDTO = mapFeatureToDTO(f);
+			storyDTO.getFeatures().add(fullFeatureDTO);
+		}
+		return storyDTO;
+	}
+
+	private FullTaskDTO mapTaskToDTO(Task task) {
+		FullTaskDTO taskDTO = new FullTaskDTO();
+		taskDTO.setId(task.getId());
+		taskDTO.setProjectId(task.getProjectId());
+		taskDTO.setReference(task.getReference());
+		taskDTO.setTitle(task.getTitle());
+		taskDTO.setDescription(task.getDescription());
+		taskDTO.setDueDate(task.getDueDate());
+		taskDTO.setDoneDate(task.getDoneDate());
+		taskDTO.setIdReference(task.getIdReference());
+		taskDTO.setName(task.getName());
+		taskDTO.setCreationDate(task.getCreationDate());
+		taskDTO.setLastUpdateDate(task.getLastUpdateDate());
+		return taskDTO;
+	}
+
+	private FullProjectDTO objectTree(String projectRef) {
+		Project p = accessService.findProject(projectRef);
+		if (p == null) {
+			return null;
+		}
+
+		FullProjectDTO projectDTO = mapProjectToDTO(p);
+		List<Actor> actors = actorRepository.findByProjectName(p.getName());
+		for (Actor a : actors) {
+			FullActorDTO actorDTO = mapActorToDTO(a, projectDTO.getCode());
+			projectDTO.getActors().add(actorDTO);
+		}
+		return projectDTO;
 	}
 
 	private List<FeatureTreeDTO> order(List<FeatureTreeDTO> in) {
 		return new ArrayList<>();
+	}
+
+	private String actorToCsv(FullActorDTO actor) {
+		StringBuilder ans = new StringBuilder();
+		if (actor.getStories().size() > 0) {
+			for (FullStoryDTO story : actor.getStories()) {
+				String tStoryPart = "\"" + story.getActorName() + "\", \"" + story.getAction() + "\", \""
+						+ story.getScenario() + "\"";
+				if (story.getFeatures().size() > 0) {
+					for (FullFeatureDTO feature : story.getFeatures()) {
+						String featurePart = tStoryPart + ", \"[" + feature.getType() + "] " + feature.getName() + "\"";
+						if (feature.getTasks().size() > 0) {
+							for (FullTaskDTO task : feature.getTasks()) {
+								ans.append(featurePart).append(", \"").append(task.getTitle()).append("\"\n");
+							}
+						} else {
+							ans.append(featurePart).append("\n");
+						}
+					}
+				} else {
+					ans.append(tStoryPart).append("\n");
+				}
+			}
+		} else {
+			ans.append("\"").append(actor.getName()).append("\" \n");
+		}
+		return ans.toString();
 	}
 }

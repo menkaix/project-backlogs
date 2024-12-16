@@ -16,8 +16,6 @@ public class Story extends AbstractEntity {
 
     private String scenario;
 
-    private Date lastUpdateDate;
-
     public String getId() {
         return id;
     }
@@ -58,11 +56,4 @@ public class Story extends AbstractEntity {
         this.scenario = scenario;
     }
 
-    public Date getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void setLastUpdateDate(Date lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
-    }
 }
