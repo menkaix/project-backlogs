@@ -1,8 +1,6 @@
 package com.menkaix.backlogs.services;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -84,8 +82,14 @@ public class ProjectService {
 	}
 
 	public List<FeatureTreeDTO> featureTree(String projectRef) {
-		ArrayList<FeatureTreeDTO> ans = new ArrayList<>();
-		Project prj = accessService.findProject(projectRef);
+
+		Project prj;
+		try {
+			prj = accessService.findProject(projectRef);
+		} catch (NoSuchElementException e) {
+			logger.error("Project not found: {}", projectRef, e);
+			throw new NoSuchElementException("Project not found: " + projectRef);
+		}
 		List<Feature> features = featureService.getFeatures(prj);
 		List<FeatureTreeDTO> allDtos = new ArrayList<>();
 
@@ -113,13 +117,16 @@ public class ProjectService {
 			prjs = repo.findByCode(projectCanditate.getCode());
 			projectCanditate.setName(projectCanditate.getCode());
 		} else {
+			logger.error("Missing project name and code");
 			throw new DataDefinitionException("Missing project name and code");
 		}
 
 		if (prjs.size() != 0) {
+			logger.error("Project already exists: {}", projectCanditate.getName());
 			throw new DataConflictException("Project already exists");
 		} else {
 			repo.save(projectCanditate);
+			logger.info("Project created successfully: {}", projectCanditate.getName());
 		}
 	}
 
@@ -146,11 +153,18 @@ public class ProjectService {
 		newStory.setScenario(storyDTO.getScenario());
 		newStory.setObjective(storyDTO.getObjective());
 		Story ans = storyRepository.save(newStory);
+		logger.info("Story created successfully for project {}: {}", project.getName(), newStory.getId());
 		return gson.toJson(ans);
 	}
 
 	public String csv(String projectRef) {
-		FullProjectDTO project = objectTree(projectRef);
+		FullProjectDTO project;
+		try {
+			project = objectTree(projectRef);
+		} catch (NoSuchElementException e) {
+			logger.error("Project not found: {}", projectRef, e);
+			throw new NoSuchElementException("Project not found: " + projectRef);
+		}
 		StringBuilder ans = new StringBuilder();
 		for (FullActorDTO actor : project.getActors()) {
 			ans.append(actorToCsv(actor)).append("\n");
@@ -159,7 +173,13 @@ public class ProjectService {
 	}
 
 	public String csvTasks(String projectRef) {
-		Project prj = accessService.findProject(projectRef);
+		Project prj;
+		try {
+			prj = accessService.findProject(projectRef);
+		} catch (NoSuchElementException e) {
+			logger.error("Project not found: {}", projectRef, e);
+			throw new NoSuchElementException("Project not found: " + projectRef);
+		}
 		List<Task> tasks = taskRepository.findByProjectId(prj.getId());
 		StringBuilder ans = new StringBuilder();
 
@@ -185,7 +205,13 @@ public class ProjectService {
 	}
 
 	public String tree(String projectRef) {
-		FullProjectDTO tAns = objectTree(projectRef);
+		FullProjectDTO tAns;
+		try {
+			tAns = objectTree(projectRef);
+		} catch (NoSuchElementException e) {
+			logger.error("Project not found: {}", projectRef, e);
+			throw new NoSuchElementException("Project not found: " + projectRef);
+		}
 		Gson gson = new GsonBuilder()
 				.setPrettyPrinting()
 				.setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
@@ -278,7 +304,8 @@ public class ProjectService {
 	private FullProjectDTO objectTree(String projectRef) {
 		Project p = accessService.findProject(projectRef);
 		if (p == null) {
-			return null;
+			logger.error("Project not found: {}", projectRef);
+			throw new NoSuchElementException("Project not found: " + projectRef);
 		}
 
 		FullProjectDTO projectDTO = mapProjectToDTO(p);
