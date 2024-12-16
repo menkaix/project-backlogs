@@ -29,14 +29,34 @@ public class StoryService {
     private final DataAccessService projectService;
 
     @Autowired
-    public StoryService(StoryRepository storyRepository, ActorRepository actorRepisitory,
-            DataAccessService projectRepisitory, FeatureRepository featureRepository,
+    public StoryService(StoryRepository storyRepository, ActorRepository actorRepository,
+            DataAccessService projectRepository, FeatureRepository featureRepository,
             DataAccessService projectService) {
         this.storyRepository = storyRepository;
-        this.actorRepository = actorRepisitory;
-        this.projectRepository = projectRepisitory;
+        this.actorRepository = actorRepository;
+        this.projectRepository = projectRepository;
         this.featureRepository = featureRepository;
         this.projectService = projectService;
+    }
+
+    public StoryRepository getStoryRepository() {
+        return storyRepository;
+    }
+
+    public ActorRepository getActorRepository() {
+        return actorRepository;
+    }
+
+    public DataAccessService getProjectRepository() {
+        return projectRepository;
+    }
+
+    public FeatureRepository getFeatureRepository() {
+        return featureRepository;
+    }
+
+    public DataAccessService getProjectService() {
+        return projectService;
     }
 
     public FullStoryDTO storyTree(String storyID) {
@@ -46,34 +66,34 @@ public class StoryService {
             return null;
 
         FullStoryDTO storyDTO = new FullStoryDTO();
-        storyDTO.id = s.id;
+        storyDTO.setId(s.getId());
 
-        storyDTO.action = s.action;
-        storyDTO.objective = s.objective;
-        storyDTO.scenario = s.scenario;
+        storyDTO.setAction(s.getAction());
+        storyDTO.setObjective(s.getObjective());
+        storyDTO.setScenario(s.getScenario());
 
-        Actor a = actorRepository.findById(s.actorId).get();
+        Actor a = actorRepository.findById(s.getActorId()).get();
         if (a == null)
             return null;
-        storyDTO.actorName = a.name;
+        storyDTO.setActorName(a.getName());
 
-        List<Project> projects = projectRepository.findProjectByName(a.projectName);
+        List<Project> projects = projectRepository.findProjectByName(a.getProjectName());
         if (projects.size() > 0) {
-            storyDTO.projectCode = projects.get(0).code;
+            storyDTO.setProjectCode(projects.get(0).getCode());
         }
 
-        List<Feature> features = featureRepository.findByStoryId(s.id);
+        List<Feature> features = featureRepository.findByStoryId(s.getId());
         for (Feature f : features) {
 
             FullFeatureDTO fullFeatureDTO = new FullFeatureDTO();
 
-            fullFeatureDTO.id = f.id;
-            fullFeatureDTO.name = f.name;
-            fullFeatureDTO.description = f.description;
-            fullFeatureDTO.type = f.type;
-            fullFeatureDTO.parentID = f.parentID;
+            fullFeatureDTO.setId(f.getId());
+            fullFeatureDTO.setName(f.getName());
+            fullFeatureDTO.setDescription(f.getDescription());
+            fullFeatureDTO.setType(f.getType());
+            fullFeatureDTO.setParentID(f.getParentID());
 
-            storyDTO.features.add(fullFeatureDTO);
+            storyDTO.getFeatures().add(fullFeatureDTO);
 
         }
 
@@ -82,30 +102,30 @@ public class StoryService {
 
     public FullStoryDTO updateStory(FullStoryDTO storyDTO) {
 
-        Story story = storyRepository.findById(storyDTO.id).orElse(new Story());
+        Story story = storyRepository.findById(storyDTO.getId()).orElse(new Story());
 
-        Project project = projectService.findProject(storyDTO.projectCode);
+        Project project = projectService.findProject(storyDTO.getProjectCode());
 
         if (project == null)
             return null;
 
-        List<Actor> actors = actorRepository.findByProjectName(project.name);
+        List<Actor> actors = actorRepository.findByProjectName(project.getName());
 
         for (Actor actor : actors) {
-            if (actor.name.equalsIgnoreCase(storyDTO.actorName)) {
-                story.actorId = actor.id;
+            if (actor.getName().equalsIgnoreCase(storyDTO.getActorName())) {
+                story.setActorId(actor.getId());
             }
         }
 
-        story.objective = storyDTO.objective;
-        story.action = storyDTO.action;
-        story.scenario = storyDTO.scenario;
+        story.setObjective(storyDTO.getObjective());
+        story.setAction(storyDTO.getAction());
+        story.setScenario(storyDTO.getScenario());
 
-        story.lastUpdateDate = new Date();
+        story.setLastUpdateDate(new Date());
 
         storyRepository.save(story);
 
-        storyDTO.id = story.id;
+        storyDTO.setId(story.getId());
 
         return storyDTO;
     }
@@ -119,10 +139,10 @@ public class StoryService {
 
         ArrayList<Story> ans = new ArrayList<>();
 
-        List<Actor> actors = actorRepository.findByProjectName(prj.name);
+        List<Actor> actors = actorRepository.findByProjectName(prj.getName());
 
         for (Actor actor : actors) {
-            ans.addAll(storyRepository.findByActorId(actor.id));
+            ans.addAll(storyRepository.findByActorId(actor.getId()));
         }
 
         return ans;

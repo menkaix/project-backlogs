@@ -25,21 +25,21 @@ public class TaskService {
 
 	public void createUsualTasks(Feature feature) {
 
-		FeatureType featureType = featureTypeService.getFeatureType(feature.type);
+		FeatureType featureType = featureTypeService.getFeatureType(feature.getType());
 
 		if (featureType != null) {
-			for (String taskKey : featureType.usualTask.keySet()) {
+			for (String taskKey : featureType.getUsualTask().keySet()) {
 
 				Task task = new Task();
-				task.idReference = "feature/" + feature.id;
-				task.reference = "feature/" + feature.id + "/" + taskKey;
-				task.title = String.format(featureType.usualTask.get(taskKey), feature.name);
+				task.setIdReference("feature/" + feature.getId());
+				task.setReference("feature/" + feature.getId() + "/" + taskKey);
+				task.setTitle(String.format(featureType.getUsualTask().get(taskKey), feature.getName()));
 
 				repository.save(task);
 
 			}
 		} else {
-			logger.error("no feature type named " + feature.type);
+			logger.error("no feature type named " + feature.getType());
 		}
 	}
 

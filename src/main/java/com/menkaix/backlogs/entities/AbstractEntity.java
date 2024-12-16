@@ -8,10 +8,10 @@ import com.menkaix.backlogs.entities.transients.Comment;
 import com.menkaix.backlogs.entities.transients.Link;
 
 public abstract class AbstractEntity {
-	
+
 	public String name;
-	public Date creationDate=new Date() ;
-	public Date lastUpdateDate ;
+	public Date creationDate = new Date();
+	public Date lastUpdateDate;
 
 	private List<Comment> comments = new ArrayList<Comment>();
 	private List<Link> links = new ArrayList<Link>();
@@ -24,7 +24,6 @@ public abstract class AbstractEntity {
 		this.links = links;
 	}
 
-
 	public List<Comment> getComments() {
 		return comments;
 	}
@@ -32,13 +31,13 @@ public abstract class AbstractEntity {
 	public void setComments(List<Comment> comments) {
 		this.comments = comments;
 	}
-	
+
 	public AbstractEntity() {
-		
+
 	}
-	
+
 	public AbstractEntity(String name) {
-		this.name = name ;
+		this.name = name;
 	}
 
 	public String getName() {
@@ -52,6 +51,7 @@ public abstract class AbstractEntity {
 	public Date getCreationDate() {
 		return creationDate;
 	}
+
 	public void setCreationDate(Date creationDate) {
 		this.creationDate = creationDate;
 	}
@@ -59,6 +59,7 @@ public abstract class AbstractEntity {
 	public Date getLastUpdateDate() {
 		return lastUpdateDate;
 	}
+
 	public void setLastUpdateDate(Date lastUpdateDate) {
 		this.lastUpdateDate = lastUpdateDate;
 	}

@@ -38,7 +38,7 @@ public class FeatureService {
         if (story == null)
             throw new EntityNotFoundException("story not found with id " + storyId);
 
-        feature.storyId = story.id;
+        feature.setStoryId(story.getId());
 
         Feature ans = featureRepository.save(feature);
 
@@ -54,10 +54,10 @@ public class FeatureService {
         if (parent == null)
             throw new EntityNotFoundException("Feature not found with id " + parentId);
 
-        feature.parentID = parent.id;
+        feature.setParentID(parent.getId());
 
-        if (feature.storyId == null || feature.storyId.length() == 0) {
-            feature.storyId = parent.storyId;
+        if (feature.getStoryId() == null || feature.getStoryId().length() == 0) {
+            feature.setStoryId(parent.getStoryId());
         }
 
         return featureRepository.save(feature);
@@ -73,10 +73,10 @@ public class FeatureService {
         if (child == null)
             throw new EntityNotFoundException("Feature not found with id " + childId);
 
-        child.parentID = parent.id;
+        child.setParentID(parent.getId());
 
-        if (child.storyId == null || child.storyId.length() == 0) {
-            child.storyId = parent.storyId;
+        if (child.getStoryId() == null || child.getStoryId().length() == 0) {
+            child.setStoryId(parent.getStoryId());
         }
 
         return featureRepository.save(child);
@@ -90,7 +90,7 @@ public class FeatureService {
         List<Story> stories = storyService.findByProject(prj);
 
         for (Story story : stories) {
-            ans.addAll(featureRepository.findByStoryId(story.id));
+            ans.addAll(featureRepository.findByStoryId(story.getId()));
         }
 
         return ans;

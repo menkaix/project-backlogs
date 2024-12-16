@@ -4,20 +4,66 @@ import org.springframework.data.annotation.Id;
 
 import java.util.WeakHashMap;
 
-public class Feature  extends AbstractEntity {
+public class Feature extends AbstractEntity {
 
     @Id
-    public String id;
-    
-    public String description;
+    private String id;
 
-    public String type;
+    private String description;
 
-    public String storyId;
+    private String type;
 
-    public String parentID;
+    private String storyId;
 
-    public WeakHashMap<String, String> properties = new WeakHashMap<>() ;
+    private String parentID;
 
+    private WeakHashMap<String, String> properties = new WeakHashMap<>();
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getStoryId() {
+        return storyId;
+    }
+
+    public void setStoryId(String storyId) {
+        this.storyId = storyId;
+    }
+
+    public String getParentID() {
+        return parentID;
+    }
+
+    public void setParentID(String parentID) {
+        this.parentID = parentID;
+    }
+
+    public WeakHashMap<String, String> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(WeakHashMap<String, String> properties) {
+        this.properties = properties;
+    }
 }

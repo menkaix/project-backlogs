@@ -35,7 +35,7 @@ import com.menkaix.backlogs.services.ProjectService;
 public class ClientRepositoryTests {
 
 	@MockBean
-	ProjectRepository projectRepisitory;
+	ProjectRepository projectRepository;
 
 	@Autowired
 	DataAccessService service;
@@ -49,12 +49,12 @@ public class ClientRepositoryTests {
 		project.code = "TST";
 		prjs.add(project);
 
-		Mockito.when(projectRepisitory.findByName("test")).thenReturn(prjs);
-		Mockito.when(projectRepisitory.findByCode("TST")).thenReturn(prjs);
+		Mockito.when(projectRepository.findByName("test")).thenReturn(prjs);
+		Mockito.when(projectRepository.findByCode("TST")).thenReturn(prjs);
 
 		Optional<Project> oPrj = Optional.of(project);
 
-		Mockito.when(projectRepisitory.findById("abcd1234")).thenReturn(oPrj);
+		Mockito.when(projectRepository.findById("abcd1234")).thenReturn(oPrj);
 
 	}
 
