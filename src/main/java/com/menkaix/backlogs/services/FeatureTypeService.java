@@ -2,7 +2,7 @@ package com.menkaix.backlogs.services;
 
 import com.menkaix.backlogs.entities.FeatureType;
 import com.menkaix.backlogs.repositories.FeatureTypeRepository;
-import jakarta.annotation.PostConstruct;
+
 
 import java.util.List;
 

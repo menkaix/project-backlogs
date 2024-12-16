@@ -29,7 +29,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.menkaix.backlogs.entities.Project;
 import com.menkaix.backlogs.repositories.ProjectRepository;
-import com.menkaix.backlogs.services.ProjectService;
 
 @SpringBootTest
 public class ClientRepositoryTests {

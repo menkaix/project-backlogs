@@ -1,7 +1,6 @@
 package com.menkaix.backlogs.entities;
 
 import org.springframework.data.annotation.Id;
-import java.util.Date;
 
 public class Story extends AbstractEntity {
 

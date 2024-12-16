@@ -2,7 +2,6 @@ package com.menkaix.backlogs.services.applicatif;
 
 import com.menkaix.backlogs.entities.Project;
 import com.menkaix.backlogs.repositories.ProjectRepository;
-import com.menkaix.backlogs.services.ProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
