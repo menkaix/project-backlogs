@@ -8,7 +8,6 @@ import com.menkaix.backlogs.models.FullFeatureDTO;
 import com.menkaix.backlogs.models.FullStoryDTO;
 import com.menkaix.backlogs.repositories.ActorRepository;
 import com.menkaix.backlogs.repositories.FeatureRepository;
-import com.menkaix.backlogs.repositories.ProjectRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;
 import com.menkaix.backlogs.services.applicatif.DataAccessService;
 import org.springframework.beans.factory.annotation.Autowired;
