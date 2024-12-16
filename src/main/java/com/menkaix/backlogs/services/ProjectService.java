@@ -34,7 +34,10 @@ import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
 @Service
 public class ProjectService {
 
+	// Logger pour enregistrer les messages de log
 	private static Logger logger = LoggerFactory.getLogger(ProjectService.class);
+
+	// Déclaration des repositories et services utilisés
 	private final ProjectRepository repo;
 	private final ActorRepository actorRepository;
 	private final TaskRepository taskRepository;
@@ -42,9 +45,9 @@ public class ProjectService {
 	private final FeatureRepository featureRepository;
 	private final FeatureService featureService;
 	private final DataAccessService accessService;
-
 	private final RaciRepository raciRepository;
 
+	// Constructeur avec injection de dépendances
 	@Autowired
 	public ProjectService(ProjectRepository repo, ActorRepository actorRepository, TaskRepository taskRepository,
 			StoryRepository storyRepository, FeatureRepository featureRepository, FeatureService featureService,
@@ -59,6 +62,7 @@ public class ProjectService {
 		this.raciRepository = raciRepository;
 	}
 
+	// Méthodes getter pour les repositories et services
 	public ActorRepository getActorRepository() {
 		return actorRepository;
 	}
@@ -87,6 +91,7 @@ public class ProjectService {
 		return taskRepository;
 	}
 
+	// Méthode pour obtenir l'arbre des fonctionnalités d'un projet
 	public List<FeatureTreeDTO> featureTree(String projectRef) {
 
 		Project prj;
@@ -111,10 +116,12 @@ public class ProjectService {
 		return order(allDtos);
 	}
 
+	// Méthode pour obtenir tous les projets
 	public List<Project> getAll() {
 		return repo.findAll();
 	}
 
+	// Méthode pour créer un projet en toute sécurité
 	public void safeCreateProject(Project projectCanditate) throws DataConflictException, DataDefinitionException {
 		List<Project> prjs = null;
 		if (projectCanditate.getName() != null) {
@@ -136,6 +143,7 @@ public class ProjectService {
 		}
 	}
 
+	// Méthode pour créer une histoire utilisateur
 	public String createStory(Project project, UserStoryDTO storyDTO) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		Story newStory = new Story();
@@ -163,6 +171,7 @@ public class ProjectService {
 		return gson.toJson(ans);
 	}
 
+	// Méthode pour générer un CSV des acteurs d'un projet
 	public String csv(String projectRef) {
 		FullProjectDTO project;
 		try {
@@ -178,6 +187,7 @@ public class ProjectService {
 		return ans.toString();
 	}
 
+	// Méthode pour générer un CSV des tâches d'un projet
 	public String csvTasks(String projectRef) {
 		Project prj;
 		try {
@@ -210,6 +220,7 @@ public class ProjectService {
 		return ans.toString();
 	}
 
+	// Méthode pour obtenir l'arbre d'un projet au format JSON
 	public String tree(String projectRef) {
 		FullProjectDTO tAns;
 		try {
@@ -225,6 +236,7 @@ public class ProjectService {
 		return gson.toJson(tAns);
 	}
 
+	// Méthode privée pour créer un acteur
 	private Actor createActor(Project p, String actorName) {
 		Actor actor = new Actor();
 		actor.setProjectName(p.getName());
@@ -232,6 +244,7 @@ public class ProjectService {
 		return actorRepository.save(actor);
 	}
 
+	// Méthode privée pour mapper un acteur à un DTO
 	private FullActorDTO mapActorToDTO(Actor a, String projectCode) {
 		FullActorDTO actorDTO = new FullActorDTO();
 		actorDTO.setId(a.getId());
@@ -247,6 +260,7 @@ public class ProjectService {
 		return actorDTO;
 	}
 
+	// Méthode privée pour mapper une fonctionnalité à un DTO
 	private FullFeatureDTO mapFeatureToDTO(Feature f) {
 		FullFeatureDTO fullFeatureDTO = new FullFeatureDTO();
 		fullFeatureDTO.setId(f.getId());
@@ -263,6 +277,7 @@ public class ProjectService {
 		return fullFeatureDTO;
 	}
 
+	// Méthode privée pour mapper un projet à un DTO
 	private FullProjectDTO mapProjectToDTO(Project p) {
 		FullProjectDTO projectDTO = new FullProjectDTO();
 		projectDTO.setId(p.getId());
@@ -274,6 +289,7 @@ public class ProjectService {
 		return projectDTO;
 	}
 
+	// Méthode privée pour mapper une histoire à un DTO
 	private FullStoryDTO mapStoryToDTO(Story s, String projectCode, String actorName) {
 		FullStoryDTO storyDTO = new FullStoryDTO();
 		storyDTO.setId(s.getId());
@@ -291,6 +307,7 @@ public class ProjectService {
 		return storyDTO;
 	}
 
+	// Méthode privée pour mapper une tâche à un DTO
 	private FullTaskDTO mapTaskToDTO(Task task) {
 		FullTaskDTO taskDTO = new FullTaskDTO();
 		taskDTO.setId(task.getId());
@@ -307,6 +324,7 @@ public class ProjectService {
 		return taskDTO;
 	}
 
+	// Méthode privée pour obtenir l'arbre d'un projet
 	private FullProjectDTO objectTree(String projectRef) {
 		Project p = accessService.findProject(projectRef);
 		if (p == null) {
@@ -323,10 +341,12 @@ public class ProjectService {
 		return projectDTO;
 	}
 
+	// Méthode privée pour ordonner une liste de fonctionnalités
 	private List<FeatureTreeDTO> order(List<FeatureTreeDTO> in) {
 		return new ArrayList<>();
 	}
 
+	// Méthode privée pour convertir un acteur en CSV
 	private String actorToCsv(FullActorDTO actor) {
 		StringBuilder ans = new StringBuilder();
 		if (actor.getStories().size() > 0) {
@@ -354,7 +374,8 @@ public class ProjectService {
 		return ans.toString();
 	}
 
-	public void merge(ArrayList<String> initial, ArrayList<String> adendum) {
+	// Méthode pour fusionner deux listes de chaînes de caractères
+	public List<String> merge(List<String> a, List<String> b) {
 
 		if (b == null)
 			return a;
@@ -367,6 +388,7 @@ public class ProjectService {
 		return a;
 	}
 
+	// Méthode pour ajouter un RACI à un projet
 	public RaciDTO addRaci(String project, RaciDTO raciDTO) throws EntityNotFoundException {
 		Project prj = accessService.findProject(project);
 
@@ -392,6 +414,8 @@ public class ProjectService {
 		raciDTO.setA(saved.getAccountable());
 		raciDTO.setC(saved.getConsulted());
 		raciDTO.setI(saved.getInformed());
+
+		return raciDTO;
 
 	}
 }
