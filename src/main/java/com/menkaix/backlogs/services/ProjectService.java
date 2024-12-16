@@ -33,188 +33,180 @@ import com.menkaix.backlogs.utilities.exceptions.DataDefinitionException;
 public class ProjectService {
 
 	private static Logger logger = LoggerFactory.getLogger(ProjectService.class);
+	private final ProjectRepisitory repo;
+	private final ActorRepisitory actorRepisitory;
+	private final TaskRepository taskRepository;
+	private final StoryRepository storyRepository;
+	private final FeatureRepository featureRepository;
+	private final FeatureService featureService;
+	private final GeminiService geminiService;
+	private final DataAccessService accessService;
 
 	@Autowired
-	private ProjectRepisitory repo;
-
-	@Autowired
-	private ActorRepisitory actorRepisitory ;
-
-	@Autowired
-	private TaskRepository taskRepository ;
-
-	@Autowired
-	private StoryRepository storyRepository ;
-
-	@Autowired
-	private FeatureRepository featureRepository ;
-	
-	@Autowired
-	private FeatureService featureService ;
-	
-	@Deprecated
-	@Autowired
-	private GeminiService geminiService ;
-
-
-	@Autowired
-	private DataAccessService accessService ;
-
-	private FullProjectDTO objectTree(String projectRef){
-	
-		Project p = accessService.findProject(projectRef) ;
-		if(p==null) {
-			return null ;
-		}
-	
-		FullProjectDTO projectDTO = new FullProjectDTO() ;
-		projectDTO.id = p.id ;
-		projectDTO.name = p.name ;
-		projectDTO.description = p.description ;
-		projectDTO.clientName = p.clientName ;
-		projectDTO.creationDate = p.creationDate ;
-		projectDTO.code = p.code ;
-	
-		List<Actor> actors = actorRepisitory.findByProjectName(p.name) ;
-		for(Actor a : actors){
-	
-			List<Story> stories = storyRepository.findByActorId(a.id) ;
-	
-			FullActorDTO actorDTO = new FullActorDTO();
-			actorDTO.id = a.id ;
-			actorDTO.name = a.name ;
-			actorDTO.description = a.description ;
-			actorDTO.type = a.type ;
-	
-			for(Story s : stories){
-	
-				FullStoryDTO storyDTO = new FullStoryDTO() ;
-	
-				storyDTO.id = s.id ;
-				storyDTO.projectCode = projectDTO.code ;
-				storyDTO.actorName = actorDTO.name ;
-				storyDTO.action = s.action ;
-				storyDTO.objective = s.objective ;
-				storyDTO.scenario = s.scenario ;
-	
-				List<Feature> features = featureRepository.findByStoryId(s.id) ;
-				for(Feature f : features){
-	
-					FullFeatureDTO fullFeatureDTO = new FullFeatureDTO() ;
-	
-					fullFeatureDTO.id=f.id;
-					fullFeatureDTO.name =f.name;
-					fullFeatureDTO.description=f.description;
-					fullFeatureDTO.type=f.type;
-					fullFeatureDTO.parentID=f.parentID;
-	
-					List<Task> tasks = taskRepository.findByIdReference("feature/"+fullFeatureDTO.id) ;
-	
-					for (Task task : tasks) {
-						FullTaskDTO taskDTO = new FullTaskDTO() ;
-	
-						taskDTO.id=task.id;
-						taskDTO.projectId=task.projectId;
-						taskDTO.reference=task.reference;
-						taskDTO.title=task.title;
-						taskDTO.description=task.description;
-						taskDTO.dueDate=task.dueDate;
-						taskDTO.doneDate=task.doneDate;
-						taskDTO.idReference=task.idReference;
-	
-						
-						taskDTO.name=task.name;
-						taskDTO.creationDate= task.creationDate;
-						taskDTO.lastUpdateDate= task.lastUpdateDate;
-						
-						fullFeatureDTO.tasks.add(taskDTO);						
-	
-					}
-	
-					storyDTO.features.add(fullFeatureDTO);
-	
-				}
-	
-				actorDTO.stories.add(storyDTO) ;
-	
-			}
-	
-	
-			projectDTO.actors.add(actorDTO) ;
-	
-		}
-	
-		return projectDTO ;
+	public ProjectService(ProjectRepisitory repo, ActorRepisitory actorRepisitory, TaskRepository taskRepository,
+			StoryRepository storyRepository, FeatureRepository featureRepository, FeatureService featureService,
+			GeminiService geminiService, DataAccessService accessService) {
+		this.repo = repo;
+		this.actorRepisitory = actorRepisitory;
+		this.taskRepository = taskRepository;
+		this.storyRepository = storyRepository;
+		this.featureRepository = featureRepository;
+		this.featureService = featureService;
+		this.geminiService = geminiService;
+		this.accessService = accessService;
 	}
 
-	private Actor createActor(Project p, String actorName){
-		Actor actor = new Actor() ;
-		actor.projectName = p.name ;
-		actor.name = actorName.toLowerCase() ;
-	
-		return actorRepisitory.save(actor) ;
+	private FullProjectDTO objectTree(String projectRef) {
+
+		Project p = accessService.findProject(projectRef);
+		if (p == null) {
+			return null;
+		}
+
+		FullProjectDTO projectDTO = new FullProjectDTO();
+		projectDTO.id = p.id;
+		projectDTO.name = p.name;
+		projectDTO.description = p.description;
+		projectDTO.clientName = p.clientName;
+		projectDTO.creationDate = p.creationDate;
+		projectDTO.code = p.code;
+
+		List<Actor> actors = actorRepisitory.findByProjectName(p.name);
+		for (Actor a : actors) {
+
+			List<Story> stories = storyRepository.findByActorId(a.id);
+
+			FullActorDTO actorDTO = new FullActorDTO();
+			actorDTO.id = a.id;
+			actorDTO.name = a.name;
+			actorDTO.description = a.description;
+			actorDTO.type = a.type;
+
+			for (Story s : stories) {
+
+				FullStoryDTO storyDTO = new FullStoryDTO();
+
+				storyDTO.id = s.id;
+				storyDTO.projectCode = projectDTO.code;
+				storyDTO.actorName = actorDTO.name;
+				storyDTO.action = s.action;
+				storyDTO.objective = s.objective;
+				storyDTO.scenario = s.scenario;
+
+				List<Feature> features = featureRepository.findByStoryId(s.id);
+				for (Feature f : features) {
+
+					FullFeatureDTO fullFeatureDTO = new FullFeatureDTO();
+
+					fullFeatureDTO.id = f.id;
+					fullFeatureDTO.name = f.name;
+					fullFeatureDTO.description = f.description;
+					fullFeatureDTO.type = f.type;
+					fullFeatureDTO.parentID = f.parentID;
+
+					List<Task> tasks = taskRepository.findByIdReference("feature/" + fullFeatureDTO.id);
+
+					for (Task task : tasks) {
+						FullTaskDTO taskDTO = new FullTaskDTO();
+
+						taskDTO.id = task.id;
+						taskDTO.projectId = task.projectId;
+						taskDTO.reference = task.reference;
+						taskDTO.title = task.title;
+						taskDTO.description = task.description;
+						taskDTO.dueDate = task.dueDate;
+						taskDTO.doneDate = task.doneDate;
+						taskDTO.idReference = task.idReference;
+
+						taskDTO.name = task.name;
+						taskDTO.creationDate = task.creationDate;
+						taskDTO.lastUpdateDate = task.lastUpdateDate;
+
+						fullFeatureDTO.tasks.add(taskDTO);
+
+					}
+
+					storyDTO.features.add(fullFeatureDTO);
+
+				}
+
+				actorDTO.stories.add(storyDTO);
+
+			}
+
+			projectDTO.actors.add(actorDTO);
+
+		}
+
+		return projectDTO;
+	}
+
+	private Actor createActor(Project p, String actorName) {
+		Actor actor = new Actor();
+		actor.projectName = p.name;
+		actor.name = actorName.toLowerCase();
+
+		return actorRepisitory.save(actor);
 	}
 
 	private String actorToCsv(FullActorDTO actor) {
-	
-		String ans = "" ;
-	
-		if(actor.stories.size()>0){
-			for (FullStoryDTO story: actor.stories) {
-				String tStoryPart =  "\""+story.actorName + "\", \"" + story.action+"\", \""+story.scenario+"\"" ;
-	
-				if(story.features.size()>0){
-	
-					for (FullFeatureDTO feature:story.features) {
-	
-						String featurePart = tStoryPart +", \"[" + feature.type+"] " + feature.name + "\"" ;
-	
-						if(feature.tasks.size()>0){
+
+		String ans = "";
+
+		if (actor.stories.size() > 0) {
+			for (FullStoryDTO story : actor.stories) {
+				String tStoryPart = "\"" + story.actorName + "\", \"" + story.action + "\", \"" + story.scenario + "\"";
+
+				if (story.features.size() > 0) {
+
+					for (FullFeatureDTO feature : story.features) {
+
+						String featurePart = tStoryPart + ", \"[" + feature.type + "] " + feature.name + "\"";
+
+						if (feature.tasks.size() > 0) {
 							for (FullTaskDTO task : feature.tasks) {
-								ans += featurePart + ", \""+task.title +"\"" + "\n" ;
+								ans += featurePart + ", \"" + task.title + "\"" + "\n";
 							}
-						}
-						else {
-							ans += featurePart + "\n" ;
+						} else {
+							ans += featurePart + "\n";
 						}
 					}
-	
-				}
-				else{
+
+				} else {
 					ans += tStoryPart + "\n";
 				}
 			}
+		} else {
+			ans = "\"" + actor.name + "\" \n";
 		}
-		else {
-			ans = "\""+actor.name+"\" \n" ;
-		}
-	
-	
-	
-	
-		return  ans ;
+
+		return ans;
 	}
 
 	@Deprecated
-	private String buildFullPrompt(String description, String prompt){
-	
-		String str = "Tu es un Business Analyst, et ton travail est de décrire les systèmes informatiques et les logiciels " +
+	private String buildFullPrompt(String description, String prompt) {
+
+		String str = "Tu es un Business Analyst, et ton travail est de décrire les systèmes informatiques et les logiciels "
+				+
 				"de façon à ce que ce soit compréhensible par des personnes qui n'on pas de base de programmation." +
 				"Voici la description du projet sur lequel tu travailles : %s\n" +
 				"Ecris un objet json contenant les proprietés suivantes : \n" +
 				"- 'actor' : qui représente celui qui parle,  \n" +
 				"- 'action' : décrit l'action qu'il voudrait faire  \n" +
-				"- 'objectif' (optionnel) : décrit son benefice attendu, sa motivation, ou alors une nouvelle possibilité d'action à postériori \n" +
-				"- 'scenario' (optionnel) : une paragraphe qui décrit les étapes exécutées par l'acteur pour réaliser l'opération.\n" +
-				"Utilise en entrée, apres l'avoir reformulée pour qu'elle soit compréhensible par des personnes qui n'ont pas de notion de programmation, " +
-				"la phrase suivante : %s." ;
-	
-		return String.format(str, description, prompt) ;
+				"- 'objectif' (optionnel) : décrit son benefice attendu, sa motivation, ou alors une nouvelle possibilité d'action à postériori \n"
+				+
+				"- 'scenario' (optionnel) : une paragraphe qui décrit les étapes exécutées par l'acteur pour réaliser l'opération.\n"
+				+
+				"Utilise en entrée, apres l'avoir reformulée pour qu'elle soit compréhensible par des personnes qui n'ont pas de notion de programmation, "
+				+
+				"la phrase suivante : %s.";
+
+		return String.format(str, description, prompt);
 	}
 
 	public List<Project> getAll() {
 
-		return repo.findAll() ;
+		return repo.findAll();
 
 	}
 
@@ -236,98 +228,93 @@ public class ProjectService {
 		}
 	}
 
-
-
 	public String tree(String projectRef) {
 
-		FullProjectDTO tAns = objectTree(projectRef) ;
-
+		FullProjectDTO tAns = objectTree(projectRef);
 
 		Gson gson = new GsonBuilder()
 				.setPrettyPrinting()
 				.setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-				.create() ;
+				.create();
 
-		return gson.toJson(tAns) ;
-    }
+		return gson.toJson(tAns);
+	}
 
-    public String createStory(Project project, UserStoryDTO storyDTO){
+	public String createStory(Project project, UserStoryDTO storyDTO) {
 
-		Gson gson = new GsonBuilder().setPrettyPrinting().create() ;
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-		Story newStory = new Story() ;
+		Story newStory = new Story();
 
-		List<Actor> actors = actorRepisitory.findByProjectName(project.name) ;
+		List<Actor> actors = actorRepisitory.findByProjectName(project.name);
 
-		boolean actorFound = false ;
+		boolean actorFound = false;
 
-		for (Actor tActor:actors) {
-			if(tActor.name.equalsIgnoreCase(storyDTO.actor)){
+		for (Actor tActor : actors) {
+			if (tActor.name.equalsIgnoreCase(storyDTO.actor)) {
 
-				newStory.actorId = tActor.id ;
+				newStory.actorId = tActor.id;
 
-				actorFound =true ;
-				break ;
+				actorFound = true;
+				break;
 			}
 		}
 
-		if(!actorFound){
-			Actor newActor = createActor(project, storyDTO.actor) ;
-			newStory.actorId = newActor.id ;
+		if (!actorFound) {
+			Actor newActor = createActor(project, storyDTO.actor);
+			newStory.actorId = newActor.id;
 		}
 
-		newStory.action = storyDTO.action ;
-		newStory.scenario = storyDTO.scenario ;
-		newStory.objective = storyDTO.objective ;
+		newStory.action = storyDTO.action;
+		newStory.scenario = storyDTO.scenario;
+		newStory.objective = storyDTO.objective;
 
-		Story ans = storyRepository.save(newStory) ;
+		Story ans = storyRepository.save(newStory);
 
-		return gson.toJson(ans) ;
+		return gson.toJson(ans);
 	}
 
 	public String csv(String projectRef) {
 
 		FullProjectDTO project = objectTree(projectRef);
 
-		String ans = "" ;
+		String ans = "";
 
-		for (FullActorDTO actor: project.actors ) {
+		for (FullActorDTO actor : project.actors) {
 			ans += actorToCsv(actor) + "\n";
 		}
 
-
-
-		return ans ;
+		return ans;
 
 	}
 
 	public String csvTasks(String projectRef) {
 
-		Project prj = accessService.findProject(projectRef) ;
+		Project prj = accessService.findProject(projectRef);
 
-		List<Task> tasks = taskRepository.findByProjectId(prj.id) ;
+		List<Task> tasks = taskRepository.findByProjectId(prj.id);
 
-		String ans = "" ;
+		String ans = "";
 
-		for (Task task: tasks) {
-			ans += task.title + ", \"" + task.description + "\"\n" ;
+		for (Task task : tasks) {
+			ans += task.title + ", \"" + task.description + "\"\n";
 		}
 
-		List<Actor> actors = actorRepisitory.findByProjectName(prj.name) ;
+		List<Actor> actors = actorRepisitory.findByProjectName(prj.name);
 
-		for (Actor actor: actors) {
+		for (Actor actor : actors) {
 
 			List<Story> stories = storyRepository.findByActorId(actor.id);
-			for (Story story: stories) {
+			for (Story story : stories) {
 
-				List<Feature> features = featureRepository.findByStoryId(story.id) ;
+				List<Feature> features = featureRepository.findByStoryId(story.id);
 
-				for (Feature feature: features) {
-					List<Task> tasksOfFeature = taskRepository.findByIdReference("feature/"+feature.id);
+				for (Feature feature : features) {
+					List<Task> tasksOfFeature = taskRepository.findByIdReference("feature/" + feature.id);
 
-					for (Task taskOfFeature: tasksOfFeature) {
+					for (Task taskOfFeature : tasksOfFeature) {
 
-						ans += taskOfFeature.title + ", \"" + taskOfFeature.description + "\"\n" ;
+						ans += taskOfFeature.title + ", \"" + taskOfFeature.description + "\"\n";
 
 					}
 
@@ -337,72 +324,67 @@ public class ProjectService {
 
 		}
 
-		return ans ;
+		return ans;
 
 	}
-	
-	
-	
-	public List<FeatureTreeDTO> featureTree(String projectRef){
-		
-		ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
-		
-		Project prj = accessService.findProject(projectRef) ;
-		
+
+	public List<FeatureTreeDTO> featureTree(String projectRef) {
+
+		ArrayList<FeatureTreeDTO> ans = new ArrayList<>();
+
+		Project prj = accessService.findProject(projectRef);
+
 		List<Feature> features = featureService.getFeatures(prj);
-		
+
 		List<FeatureTreeDTO> allDtos = new ArrayList<FeatureTreeDTO>();
 
 		for (Feature feature : features) {
-			
-			FeatureTreeDTO tmpDTO = new FeatureTreeDTO() ;
-			
-			tmpDTO.id= feature.id;
-			tmpDTO.name= feature.name;
-			tmpDTO.description=feature.description;
-			tmpDTO.parentID= feature.parentID;
-			tmpDTO.type= feature.type;
-			
+
+			FeatureTreeDTO tmpDTO = new FeatureTreeDTO();
+
+			tmpDTO.id = feature.id;
+			tmpDTO.name = feature.name;
+			tmpDTO.description = feature.description;
+			tmpDTO.parentID = feature.parentID;
+			tmpDTO.type = feature.type;
+
 			allDtos.add(tmpDTO);
 		}
-		
-		return order(allDtos) ;
+
+		return order(allDtos);
 	}
-	
-	private List<FeatureTreeDTO> order(List<FeatureTreeDTO> in){
-		
-		ArrayList<FeatureTreeDTO> ans = new ArrayList<>() ;
-		
-	
-		return ans ;
-	
+
+	private List<FeatureTreeDTO> order(List<FeatureTreeDTO> in) {
+
+		ArrayList<FeatureTreeDTO> ans = new ArrayList<>();
+
+		return ans;
+
 	}
-	
-	
 
 	@Deprecated
 	public String ingestStory(String project, String prompt) {
-	
-		Project prj = accessService.findProject(project) ;
-	
-		if(prj==null){
-			return  null ;
+
+		Project prj = accessService.findProject(project);
+
+		if (prj == null) {
+			return null;
 		}
-	
-		String str = buildFullPrompt(prj.description, prompt) ;
-	
+
+		String str = buildFullPrompt(prj.description, prompt);
+
 		try {
 			String json = geminiService.predictFunction(str);
-	
-			Gson gson = new GsonBuilder().setPrettyPrinting().create() ;
-	
-			UserStoryDTO storyDTO = gson.fromJson(json,UserStoryDTO.class) ;
-	
-			return  createStory(prj, storyDTO) ;
-	
+
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+			UserStoryDTO storyDTO = gson.fromJson(json, UserStoryDTO.class);
+
+			return createStory(prj, storyDTO);
+
 		} catch (IOException e) {
 			logger.error(e.getMessage());
-			return e.getMessage() ;
+			return e.getMessage();
 		}
 	}
 }

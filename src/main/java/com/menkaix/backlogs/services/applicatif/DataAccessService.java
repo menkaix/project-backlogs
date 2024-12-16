@@ -15,11 +15,14 @@ import java.util.NoSuchElementException;
 public class DataAccessService {
 
     private static Logger logger = LoggerFactory.getLogger(DataAccessService.class);
+    private final ProjectRepisitory repo;
+
     @Autowired
-    private ProjectRepisitory repo;
+    public DataAccessService(ProjectRepisitory repo) {
+        this.repo = repo;
+    }
 
-
-    //finds a project by name, code, or id
+    // finds a project by name, code, or id
     public Project findProject(String in) {
 
         List<Project> prjs = repo.findByName(in);
@@ -32,7 +35,7 @@ public class DataAccessService {
             } else {
                 try {
                     Project p = repo.findById(in).get();
-                    return p ;
+                    return p;
                 } catch (NoSuchElementException e) {
                     logger.warn("no project found with " + in);
                     return null;
@@ -45,7 +48,7 @@ public class DataAccessService {
 
     public List<Project> findProjectByName(String projectName) {
 
-        return repo.findByName(projectName) ;
+        return repo.findByName(projectName);
 
     }
 }

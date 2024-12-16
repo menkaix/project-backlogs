@@ -22,9 +22,12 @@ import org.springframework.stereotype.Service;
 public class GeminiService {
 
 	private static Logger logger = LoggerFactory.getLogger(GeminiService.class);
-	
+	private final Environment env;
+
 	@Autowired
-	private Environment env ;
+	public GeminiService(Environment env) {
+		this.env = env;
+	}
 
 	// Passes the provided text input to the Gemini model and returns the text-only
 	// response.

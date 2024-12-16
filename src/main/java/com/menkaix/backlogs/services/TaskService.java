@@ -12,14 +12,16 @@ import com.menkaix.backlogs.repositories.TaskRepository;
 
 @Service
 public class TaskService {
-	
+
 	private static Logger logger = LoggerFactory.getLogger(TaskService.class);
+	private final TaskRepository repository;
+	private final FeatureTypeService featureTypeService;
 
 	@Autowired
-	private TaskRepository repository;
-
-	@Autowired
-	private FeatureTypeService featureTypeService;
+	public TaskService(TaskRepository repository, FeatureTypeService featureTypeService) {
+		this.repository = repository;
+		this.featureTypeService = featureTypeService;
+	}
 
 	public void createUsualTasks(Feature feature) {
 
@@ -29,16 +31,15 @@ public class TaskService {
 			for (String taskKey : featureType.usualTask.keySet()) {
 
 				Task task = new Task();
-				task.idReference = "feature/"+feature.id ;
+				task.idReference = "feature/" + feature.id;
 				task.reference = "feature/" + feature.id + "/" + taskKey;
 				task.title = String.format(featureType.usualTask.get(taskKey), feature.name);
 
 				repository.save(task);
 
 			}
-		}
-		else {
-			logger.error("no feature type named "+feature.type);
+		} else {
+			logger.error("no feature type named " + feature.type);
 		}
 	}
 

@@ -21,81 +21,87 @@ import java.util.List;
 @Service
 public class ActorService {
 
-    @Autowired
-    DataAccessService projectService ;
+    private final DataAccessService projectService;
+    private final ActorRepisitory actorRepisitory;
+    private final StoryRepository storyRepository;
+    private final RaciRepository raciRepository;
 
     @Autowired
-    ActorRepisitory actorRepisitory ;
-
-    @Autowired
-    StoryRepository storyRepository ;
-
-    @Autowired
-    RaciRepository raciRepository ;
-
+    public ActorService(DataAccessService projectService, ActorRepisitory actorRepisitory,
+            StoryRepository storyRepository, RaciRepository raciRepository) {
+        this.projectService = projectService;
+        this.actorRepisitory = actorRepisitory;
+        this.storyRepository = storyRepository;
+        this.raciRepository = raciRepository;
+    }
 
     public Actor addNew(String project, Actor actor) throws EntityNotFoundException {
 
-        Project prj = projectService.findProject(project) ;
-        if(prj == null) throw new EntityNotFoundException("no project foun with reference "+project);
+        Project prj = projectService.findProject(project);
+        if (prj == null)
+            throw new EntityNotFoundException("no project foun with reference " + project);
 
-        actor.projectName = prj.name ;
+        actor.projectName = prj.name;
 
-        return  save(actor) ;
+        return save(actor);
     }
 
     private Actor save(Actor actor) {
 
-        return actorRepisitory.save(actor) ;
+        return actorRepisitory.save(actor);
     }
 
     public Story addStory(String project, String name, Story story) throws EntityNotFoundException {
 
-        Project prj = projectService.findProject(project) ;
-        if(prj == null) throw new EntityNotFoundException("no project found with reference "+project);
+        Project prj = projectService.findProject(project);
+        if (prj == null)
+            throw new EntityNotFoundException("no project found with reference " + project);
 
-        List<Actor> actors = actorRepisitory.findByProjectName(prj.name) ;
+        List<Actor> actors = actorRepisitory.findByProjectName(prj.name);
 
-        if(actors.size()<=0) throw new EntityNotFoundException("no actor found with name "+name+" in project "+project);
+        if (actors.size() <= 0)
+            throw new EntityNotFoundException("no actor found with name " + name + " in project " + project);
 
-        for (Actor a: actors) {
-            if(a.name.equalsIgnoreCase(name)){
-                story.actorId = a.id ;
-                return storyRepository.save(story) ;
+        for (Actor a : actors) {
+            if (a.name.equalsIgnoreCase(name)) {
+                story.actorId = a.id;
+                return storyRepository.save(story);
             }
         }
 
-        return null ;
+        return null;
     }
 
     public List<Actor> listActors(String project) throws EntityNotFoundException {
 
-        Project prj = projectService.findProject(project) ;
-        if(prj == null) throw new EntityNotFoundException("no project found with reference "+project);
+        Project prj = projectService.findProject(project);
+        if (prj == null)
+            throw new EntityNotFoundException("no project found with reference " + project);
 
-        return actorRepisitory.findByProjectName(prj.name) ;
+        return actorRepisitory.findByProjectName(prj.name);
 
     }
 
     public RaciDTO addRaci(String project, RaciDTO raciDTO) throws EntityNotFoundException {
-        
-        Project prj = projectService.findProject(project) ;
 
-        if(prj == null) throw new EntityNotFoundException(project);
+        Project prj = projectService.findProject(project);
+
+        if (prj == null)
+            throw new EntityNotFoundException(project);
 
         Raci raci = raciRepository.findByprojectID(prj.code);
 
-        if(raci == null){
-            raci = new Raci() ;
-            raci.setprojectID(prj.code) ;
+        if (raci == null) {
+            raci = new Raci();
+            raci.setprojectID(prj.code);
         }
 
         raci.setResponsible(merge(raci.getResponsible(), raciDTO.getR()));
-        raci.setAccountable(merge( raci.getAccountable(),raciDTO.getA()));
+        raci.setAccountable(merge(raci.getAccountable(), raciDTO.getA()));
         raci.setConsulted(merge(raci.getConsulted(), raciDTO.getC()));
         raci.setInformed(merge(raci.getInformed(), raciDTO.getI()));
 
-        Raci saved = raciRepository.save(raci) ;
+        Raci saved = raciRepository.save(raci);
 
         raciDTO.setProjectCode(prj.code);
         raciDTO.setR(saved.getResponsible());
@@ -103,17 +109,17 @@ public class ActorService {
         raciDTO.setC(saved.getConsulted());
         raciDTO.setI(saved.getInformed());
 
-        return raciDTO ;
+        return raciDTO;
     }
 
-    private List<String> merge(List<String> a , List<String> b){
-        ArrayList<String>ans = new ArrayList<String>() ;
+    private List<String> merge(List<String> a, List<String> b) {
+        ArrayList<String> ans = new ArrayList<String>();
         ans.addAll(a);
-        for (String  c : b) {
-            if(!ans.contains(c)){
+        for (String c : b) {
+            if (!ans.contains(c)) {
                 ans.add(c);
             }
         }
-        return ans ;
+        return ans;
     }
 }

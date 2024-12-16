@@ -19,79 +19,80 @@ import org.springframework.stereotype.Service;
 @Service
 public class FeatureService {
 
-    private static Logger logger = LoggerFactory.getLogger(FeatureService.class) ;
+    private static Logger logger = LoggerFactory.getLogger(FeatureService.class);
+    private final FeatureRepository featureRepository;
+    private final StoryService storyService;
+    private final TaskService taskService;
 
     @Autowired
-    private  FeatureRepository featureRepository ;
-    
-    
-    @Autowired
-    private StoryService storyService ;
+    public FeatureService(FeatureRepository featureRepository, StoryService storyService, TaskService taskService) {
+        this.featureRepository = featureRepository;
+        this.storyService = storyService;
+        this.taskService = taskService;
+    }
 
-    @Autowired
-	private TaskService taskService ;
-    
-    
-
-	public Feature addFeatureToStory(String storyId, Feature feature) throws EntityNotFoundException {
+    public Feature addFeatureToStory(String storyId, Feature feature) throws EntityNotFoundException {
 
         Story story = storyService.findById(storyId).get();
-        
 
-        if(story == null) throw new EntityNotFoundException("story not found with id "+storyId);
-        
-        feature.storyId = story.id ;
-        
-        Feature ans =  featureRepository.save(feature) ;
-        
+        if (story == null)
+            throw new EntityNotFoundException("story not found with id " + storyId);
+
+        feature.storyId = story.id;
+
+        Feature ans = featureRepository.save(feature);
+
         taskService.createUsualTasks(ans);
 
-        return  ans ;
+        return ans;
     }
 
     public Feature addToParent(String parentId, Feature feature) throws EntityNotFoundException {
 
-        Feature parent = featureRepository.findById(parentId).get() ;
+        Feature parent = featureRepository.findById(parentId).get();
 
-        if(parent ==  null) throw new EntityNotFoundException("Feature not found with id "+parentId);
+        if (parent == null)
+            throw new EntityNotFoundException("Feature not found with id " + parentId);
 
-        feature.parentID = parent.id ;
-        
-        if(feature.storyId == null || feature.storyId.length()==0) {
-        	feature.storyId = parent.storyId ;
+        feature.parentID = parent.id;
+
+        if (feature.storyId == null || feature.storyId.length() == 0) {
+            feature.storyId = parent.storyId;
         }
 
-        return  featureRepository.save(feature) ;
+        return featureRepository.save(feature);
     }
 
     public Feature addToParent(String parentId, String childId) throws EntityNotFoundException {
 
-        Feature parent = featureRepository.findById(parentId).get() ;
-        Feature child = featureRepository.findById(childId).get() ;
+        Feature parent = featureRepository.findById(parentId).get();
+        Feature child = featureRepository.findById(childId).get();
 
-        if(parent ==  null) throw new EntityNotFoundException("Feature not found with id "+parentId);
-        if(child ==  null) throw new EntityNotFoundException("Feature not found with id "+childId);
+        if (parent == null)
+            throw new EntityNotFoundException("Feature not found with id " + parentId);
+        if (child == null)
+            throw new EntityNotFoundException("Feature not found with id " + childId);
 
-        child.parentID = parent.id ;
-        
-        if(child.storyId == null || child.storyId.length()==0) {
-        	child.storyId = parent.storyId ;
+        child.parentID = parent.id;
+
+        if (child.storyId == null || child.storyId.length() == 0) {
+            child.storyId = parent.storyId;
         }
 
-        return  featureRepository.save(child) ;
+        return featureRepository.save(child);
 
     }
 
-	public List<Feature> getFeatures(Project prj) {
-		
-		ArrayList<Feature> ans = new ArrayList<>() ;
-		
-		List<Story> stories = storyService.findByProject(prj);
-		
-		for (Story story : stories) {
-			ans.addAll(featureRepository.findByStoryId(story.id)) ;
-		}
-		
-		return ans;
-	}
+    public List<Feature> getFeatures(Project prj) {
+
+        ArrayList<Feature> ans = new ArrayList<>();
+
+        List<Story> stories = storyService.findByProject(prj);
+
+        for (Story story : stories) {
+            ans.addAll(featureRepository.findByStoryId(story.id));
+        }
+
+        return ans;
+    }
 }
