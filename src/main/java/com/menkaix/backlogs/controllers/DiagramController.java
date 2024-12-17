@@ -34,6 +34,7 @@ public class DiagramController {
 		String encoded = service.encodedDiagramDefinition(name);
 
 		return "http://www.plantuml.com/plantuml/png/~h" + encoded;
+		// return "http://www.plantuml.com/plantuml/png/" + encoded;
 
 	}
 
@@ -52,16 +53,15 @@ public class DiagramController {
 		return service.updateDefinition(name, data);
 
 	}
-	
+
 	@RequestMapping(path = "/update-graphic/{name}", produces = "image/png", consumes = "text/plain", method = RequestMethod.PATCH)
 	public @ResponseBody byte[] updateDescriptionGraphics(@PathVariable("name") String name, @RequestBody String data) {
 
 		service.updateDefinition(name, data);
-		
+
 		String encoded = service.encodedDiagramDefinition(name);
 
 		return service.getDiagramPNG(encoded);
-		
 
 	}
 
