@@ -1,128 +1,30 @@
 package com.menkaix.backlogs.utilities;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.URLEncoder;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
-import java.io.ByteArrayInputStream;
-import java.util.zip.Inflater;
-import java.util.zip.InflaterInputStream;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class PlantUMLEncoder {
 
+    public static String toHex(String arg) {
+        return String.format("%040x", new BigInteger(1, arg.getBytes(StandardCharsets.UTF_8)));
+    }
+
     public static String plantUMLEncode(String text) {
 
-        try {
+        byte[] data = text.getBytes(StandardCharsets.UTF_8);
 
-            // encode to UTF-8 and compress using Deflate algorithm
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            DeflaterOutputStream dos = new DeflaterOutputStream(baos, new Deflater());
-            dos.write(text.getBytes(StandardCharsets.UTF_8));
-            dos.close();
-            byte[] compressedData = baos.toByteArray();
-
-            // encode using custom base64 encoding
-            return customBase64Encode(compressedData);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return null;
-
     }
 
-    public static String toHex(String arg) {
-        return String.format("%040x", new BigInteger(1, arg.getBytes(/* YOUR_CHARSET? */)));
+    public static String customBase64EncodeString(String data) {
+        return customBase64EncodeBytes(data.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static String toBase64(String arg) {
-        return Base64.getEncoder().encodeToString(arg.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public static String toURL(String arg) {
-        try {
-            return URLEncoder.encode(arg, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // Fonction pour compresser une chaîne en utilisant l'algorithme "Deflate"
-    public static String compress(String arg) {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            DeflaterOutputStream dos = new DeflaterOutputStream(baos, new Deflater());
-            dos.write(arg.getBytes(StandardCharsets.UTF_8));
-            dos.close();
-            return Base64.getEncoder().encodeToString(baos.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // Fonction pour décompresser une chaîne en utilisant l'algorithme "Deflate"
-    public static String decompress(String compressedStr) {
-        try {
-            byte[] compressedBytes = Base64.getDecoder().decode(compressedStr);
-            ByteArrayInputStream bais = new ByteArrayInputStream(compressedBytes);
-            InflaterInputStream iis = new InflaterInputStream(bais, new Inflater());
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = iis.read(buffer)) > 0) {
-                baos.write(buffer, 0, len);
-            }
-            return new String(baos.toByteArray(), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // Fonction pour encoder du texte en PlantUML pour une URL
-    public static String encodePlantUML(String text) {
-        String compressed = compress(text);
-        return toURL(compressed);
-    }
-
-    public static String encode64(String data) {
-        StringBuilder r = new StringBuilder();
-        for (int i = 0; i < data.length(); i += 3) {
-            if (i + 2 == data.length()) {
-                r.append(append3bytes(data.charAt(i), data.charAt(i + 1), 0));
-            } else if (i + 1 == data.length()) {
-                r.append(append3bytes(data.charAt(i), 0, 0));
-            } else {
-                r.append(append3bytes(data.charAt(i), data.charAt(i + 1), data.charAt(i + 2)));
-            }
-        }
-        return r.toString();
-    }
-
-    public static String customBase64Encode(String data) {
-        StringBuilder r = new StringBuilder();
-        for (int i = 0; i < data.length(); i += 3) {
-            if (i + 2 == data.length()) {
-                r.append(append3bytes(data.charAt(i), data.charAt(i + 1), 0));
-            } else if (i + 1 == data.length()) {
-                r.append(append3bytes(data.charAt(i), 0, 0));
-            } else {
-                r.append(append3bytes(data.charAt(i), data.charAt(i + 1), data.charAt(i + 2)));
-            }
-        }
-        return r.toString();
-    }
-
-    public static String customBase64Encode(byte[] data) {
+    public static String customBase64EncodeBytes(byte[] data) {
         StringBuilder r = new StringBuilder();
         for (int i = 0; i < data.length; i += 3) {
             if (i + 2 == data.length) {
@@ -134,6 +36,10 @@ public class PlantUMLEncoder {
             }
         }
         return r.toString();
+    }
+
+    public static String encodeToBase64(byte[] data) {
+        return Base64.getEncoder().encodeToString(data);
     }
 
     private static String append3bytes(int b1, int b2, int b3) {

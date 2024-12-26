@@ -13,31 +13,13 @@ public class PlantUMLEncoderTest {
     }
 
     @Test
-    public void testToBase64() {
-        String input = "test";
-        String expected = "dGVzdA==";
-        assertEquals(expected, PlantUMLEncoder.toBase64(input));
+    public void testPlantUMLEncode() {
+        String input = "@startuml\r\n" + //
+                "Alice -> Bob: Authentication Request\r\n" + //
+                "Bob --> Alice: Authentication Response\r\n" + //
+                "@enduml";
+        String expected = "Syp9J4vLqBLJSCfFib9mB2t9ICqhoKnEBCdCprC8IYqiJIqkuGBAAUW2rO0LOr5LN92VLvpA1G00";
+        assertEquals(expected, PlantUMLEncoder.plantUMLEncode(input));
     }
 
-    @Test
-    public void testToURL() {
-        String input = "test";
-        String expected = "test";
-        assertEquals(expected, PlantUMLEncoder.toURL(input));
-    }
-
-    @Test
-    public void testCompress() {
-        String input = "test";
-        String compressed = PlantUMLEncoder.compress(input);
-        assertNotNull(compressed);
-    }
-
-    @Test
-    public void testDecompress() {
-        String input = "test";
-        String compressed = PlantUMLEncoder.compress(input);
-        String decompressed = PlantUMLEncoder.decompress(compressed);
-        assertEquals(input, decompressed);
-    }
 }
