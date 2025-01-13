@@ -1,6 +1,6 @@
 package com.menkaix.backlogs.services.applicatif;
 
-import com.menkaix.backlogs.entities.Project;
+import com.menkaix.backlogs.models.entities.Project;
 import com.menkaix.backlogs.repositories.ProjectRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

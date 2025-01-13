@@ -1,10 +1,10 @@
 package com.menkaix.backlogs.services;
 
-import com.menkaix.backlogs.entities.Actor;
-import com.menkaix.backlogs.entities.Project;
-import com.menkaix.backlogs.entities.Raci;
-import com.menkaix.backlogs.entities.Story;
-import com.menkaix.backlogs.models.RaciDTO;
+import com.menkaix.backlogs.models.dto.RaciDTO;
+import com.menkaix.backlogs.models.entities.Actor;
+import com.menkaix.backlogs.models.entities.Project;
+import com.menkaix.backlogs.models.entities.Raci;
+import com.menkaix.backlogs.models.entities.Story;
 import com.menkaix.backlogs.repositories.ActorRepository;
 import com.menkaix.backlogs.repositories.RaciRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;

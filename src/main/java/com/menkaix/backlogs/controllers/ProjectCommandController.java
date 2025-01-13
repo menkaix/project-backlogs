@@ -1,9 +1,9 @@
 package com.menkaix.backlogs.controllers;
 
-import com.menkaix.backlogs.entities.Actor;
-import com.menkaix.backlogs.entities.Project;
-import com.menkaix.backlogs.models.FeatureTreeDTO;
-import com.menkaix.backlogs.models.RaciDTO;
+import com.menkaix.backlogs.models.dto.FeatureTreeDTO;
+import com.menkaix.backlogs.models.dto.RaciDTO;
+import com.menkaix.backlogs.models.entities.Actor;
+import com.menkaix.backlogs.models.entities.Project;
 import com.menkaix.backlogs.services.ActorService;
 import com.menkaix.backlogs.services.ProjectService;
 import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;

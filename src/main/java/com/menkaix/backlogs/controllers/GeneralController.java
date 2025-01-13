@@ -1,9 +1,8 @@
 package com.menkaix.backlogs.controllers;
 
 
-import com.menkaix.backlogs.entities.FeatureType;
-import com.menkaix.backlogs.entities.Task;
-
+import com.menkaix.backlogs.models.entities.FeatureType;
+import com.menkaix.backlogs.models.entities.Task;
 import com.menkaix.backlogs.repositories.FeatureTypeRepository;
 import com.menkaix.backlogs.repositories.TaskRepository;
 

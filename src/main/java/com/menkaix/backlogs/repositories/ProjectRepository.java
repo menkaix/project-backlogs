@@ -2,9 +2,10 @@ package com.menkaix.backlogs.repositories;
 
 import java.util.List;
 
-import com.menkaix.backlogs.entities.Project;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
+
+import com.menkaix.backlogs.models.entities.Project;
 
 @RepositoryRestController(path = "projects", value = "projects")
 public interface ProjectRepository extends MongoRepository<Project, String> {

@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.menkaix.backlogs.entities.Diagram;
+import com.menkaix.backlogs.models.entities.Diagram;
 import com.menkaix.backlogs.repositories.DiagramRepository;
 import com.menkaix.backlogs.utilities.PlantUMLEncoder;
 

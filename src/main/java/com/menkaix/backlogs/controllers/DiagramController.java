@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.menkaix.backlogs.entities.Diagram;
+import com.menkaix.backlogs.models.entities.Diagram;
 import com.menkaix.backlogs.services.DiagramService;
 
 @Controller
