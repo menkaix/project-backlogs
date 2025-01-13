@@ -1,8 +1,8 @@
 package com.menkaix.backlogs.services;
 
-import com.menkaix.backlogs.entities.Feature;
-import com.menkaix.backlogs.entities.Project;
-import com.menkaix.backlogs.entities.Story;
+import com.menkaix.backlogs.models.entities.Feature;
+import com.menkaix.backlogs.models.entities.Project;
+import com.menkaix.backlogs.models.entities.Story;
 import com.menkaix.backlogs.repositories.FeatureRepository;
 
 import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;

@@ -1,6 +1,6 @@
 package com.menkaix.backlogs.services;
 
-import com.menkaix.backlogs.entities.FeatureType;
+import com.menkaix.backlogs.models.entities.FeatureType;
 import com.menkaix.backlogs.repositories.FeatureTypeRepository;
 
 

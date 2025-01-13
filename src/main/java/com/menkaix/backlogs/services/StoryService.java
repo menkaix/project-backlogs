@@ -1,11 +1,11 @@
 package com.menkaix.backlogs.services;
 
-import com.menkaix.backlogs.entities.Actor;
-import com.menkaix.backlogs.entities.Feature;
-import com.menkaix.backlogs.entities.Project;
-import com.menkaix.backlogs.entities.Story;
-import com.menkaix.backlogs.models.FullFeatureDTO;
-import com.menkaix.backlogs.models.FullStoryDTO;
+import com.menkaix.backlogs.models.dto.FullFeatureDTO;
+import com.menkaix.backlogs.models.dto.FullStoryDTO;
+import com.menkaix.backlogs.models.entities.Actor;
+import com.menkaix.backlogs.models.entities.Feature;
+import com.menkaix.backlogs.models.entities.Project;
+import com.menkaix.backlogs.models.entities.Story;
 import com.menkaix.backlogs.repositories.ActorRepository;
 import com.menkaix.backlogs.repositories.FeatureRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;

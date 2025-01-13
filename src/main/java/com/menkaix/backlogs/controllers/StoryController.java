@@ -1,6 +1,6 @@
 package com.menkaix.backlogs.controllers;
 
-import com.menkaix.backlogs.models.FullStoryDTO;
+import com.menkaix.backlogs.models.dto.FullStoryDTO;
 import com.menkaix.backlogs.services.StoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

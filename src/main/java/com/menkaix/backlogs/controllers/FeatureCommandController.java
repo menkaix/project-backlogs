@@ -1,6 +1,6 @@
 package com.menkaix.backlogs.controllers;
 
-import com.menkaix.backlogs.entities.Feature;
+import com.menkaix.backlogs.models.entities.Feature;
 import com.menkaix.backlogs.services.FeatureService;
 import com.menkaix.backlogs.services.FeatureTypeService;
 import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;

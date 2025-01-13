@@ -6,11 +6,13 @@ import java.util.NoSuchElementException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.menkaix.backlogs.entities.Actor;
-import com.menkaix.backlogs.entities.Feature;
-import com.menkaix.backlogs.entities.Story;
-import com.menkaix.backlogs.entities.Task;
-import com.menkaix.backlogs.models.*;
+import com.menkaix.backlogs.models.dto.*;
+import com.menkaix.backlogs.models.entities.Actor;
+import com.menkaix.backlogs.models.entities.Feature;
+import com.menkaix.backlogs.models.entities.Project;
+import com.menkaix.backlogs.models.entities.Raci;
+import com.menkaix.backlogs.models.entities.Story;
+import com.menkaix.backlogs.models.entities.Task;
 import com.menkaix.backlogs.repositories.ActorRepository;
 import com.menkaix.backlogs.repositories.FeatureRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;
@@ -23,8 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.menkaix.backlogs.entities.Project;
-import com.menkaix.backlogs.entities.Raci;
 import com.menkaix.backlogs.repositories.ProjectRepository;
 import com.menkaix.backlogs.repositories.RaciRepository;
 import com.menkaix.backlogs.utilities.exceptions.DataConflictException;

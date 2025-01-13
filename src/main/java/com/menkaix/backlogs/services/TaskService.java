@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.menkaix.backlogs.entities.Feature;
-import com.menkaix.backlogs.entities.FeatureType;
-import com.menkaix.backlogs.entities.Task;
+import com.menkaix.backlogs.models.entities.Feature;
+import com.menkaix.backlogs.models.entities.FeatureType;
+import com.menkaix.backlogs.models.entities.Task;
 import com.menkaix.backlogs.repositories.TaskRepository;
 
 @Service

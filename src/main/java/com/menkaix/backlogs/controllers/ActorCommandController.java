@@ -1,7 +1,7 @@
 package com.menkaix.backlogs.controllers;
 
-import com.menkaix.backlogs.entities.Actor;
-import com.menkaix.backlogs.entities.Story;
+import com.menkaix.backlogs.models.entities.Actor;
+import com.menkaix.backlogs.models.entities.Story;
 import com.menkaix.backlogs.services.ActorService;
 import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
 import org.slf4j.Logger;

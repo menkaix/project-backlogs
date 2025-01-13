@@ -1,8 +1,9 @@
 package com.menkaix.backlogs.repositories;
 
-import com.menkaix.backlogs.entities.Story;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
+
+import com.menkaix.backlogs.models.entities.Story;
 
 import java.util.List;
 
