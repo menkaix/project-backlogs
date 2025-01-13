@@ -1,19 +1,10 @@
 package com.menkaix.backlogs.models.entities;
 
-
 public class Channel {
 
-	private Integer id;
-	
-	private String channelName ;
+	private String id;
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
+	private String channelName;
 
 	public String getChannelName() {
 		return channelName;

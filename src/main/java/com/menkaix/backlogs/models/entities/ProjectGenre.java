@@ -1,13 +1,11 @@
 package com.menkaix.backlogs.models.entities;
 
-
 public class ProjectGenre {
 
-	
-	private Integer id;
-	
-	private String genreName ;
-	private String description ;
+	private String id;
+
+	private String genreName;
+	private String description;
 
 	public String getGenreName() {
 		return genreName;
@@ -24,5 +22,5 @@ public class ProjectGenre {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
 }

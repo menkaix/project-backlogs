@@ -4,8 +4,7 @@ import java.util.Date;
 
 public class Note {
 
-	
-	private Integer id;
+	private String id;
 
 	private String projectCode;
 
@@ -15,15 +14,6 @@ public class Note {
 
 	private String content;
 
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
 	public String getProjectCode() {
 		return projectCode;
 	}
@@ -31,8 +21,6 @@ public class Note {
 	public void setProjectCode(String projectCode) {
 		this.projectCode = projectCode;
 	}
-
-	
 
 	public Date getCreationDate() {
 		return creationDate;

@@ -1,15 +1,12 @@
 package com.menkaix.backlogs.models.entities;
 
-
-
 public class ProjectStatus {
-	
-	
-	private Integer id;
-	
-	private String statusName ;
-	private String description ;
-	private LifeCycle cycle ;
+
+	private String id;
+
+	private String statusName;
+	private String description;
+	private LifeCycle cycle;
 
 	public String getStatusName() {
 		return statusName;

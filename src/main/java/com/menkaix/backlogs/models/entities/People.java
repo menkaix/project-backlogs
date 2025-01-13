@@ -1,9 +1,8 @@
 package com.menkaix.backlogs.models.entities;
 
-
 public class People {
 
-	private Integer id;
+	private String id;
 
 	private String firstName;
 	private String lastName;
