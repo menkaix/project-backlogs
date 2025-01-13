@@ -36,6 +36,7 @@ public class DiagramService {
 		}
 
 		String encodedString = PlantUMLEncoder.toHex(source);
+		// String encodedString = PlantUMLEncoder.plantUMLEncode(source);
 
 		return encodedString;
 	}

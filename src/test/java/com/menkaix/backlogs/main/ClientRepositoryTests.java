@@ -18,6 +18,7 @@ package com.menkaix.backlogs.main;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import com.menkaix.backlogs.services.ProjectService;
 import com.menkaix.backlogs.services.applicatif.DataAccessService;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,17 +29,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.menkaix.backlogs.entities.Project;
-import com.menkaix.backlogs.repositories.ProjectRepisitory;
-import com.menkaix.backlogs.services.ProjectService;
+import com.menkaix.backlogs.repositories.ProjectRepository;
 
 @SpringBootTest
 public class ClientRepositoryTests {
 
 	@MockBean
-	ProjectRepisitory projectRepisitory;
+	ProjectRepository projectRepository;
 
 	@Autowired
 	DataAccessService service;
+
+	@Autowired
+	ProjectService projectService;
 
 	@BeforeEach
 	public void configureTest() {
@@ -49,12 +52,12 @@ public class ClientRepositoryTests {
 		project.code = "TST";
 		prjs.add(project);
 
-		Mockito.when(projectRepisitory.findByName("test")).thenReturn(prjs);
-		Mockito.when(projectRepisitory.findByCode("TST")).thenReturn(prjs);
+		Mockito.when(projectRepository.findByName("test")).thenReturn(prjs);
+		Mockito.when(projectRepository.findByCode("TST")).thenReturn(prjs);
 
 		Optional<Project> oPrj = Optional.of(project);
 
-		Mockito.when(projectRepisitory.findById("abcd1234")).thenReturn(oPrj);
+		Mockito.when(projectRepository.findById("abcd1234")).thenReturn(oPrj);
 
 	}
 
@@ -64,6 +67,19 @@ public class ClientRepositoryTests {
 		Project prj = service.findProject("test");
 
 		Assert.assertEquals("abcd1234", prj.id);
+	}
+
+	@Test
+	public void ShouldMergeLists() {
+
+		ArrayList<String> initial = new ArrayList<>();
+		ArrayList<String> adendum = new ArrayList<>();
+
+		adendum.add("bla");
+
+		projectService.merge(initial, adendum);
+
+		Assert.assertEquals(1, initial.size());
 	}
 
 	@Test

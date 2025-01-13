@@ -2,12 +2,12 @@ package com.menkaix.backlogs.entities;
 
 import org.springframework.data.annotation.Id;
 
-public class Diagram extends AbstractEntity{
+public class Diagram extends AbstractEntity {
 
     @Id
     public String id;
 
-    private String definition ;
+    private String definition;
 
     public Diagram() {
         super();
@@ -31,9 +31,5 @@ public class Diagram extends AbstractEntity{
 
     public void setId(String id) {
         this.id = id;
-    } ;
-
-    
-    
-    
+    }
 }

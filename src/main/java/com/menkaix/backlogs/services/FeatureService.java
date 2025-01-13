@@ -1,11 +1,10 @@
 package com.menkaix.backlogs.services;
 
 import com.menkaix.backlogs.entities.Feature;
-import com.menkaix.backlogs.entities.FeatureType;
 import com.menkaix.backlogs.entities.Project;
 import com.menkaix.backlogs.entities.Story;
 import com.menkaix.backlogs.repositories.FeatureRepository;
-import com.menkaix.backlogs.repositories.StoryRepository;
+
 import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
 
 import java.util.ArrayList;
@@ -32,67 +31,73 @@ public class FeatureService {
     }
 
     public Feature addFeatureToStory(String storyId, Feature feature) throws EntityNotFoundException {
+        logger.info("Adding feature to story with id: {}", storyId);
 
-        Story story = storyService.findById(storyId).get();
+        Story story = storyService.findById(storyId).orElseThrow(() -> {
+            logger.error("Story not found with id: {}", storyId);
+            return new EntityNotFoundException("Story not found with id " + storyId);
+        });
 
-        if (story == null)
-            throw new EntityNotFoundException("story not found with id " + storyId);
-
-        feature.storyId = story.id;
-
+        feature.setStoryId(story.getId());
         Feature ans = featureRepository.save(feature);
-
         taskService.createUsualTasks(ans);
 
+        logger.info("Feature added to story with id: {}", storyId);
         return ans;
     }
 
     public Feature addToParent(String parentId, Feature feature) throws EntityNotFoundException {
+        logger.info("Adding feature to parent with id: {}", parentId);
 
-        Feature parent = featureRepository.findById(parentId).get();
+        Feature parent = featureRepository.findById(parentId).orElseThrow(() -> {
+            logger.error("Feature not found with id: {}", parentId);
+            return new EntityNotFoundException("Feature not found with id " + parentId);
+        });
 
-        if (parent == null)
-            throw new EntityNotFoundException("Feature not found with id " + parentId);
-
-        feature.parentID = parent.id;
-
-        if (feature.storyId == null || feature.storyId.length() == 0) {
-            feature.storyId = parent.storyId;
+        feature.setParentID(parent.getId());
+        if (feature.getStoryId() == null || feature.getStoryId().isEmpty()) {
+            feature.setStoryId(parent.getStoryId());
         }
 
-        return featureRepository.save(feature);
+        Feature savedFeature = featureRepository.save(feature);
+        logger.info("Feature added to parent with id: {}", parentId);
+        return savedFeature;
     }
 
     public Feature addToParent(String parentId, String childId) throws EntityNotFoundException {
+        logger.info("Adding child feature with id: {} to parent with id: {}", childId, parentId);
 
-        Feature parent = featureRepository.findById(parentId).get();
-        Feature child = featureRepository.findById(childId).get();
+        Feature parent = featureRepository.findById(parentId).orElseThrow(() -> {
+            logger.error("Feature not found with id: {}", parentId);
+            return new EntityNotFoundException("Feature not found with id " + parentId);
+        });
 
-        if (parent == null)
-            throw new EntityNotFoundException("Feature not found with id " + parentId);
-        if (child == null)
-            throw new EntityNotFoundException("Feature not found with id " + childId);
+        Feature child = featureRepository.findById(childId).orElseThrow(() -> {
+            logger.error("Feature not found with id: {}", childId);
+            return new EntityNotFoundException("Feature not found with id " + childId);
+        });
 
-        child.parentID = parent.id;
-
-        if (child.storyId == null || child.storyId.length() == 0) {
-            child.storyId = parent.storyId;
+        child.setParentID(parent.getId());
+        if (child.getStoryId() == null || child.getStoryId().isEmpty()) {
+            child.setStoryId(parent.getStoryId());
         }
 
-        return featureRepository.save(child);
-
+        Feature savedChild = featureRepository.save(child);
+        logger.info("Child feature with id: {} added to parent with id: {}", childId, parentId);
+        return savedChild;
     }
 
     public List<Feature> getFeatures(Project prj) {
+        logger.info("Getting features for project with id: {}", prj.getId());
 
         ArrayList<Feature> ans = new ArrayList<>();
-
         List<Story> stories = storyService.findByProject(prj);
 
         for (Story story : stories) {
-            ans.addAll(featureRepository.findByStoryId(story.id));
+            ans.addAll(featureRepository.findByStoryId(story.getId()));
         }
 
+        logger.info("Features retrieved for project with id: {}", prj.getId());
         return ans;
     }
 }

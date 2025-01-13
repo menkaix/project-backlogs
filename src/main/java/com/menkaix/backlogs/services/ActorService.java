@@ -5,15 +5,13 @@ import com.menkaix.backlogs.entities.Project;
 import com.menkaix.backlogs.entities.Raci;
 import com.menkaix.backlogs.entities.Story;
 import com.menkaix.backlogs.models.RaciDTO;
-import com.menkaix.backlogs.repositories.ActorRepisitory;
+import com.menkaix.backlogs.repositories.ActorRepository;
 import com.menkaix.backlogs.repositories.RaciRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;
 import com.menkaix.backlogs.services.applicatif.DataAccessService;
 import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.xml.crypto.Data;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,15 +20,15 @@ import java.util.List;
 public class ActorService {
 
     private final DataAccessService projectService;
-    private final ActorRepisitory actorRepisitory;
+    private final ActorRepository actorRepository;
     private final StoryRepository storyRepository;
     private final RaciRepository raciRepository;
 
     @Autowired
-    public ActorService(DataAccessService projectService, ActorRepisitory actorRepisitory,
+    public ActorService(DataAccessService projectService, ActorRepository actorRepository,
             StoryRepository storyRepository, RaciRepository raciRepository) {
         this.projectService = projectService;
-        this.actorRepisitory = actorRepisitory;
+        this.actorRepository = actorRepository;
         this.storyRepository = storyRepository;
         this.raciRepository = raciRepository;
     }
@@ -41,14 +39,14 @@ public class ActorService {
         if (prj == null)
             throw new EntityNotFoundException("no project foun with reference " + project);
 
-        actor.projectName = prj.name;
+        actor.setProjectName(prj.name);
 
         return save(actor);
     }
 
     private Actor save(Actor actor) {
 
-        return actorRepisitory.save(actor);
+        return actorRepository.save(actor);
     }
 
     public Story addStory(String project, String name, Story story) throws EntityNotFoundException {
@@ -57,14 +55,14 @@ public class ActorService {
         if (prj == null)
             throw new EntityNotFoundException("no project found with reference " + project);
 
-        List<Actor> actors = actorRepisitory.findByProjectName(prj.name);
+        List<Actor> actors = actorRepository.findByProjectName(prj.name);
 
         if (actors.size() <= 0)
             throw new EntityNotFoundException("no actor found with name " + name + " in project " + project);
 
         for (Actor a : actors) {
             if (a.name.equalsIgnoreCase(name)) {
-                story.actorId = a.id;
+                story.setActorId(a.getId());
                 return storyRepository.save(story);
             }
         }
@@ -78,7 +76,7 @@ public class ActorService {
         if (prj == null)
             throw new EntityNotFoundException("no project found with reference " + project);
 
-        return actorRepisitory.findByProjectName(prj.name);
+        return actorRepository.findByProjectName(prj.name);
 
     }
 

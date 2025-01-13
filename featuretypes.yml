@@ -1,0 +1,77 @@
+featureTypes:
+  - name: button
+    keyFeatures:
+      - text
+      - action
+    usualTask:
+      integration: "integration du bouton %s"
+      action: "développement de l'action pour le bouton %s"
+  - name: value
+    keyFeatures:
+      - value
+  - name: function
+    usualTask:
+      dev: "développement de la fonction %s"
+  - name: screen
+    isContainer: true
+    usualTask:
+      integration: "integration de l'écran %s"
+  - name: form
+    isContainer: true
+    keyFeatures:
+      - action
+    usualTask:
+      integration: "integration du formulaire %s"
+  - name: field
+    usualTask:
+      integration: "integration du champ %s"
+      dev: "implémentation des règles de validation pour %s"
+  - name: node
+    isContainer: true
+  - name: business-rule
+    usualTask:
+      dev: "implémentation des règles de gestion %s"
+  - name: rest-api
+    usualTask:
+      dev: "mise en place de l'API %s"
+  - name: procedure
+    usualTask:
+      dev: "développement de la procédure %s"
+  - name: behaviour
+    usualTask:
+      dev: "développement du behaviour %s"
+  - name: rest-client
+    usualTask:
+      dev: "consommation de l'API %s"
+  - name: display
+    usualTask:
+      integration: "integration de l'affichage %s"
+  - name: list
+    usualTask:
+      integration-liste: "integration de la liste %s"
+      integration-element: "integration d'un élément de la liste %s"
+      dev: "dynamisation de la liste %s"
+  - name: draggable
+    usualTask:
+      dev: "développement du draggable sur %s"
+  - name: clickable
+    usualTask:
+      dev: "développement de l'action du cliquable sur %s"
+  - name: hover
+    usualTask:
+      dev: "développement de l'action du hover sur %s"
+  - name: dropzone
+    usualTask:
+      dev: "développement de la drop zone sur %s"
+  - name: radiogroup
+    usualTask:
+      dev: "développement de la radio group %s"
+      integration: "integration de la radio group %s"
+  - name: optiongroup
+    usualTask:
+      dev: "développement de la radio group %s"
+      integration: "integration de la radio group %s"
+  - name: select
+    usualTask:
+      dev: "dynamisation de la liste de sélection %s"
+      integration: "integration du select %s"

@@ -6,11 +6,43 @@ import org.springframework.data.annotation.Id;
 public class Actor extends AbstractEntity {
 
     @Id
-    public String id;
+    private String id;
 
-    public String projectName ;
-    
-    public String description ;
+    private String projectName;
 
-    public ActorType type = ActorType.USER ;
+    private String description;
+
+    private ActorType type = ActorType.USER;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public ActorType getType() {
+        return type;
+    }
+
+    public void setType(ActorType type) {
+        this.type = type;
+    }
 }
