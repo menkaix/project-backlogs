@@ -1,7 +1,10 @@
 package com.menkaix.backlogs.models.entities;
 
+import org.springframework.data.annotation.Id;
+
 public class Channel {
 
+	@Id
 	private String id;
 
 	private String channelName;

@@ -2,8 +2,11 @@ package com.menkaix.backlogs.models.entities;
 
 import java.util.Date;
 
+import org.springframework.data.annotation.Id;
+
 public class Note {
 
+	@Id
 	private String id;
 
 	private String projectCode;

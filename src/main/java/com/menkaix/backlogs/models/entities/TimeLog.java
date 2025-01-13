@@ -2,8 +2,11 @@ package com.menkaix.backlogs.models.entities;
 
 import java.util.Date;
 
+import org.springframework.data.annotation.Id;
+
 public class TimeLog {
 
+	@Id
 	private String id;
 
 	private Task task;
@@ -23,14 +26,6 @@ public class TimeLog {
 	private Float seconds;
 
 	private Date creationDate;
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
 
 	public Task getTask() {
 		return task;

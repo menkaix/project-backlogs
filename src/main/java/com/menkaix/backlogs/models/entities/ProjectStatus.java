@@ -1,7 +1,10 @@
 package com.menkaix.backlogs.models.entities;
 
+import org.springframework.data.annotation.Id;
+
 public class ProjectStatus {
 
+	@Id
 	private String id;
 
 	private String statusName;
