@@ -1,17 +1,10 @@
-package dashboard.data.entities;
+package com.menkaix.backlogs.entities;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-
-@Entity
 public class Note {
 
-	@Id
+	
 	private Integer id;
 
 	private String projectCode;
@@ -22,13 +15,24 @@ public class Note {
 
 	private String content;
 
-	public Project getProject() {
-		return project;
+
+	public Integer getId() {
+		return id;
 	}
 
-	public void setProject(Project project) {
-		this.project = project;
+	public void setId(Integer id) {
+		this.id = id;
 	}
+
+	public String getProjectCode() {
+		return projectCode;
+	}
+
+	public void setProjectCode(String projectCode) {
+		this.projectCode = projectCode;
+	}
+
+	
 
 	public Date getCreationDate() {
 		return creationDate;

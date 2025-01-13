@@ -1,19 +1,10 @@
-package dashboard.data.entities;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-
-@Entity
+package com.menkaix.backlogs.entities;
 public class UserStory {
 	
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+
 	private Integer id;
 	
-	@ManyToOne
+
 	private Actor actor ;
 	
 	private String action ;

@@ -1,17 +1,10 @@
-package dashboard.data.entities;
+package com.menkaix.backlogs.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.menkaix.backlogs.utilities.values.LifeCycle;
 
-import dashboard.data.values.LifeCycle;
-
-@Entity
 public class ProjectStatus {
 	
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	
 	private Integer id;
 	
 	private String statusName ;

@@ -1,14 +1,8 @@
-package dashboard.data.entities;
+package com.menkaix.backlogs.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
-@Entity
 public class Channel {
-	
-	@Id
+
 	private Integer id;
 	
 	private String channelName ;

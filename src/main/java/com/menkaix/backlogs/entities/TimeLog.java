@@ -1,24 +1,16 @@
-package dashboard.data.entities;
+package com.menkaix.backlogs.entities;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-
-@Entity
 public class TimeLog {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+
 	private Integer id;
 	
-	@ManyToOne
+
 	private Task task ;
 	
-	@ManyToOne
+
 	private People owner ;
 	
 	private String mailSubject ;
