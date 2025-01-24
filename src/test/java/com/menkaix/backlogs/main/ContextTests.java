@@ -20,17 +20,19 @@ import java.util.Optional;
 
 import com.menkaix.backlogs.services.ProjectService;
 import com.menkaix.backlogs.services.applicatif.DataAccessService;
-import org.junit.Assert;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+
 
 import com.menkaix.backlogs.models.entities.Project;
 import com.menkaix.backlogs.repositories.ProjectRepository;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("test")
 @SpringBootTest
 public class ContextTests {
 
