@@ -1,4 +1,4 @@
-FROM gradle:jdk17 AS build
+FROM gradle:jdk23 AS build
 
 COPY --chown=gradle:gradle . /home/gradle/src
 
@@ -8,7 +8,7 @@ RUN gradle build --no-daemon
 
 RUN ls /home/gradle/src/
 
-FROM openjdk:18-jdk-oracle
+FROM openjdk:23
 
 EXPOSE 8080
 
