@@ -24,7 +24,8 @@ public class DiagramController {
 
 		String encoded = service.encodedDiagramDefinition(name);
 
-		return service.getDiagramPNG(encoded);
+		// return service.getDiagramPNG(encoded);
+		return null ;
 
 	}
 
@@ -61,7 +62,8 @@ public class DiagramController {
 
 		String encoded = service.encodedDiagramDefinition(name);
 
-		return service.getDiagramPNG(encoded);
+		// return service.getDiagramPNG(encoded);
+		return null;
 
 	}
 

@@ -10,9 +10,9 @@ import com.menkaix.backlogs.models.entities.Diagram;
 import com.menkaix.backlogs.repositories.DiagramRepository;
 import com.menkaix.backlogs.utilities.PlantUMLEncoder;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+//import okhttp3.OkHttpClient;
+//import okhttp3.Request;
+//import okhttp3.Response;
 
 @Service
 public class DiagramService {
@@ -41,27 +41,27 @@ public class DiagramService {
 		return encodedString;
 	}
 
-	public byte[] getDiagramPNG(String encodedString) {
-
-		OkHttpClient client = new OkHttpClient().newBuilder()
-				.build();
-
-		Request request = new Request.Builder()
-				.url("http://www.plantuml.com/plantuml/png/~h" + encodedString)
-				.method("GET", null)
-				.build();
-		try {
-			Response response = client.newCall(request).execute();
-
-			return response.body().bytes();
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-
-	}
+//	public byte[] getDiagramPNG(String encodedString) {
+//
+//		OkHttpClient client = new OkHttpClient().newBuilder()
+//				.build();
+//
+//		Request request = new Request.Builder()
+//				.url("http://www.plantuml.com/plantuml/png/~h" + encodedString)
+//				.method("GET", null)
+//				.build();
+//		try {
+//			Response response = client.newCall(request).execute();
+//
+//			return response.body().bytes();
+//
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return null;
+//		}
+//
+//	}
 
 	public Diagram updateDefinition(String name, String data) {
 
