@@ -1,4 +1,4 @@
-FROM gradle:jdk23 AS build
+FROM gradle:jdk19 AS build
 
 COPY --chown=gradle:gradle . /home/gradle/src
 
@@ -8,7 +8,7 @@ RUN gradle build --no-daemon
 
 RUN ls /home/gradle/src/
 
-FROM openjdk:23
+FROM openjdk:19
 
 EXPOSE 8080
 
