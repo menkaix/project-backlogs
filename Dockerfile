@@ -1,4 +1,4 @@
-FROM gradle:jdk19 AS build
+FROM gradle:8-jdk19 AS build
 
 COPY --chown=gradle:gradle . /home/gradle/src
 
