@@ -1,4 +1,4 @@
-FROM gradle:jdk19 AS build
+FROM gradle:8.9-jdk21 AS build
 
 COPY --chown=gradle:gradle . /home/gradle/src
 
@@ -8,7 +8,7 @@ RUN gradle build --no-daemon
 
 RUN ls /home/gradle/src/
 
-FROM openjdk:19
+FROM eclipse-temurin:21-jdk
 
 EXPOSE 8080
 
