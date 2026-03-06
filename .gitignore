@@ -18,3 +18,4 @@ pom.xml
 /.vscode
 api-backlog-8.yml
 backlog-api-definition.yml
+.claude/

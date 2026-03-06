@@ -3,7 +3,9 @@ package com.menkaix.backlogs.models.entities;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection = "task")
 public class Task extends AbstractEntity {
 
 	@Id
@@ -22,6 +24,21 @@ public class Task extends AbstractEntity {
 	public Date doneDate;
 
 	public String idReference;
+
+	// Champs enrichis depuis bug-tracking-janitor
+	public String status;
+
+	public String assignee;
+
+	public String estimate;
+
+	public String trackingReference;
+
+	public Date plannedStart;
+
+	public Date deadLine;
+
+	public Date updateDate;
 
 	public String getId() {
 		return id;
@@ -85,5 +102,61 @@ public class Task extends AbstractEntity {
 
 	public void setIdReference(String idReference) {
 		this.idReference = idReference;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getAssignee() {
+		return assignee;
+	}
+
+	public void setAssignee(String assignee) {
+		this.assignee = assignee;
+	}
+
+	public String getEstimate() {
+		return estimate;
+	}
+
+	public void setEstimate(String estimate) {
+		this.estimate = estimate;
+	}
+
+	public String getTrackingReference() {
+		return trackingReference;
+	}
+
+	public void setTrackingReference(String trackingReference) {
+		this.trackingReference = trackingReference;
+	}
+
+	public Date getPlannedStart() {
+		return plannedStart;
+	}
+
+	public void setPlannedStart(Date plannedStart) {
+		this.plannedStart = plannedStart;
+	}
+
+	public Date getDeadLine() {
+		return deadLine;
+	}
+
+	public void setDeadLine(Date deadLine) {
+		this.deadLine = deadLine;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
 	}
 }
