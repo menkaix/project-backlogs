@@ -5,8 +5,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.web.bind.annotation.CrossOrigin;
-
 @ComponentScan(basePackages = {
 		"com.menkaix.backlogs.services",
 		"com.menkaix.backlogs.controllers",
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 		"com.menkaix.backlogs.mcp"
 })
 @EnableMongoRepositories("com.menkaix.backlogs.repositories")
-@CrossOrigin
 @SpringBootApplication
 public class AccessingDataMongodbApplication implements CommandLineRunner {
 
