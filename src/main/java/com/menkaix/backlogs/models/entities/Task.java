@@ -12,31 +12,22 @@ public class Task extends AbstractEntity {
 	public String id;
 
 	public String projectId;
-
 	public String reference;
-
 	public String title;
-
 	public String description;
 
+	public Date plannedStart;
 	public Date dueDate;
-
 	public Date doneDate;
 
 	public String idReference;
 
 	// Champs enrichis depuis bug-tracking-janitor
 	public String status;
-
 	public String assignee;
-
 	public String estimate;
-
 	public String trackingReference;
 
-	public Date plannedStart;
-
-	public Date deadLine;
 
 	public String getId() {
 		return id;
@@ -142,12 +133,5 @@ public class Task extends AbstractEntity {
 		this.plannedStart = plannedStart;
 	}
 
-	public Date getDeadLine() {
-		return deadLine;
-	}
-
-	public void setDeadLine(Date deadLine) {
-		this.deadLine = deadLine;
-	}
 
 }

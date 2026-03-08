@@ -10,7 +10,6 @@ public class Link {
 
     private Date createDate = new Date();
 
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:1339827003.
     public String getName() {
         return name;
     }
@@ -24,7 +23,6 @@ public class Link {
         this.href = href;
     }
 
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:1680790035.
     public String getVersion() {
         return version;
     }
@@ -32,7 +30,6 @@ public class Link {
         this.version = version;
     }
 
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:1423992242.
     public Date getCreateDate() {
         return createDate;
     }
