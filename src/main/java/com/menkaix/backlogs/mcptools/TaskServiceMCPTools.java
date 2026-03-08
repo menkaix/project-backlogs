@@ -62,7 +62,7 @@ public class TaskServiceMCPTools {
         if (details.getStatus() != null) existing.setStatus(details.getStatus());
         if (details.getAssignee() != null) existing.setAssignee(details.getAssignee());
         if (details.getEstimate() != null) existing.setEstimate(details.getEstimate());
-        if (details.getDeadLine() != null) existing.setDeadLine(details.getDeadLine());
+        if (details.getDueDate() != null) existing.setDueDate(details.getDueDate());
         if (details.getDoneDate() != null) existing.setDoneDate(details.getDoneDate());
         return taskService.update(existing);
     }
