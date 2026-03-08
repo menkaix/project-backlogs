@@ -38,8 +38,6 @@ public class Task extends AbstractEntity {
 
 	public Date deadLine;
 
-	public Date updateDate;
-
 	public String getId() {
 		return id;
 	}
@@ -152,11 +150,4 @@ public class Task extends AbstractEntity {
 		this.deadLine = deadLine;
 	}
 
-	public Date getUpdateDate() {
-		return updateDate;
-	}
-
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
-	}
 }

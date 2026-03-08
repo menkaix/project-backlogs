@@ -45,7 +45,6 @@ public class TaskService {
 				task.setIdReference("feature/" + feature.getId());
 				task.setReference("feature/" + feature.getId() + "/" + taskKey);
 				task.setTitle(String.format(featureType.getUsualTask().get(taskKey), feature.getName()));
-				task.setCreationDate(new Date());
 				repository.save(task);
 			}
 		} else {
@@ -54,8 +53,6 @@ public class TaskService {
 	}
 
 	public Task create(Task task) {
-		task.setCreationDate(new Date());
-		task.setUpdateDate(new Date());
 		return repository.save(task);
 	}
 
@@ -68,7 +65,6 @@ public class TaskService {
 	}
 
 	public Task update(Task task) {
-		task.setUpdateDate(new Date());
 		return repository.save(task);
 	}
 

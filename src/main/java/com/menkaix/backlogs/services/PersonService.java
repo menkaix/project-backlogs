@@ -1,7 +1,6 @@
 package com.menkaix.backlogs.services;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -32,8 +31,6 @@ public class PersonService {
         if (person.getEmail() == null || person.getEmail().isBlank()) {
             throw new IllegalArgumentException("Email is required");
         }
-        person.setCreationDate(new Date());
-        person.setUpdateDate(new Date());
         return repository.save(person);
     }
 
@@ -46,7 +43,6 @@ public class PersonService {
     }
 
     public People update(People person) {
-        person.setUpdateDate(new Date());
         return repository.save(person);
     }
 

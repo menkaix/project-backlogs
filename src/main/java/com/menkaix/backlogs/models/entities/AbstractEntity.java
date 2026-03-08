@@ -4,13 +4,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import com.menkaix.backlogs.models.transients.Comment;
 import com.menkaix.backlogs.models.transients.Link;
 
 public abstract class AbstractEntity {
 
 	public String name;
-	public Date creationDate = new Date();
+
+	@CreatedDate
+	public Date creationDate;
+
+	@LastModifiedDate
 	public Date lastUpdateDate;
 
 	private List<Comment> comments = new ArrayList<Comment>();
