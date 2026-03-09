@@ -14,6 +14,7 @@ public class FullTaskDTO {
 	private String name;
 	private Date creationDate;
 	private Date lastUpdateDate;
+	private String status;
 
 	public String getId() {
 		return id;
@@ -101,5 +102,13 @@ public class FullTaskDTO {
 
 	public void setLastUpdateDate(Date lastUpdateDate) {
 		this.lastUpdateDate = lastUpdateDate;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }
