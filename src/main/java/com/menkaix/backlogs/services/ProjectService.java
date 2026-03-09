@@ -321,6 +321,7 @@ public class ProjectService {
 		taskDTO.setName(task.getName());
 		taskDTO.setCreationDate(task.getCreationDate());
 		taskDTO.setLastUpdateDate(task.getLastUpdateDate());
+		taskDTO.setStatus(task.getStatus());
 		return taskDTO;
 	}
 
