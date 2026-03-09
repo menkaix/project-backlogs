@@ -3,6 +3,7 @@ package com.menkaix.backlogs.services;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -53,6 +54,22 @@ public class TaskService {
 	}
 
 	public Task create(Task task) {
+		return repository.save(task);
+	}
+
+	public Task addNewTaskToFeature(String featureId, Task task) {
+		task.setIdReference("feature/" + featureId);
+		return repository.save(task);
+	}
+
+	public Task assignTaskToFeature(String featureId, String taskId) {
+		Task task = repository.findById(taskId)
+				.orElseThrow(() -> new NoSuchElementException("Task not found: " + taskId));
+		task.setIdReference("feature/" + featureId);
+		if (task.getReference() != null && task.getReference().split("/").length == 3) {
+			String taskKey = task.getReference().split("/")[2];
+			task.setReference("feature/" + featureId + "/" + taskKey);
+		}
 		return repository.save(task);
 	}
 

@@ -1,8 +1,10 @@
 package com.menkaix.backlogs.controllers;
 
 import com.menkaix.backlogs.models.entities.Feature;
+import com.menkaix.backlogs.models.entities.Task;
 import com.menkaix.backlogs.services.FeatureService;
 import com.menkaix.backlogs.services.FeatureTypeService;
+import com.menkaix.backlogs.services.TaskService;
 import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/feature-command")
@@ -23,6 +27,9 @@ public class FeatureCommandController {
 
     @Autowired
     private FeatureTypeService featureTypeService ;
+
+    @Autowired
+    private TaskService taskService ;
 
     @GetMapping("/refresh-types")
     public String refresh(){
@@ -70,9 +77,23 @@ public class FeatureCommandController {
             logger.error(e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND) ;
         }
+    }
 
+    @PostMapping("/{featureId}/add-task")
+    public ResponseEntity<Task> addTask(@PathVariable("featureId") String featureId, @RequestBody Task task) {
+        Task ans = taskService.addNewTaskToFeature(featureId, task);
+        return new ResponseEntity<>(ans, HttpStatus.CREATED);
+    }
 
-
+    @PostMapping("/{featureId}/assign-task/{taskId}")
+    public ResponseEntity<Task> assignTask(@PathVariable("featureId") String featureId, @PathVariable("taskId") String taskId) {
+        try {
+            Task ans = taskService.assignTaskToFeature(featureId, taskId);
+            return new ResponseEntity<>(ans, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 }
