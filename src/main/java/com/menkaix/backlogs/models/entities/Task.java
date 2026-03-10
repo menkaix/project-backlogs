@@ -26,6 +26,7 @@ public class Task extends AbstractEntity {
 	public String status;
 	public String assignee;
 	public String estimate;
+	public Double estimatedManHours;
 	public String trackingReference;
 
 
@@ -110,11 +111,40 @@ public class Task extends AbstractEntity {
 	}
 
 	public String getEstimate() {
+		if (estimatedManHours != null) {
+			long totalMinutes = Math.round(estimatedManHours * 60);
+			long days = totalMinutes / 480;
+			long hours = (totalMinutes % 480) / 60;
+			long minutes = totalMinutes % 60;
+			StringBuilder sb = new StringBuilder();
+			if (days > 0) sb.append(days).append("j ");
+			if (hours > 0) sb.append(hours).append("h ");
+			if (minutes > 0) sb.append(minutes).append("min");
+			return sb.toString().trim();
+		}
 		return estimate;
 	}
 
 	public void setEstimate(String estimate) {
 		this.estimate = estimate;
+		if (estimate == null || estimate.isBlank()) return;
+		double total = 0;
+		java.util.regex.Matcher m;
+		m = java.util.regex.Pattern.compile("(\\d+(?:\\.\\d+)?)\\s*j").matcher(estimate);
+		if (m.find()) total += Double.parseDouble(m.group(1)) * 8;
+		m = java.util.regex.Pattern.compile("(\\d+(?:\\.\\d+)?)\\s*h").matcher(estimate);
+		if (m.find()) total += Double.parseDouble(m.group(1));
+		m = java.util.regex.Pattern.compile("(\\d+(?:\\.\\d+)?)\\s*min").matcher(estimate);
+		if (m.find()) total += Double.parseDouble(m.group(1)) / 60;
+		if (total > 0) this.estimatedManHours = total;
+	}
+
+	public Double getEstimatedManHours() {
+		return estimatedManHours;
+	}
+
+	public void setEstimatedManHours(Double estimatedManHours) {
+		this.estimatedManHours = estimatedManHours;
 	}
 
 	public String getTrackingReference() {

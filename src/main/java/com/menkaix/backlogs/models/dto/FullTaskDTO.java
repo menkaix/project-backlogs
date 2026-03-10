@@ -15,6 +15,7 @@ public class FullTaskDTO {
 	private Date creationDate;
 	private Date lastUpdateDate;
 	private String status;
+	private Double estimatedManHours;
 
 	public String getId() {
 		return id;
@@ -110,5 +111,13 @@ public class FullTaskDTO {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public Double getEstimatedManHours() {
+		return estimatedManHours;
+	}
+
+	public void setEstimatedManHours(Double estimatedManHours) {
+		this.estimatedManHours = estimatedManHours;
 	}
 }

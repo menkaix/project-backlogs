@@ -148,18 +148,19 @@ public class MCPResourceProvider {
     private Map<String, Object> getTaskSchema() {
         Map<String, Object> schema = new HashMap<>();
         schema.put("type", "object");
-        schema.put("properties", Map.of(
-                "id", Map.of("type", "string"),
-                "title", Map.of("type", "string"),
-                "description", Map.of("type", "string"),
-                "projectId", Map.of("type", "string"),
-                "status", Map.of("type", "string"),
-                "assignee", Map.of("type", "string"),
-                "estimate", Map.of("type", "string"),
-                "trackingReference", Map.of("type", "string"),
-                "deadLine", Map.of("type", "string", "format", "date-time"),
-                "doneDate", Map.of("type", "string", "format", "date-time")
-        ));
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("id", Map.of("type", "string"));
+        properties.put("title", Map.of("type", "string"));
+        properties.put("description", Map.of("type", "string"));
+        properties.put("projectId", Map.of("type", "string"));
+        properties.put("status", Map.of("type", "string"));
+        properties.put("assignee", Map.of("type", "string"));
+        properties.put("estimate", Map.of("type", "string"));
+        properties.put("estimatedManHours", Map.of("type", "number", "description", "Estimation en heures homme"));
+        properties.put("trackingReference", Map.of("type", "string"));
+        properties.put("deadLine", Map.of("type", "string", "format", "date-time"));
+        properties.put("doneDate", Map.of("type", "string", "format", "date-time"));
+        schema.put("properties", properties);
         schema.put("required", Arrays.asList("title"));
         return schema;
     }
