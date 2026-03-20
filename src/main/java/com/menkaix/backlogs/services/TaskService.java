@@ -100,6 +100,27 @@ public class TaskService {
 		return saved;
 	}
 
+	public Task assignPerson(String taskId, String email) {
+		Task task = repository.findById(taskId)
+				.orElseThrow(() -> new NoSuchElementException("Task not found: " + taskId));
+		if (!task.getAssignees().contains(email)) {
+			task.getAssignees().add(email);
+			Task saved = repository.save(task);
+			projectTouchService.touchByTask(saved);
+			return saved;
+		}
+		return task;
+	}
+
+	public Task unassignPerson(String taskId, String email) {
+		Task task = repository.findById(taskId)
+				.orElseThrow(() -> new NoSuchElementException("Task not found: " + taskId));
+		task.getAssignees().remove(email);
+		Task saved = repository.save(task);
+		projectTouchService.touchByTask(saved);
+		return saved;
+	}
+
 	public Optional<Task> findById(String id) {
 		return repository.findById(id);
 	}

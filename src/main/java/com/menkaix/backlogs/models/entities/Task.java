@@ -30,6 +30,10 @@ public class Task extends AbstractEntity {
 	// Champs enrichis depuis bug-tracking-janitor
 	public String status;
 	public List<String> assignees = new ArrayList<>();
+
+	/** @deprecated Ancien champ — migré vers {@link #assignees}. Conservé pour lecture des anciens documents MongoDB. */
+	@Deprecated
+	public String assignee;
 	public String estimate;
 	public Double estimatedManHours;
 	public String trackingReference;
