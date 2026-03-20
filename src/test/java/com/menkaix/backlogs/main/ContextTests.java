@@ -15,26 +15,25 @@ package com.menkaix.backlogs.main;
  * limitations under the License.
  */
 
-import java.util.ArrayList;
-import java.util.Optional;
-
-import com.menkaix.backlogs.services.ProjectService;
-import com.menkaix.backlogs.services.applicatif.DataAccessService;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 
-
-import com.menkaix.backlogs.models.entities.Project;
-import com.menkaix.backlogs.repositories.ProjectRepository;
-import org.springframework.test.context.ActiveProfiles;
-
-@ActiveProfiles("test")
 @SpringBootTest
 public class ContextTests {
+
+	@TestConfiguration
+	static class MongoMockConfig {
+		@Bean
+		@Primary
+		MongoDatabaseFactory mongoDatabaseFactory() {
+			return Mockito.mock(MongoDatabaseFactory.class, Mockito.RETURNS_DEEP_STUBS);
+		}
+	}
 
 	@Test
 	void contextLoads() {
