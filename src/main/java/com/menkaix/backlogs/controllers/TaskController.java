@@ -87,6 +87,16 @@ public class TaskController {
         return ResponseEntity.ok(taskService.findByAssigneeEmail(email));
     }
 
+    @PostMapping("/{id}/assignees/{email}")
+    public ResponseEntity<Task> assignPerson(@PathVariable String id, @PathVariable String email) {
+        return ResponseEntity.ok(taskService.assignPerson(id, email));
+    }
+
+    @DeleteMapping("/{id}/assignees/{email}")
+    public ResponseEntity<Task> unassignPerson(@PathVariable String id, @PathVariable String email) {
+        return ResponseEntity.ok(taskService.unassignPerson(id, email));
+    }
+
     @GetMapping("/by-status/{status}")
     public ResponseEntity<List<Task>> findByStatus(@PathVariable String status) {
         return ResponseEntity.ok(taskService.findByStatus(status));
