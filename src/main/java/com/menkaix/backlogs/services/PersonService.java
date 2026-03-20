@@ -54,17 +54,19 @@ public class PersonService {
     private static final Sort LAST_UPDATE_DESC = Sort.by(Sort.Direction.DESC, "lastUpdateDate");
 
     public List<People> findAll() {
-        return repository.findAll(LAST_UPDATE_DESC);
+        Query query = new Query(Criteria.where("isActive").ne(false)).with(LAST_UPDATE_DESC);
+        return mongoTemplate.find(query, People.class);
     }
 
     public Page<People> findAll(Pageable pageable, String search) {
-        Query baseQuery = new Query();
+        Criteria activeCriteria = Criteria.where("isActive").ne(false);
+        Query baseQuery = new Query(activeCriteria);
         if (search != null && !search.isBlank()) {
-            List<Criteria> criteria = new ArrayList<>();
-            criteria.add(Criteria.where("firstName").regex(Pattern.quote(search), "i"));
-            criteria.add(Criteria.where("lastName").regex(Pattern.quote(search), "i"));
-            criteria.add(Criteria.where("email").regex(Pattern.quote(search), "i"));
-            baseQuery.addCriteria(new Criteria().orOperator(criteria.toArray(new Criteria[0])));
+            List<Criteria> searchCriteria = new ArrayList<>();
+            searchCriteria.add(Criteria.where("firstName").regex(Pattern.quote(search), "i"));
+            searchCriteria.add(Criteria.where("lastName").regex(Pattern.quote(search), "i"));
+            searchCriteria.add(Criteria.where("email").regex(Pattern.quote(search), "i"));
+            baseQuery.addCriteria(new Criteria().orOperator(searchCriteria.toArray(new Criteria[0])));
         }
         Query dataQuery = Query.of(baseQuery).with(LAST_UPDATE_DESC);
         if (pageable.isPaged()) {
