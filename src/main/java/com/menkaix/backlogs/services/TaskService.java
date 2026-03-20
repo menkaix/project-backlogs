@@ -1,6 +1,7 @@
 package com.menkaix.backlogs.services;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -19,7 +21,12 @@ import org.springframework.stereotype.Service;
 
 import com.menkaix.backlogs.models.entities.Feature;
 import com.menkaix.backlogs.models.entities.FeatureType;
+import com.menkaix.backlogs.models.entities.Story;
 import com.menkaix.backlogs.models.entities.Task;
+import com.menkaix.backlogs.repositories.ActorRepository;
+import com.menkaix.backlogs.repositories.FeatureRepository;
+import com.menkaix.backlogs.repositories.ProjectRepository;
+import com.menkaix.backlogs.repositories.StoryRepository;
 import com.menkaix.backlogs.repositories.TaskRepository;
 
 @Service
@@ -29,12 +36,25 @@ public class TaskService {
 	private final TaskRepository repository;
 	private final FeatureTypeService featureTypeService;
 	private final MongoTemplate mongoTemplate;
+	private final ProjectTouchService projectTouchService;
+	private final FeatureRepository featureRepository;
+	private final StoryRepository storyRepository;
+	private final ActorRepository actorRepository;
+	private final ProjectRepository projectRepository;
 
 	@Autowired
-	public TaskService(TaskRepository repository, FeatureTypeService featureTypeService, MongoTemplate mongoTemplate) {
+	public TaskService(TaskRepository repository, FeatureTypeService featureTypeService,
+			MongoTemplate mongoTemplate, ProjectTouchService projectTouchService,
+			FeatureRepository featureRepository, StoryRepository storyRepository,
+			ActorRepository actorRepository, ProjectRepository projectRepository) {
 		this.repository = repository;
 		this.featureTypeService = featureTypeService;
 		this.mongoTemplate = mongoTemplate;
+		this.projectTouchService = projectTouchService;
+		this.featureRepository = featureRepository;
+		this.storyRepository = storyRepository;
+		this.actorRepository = actorRepository;
+		this.projectRepository = projectRepository;
 	}
 
 	public void createUsualTasks(Feature feature) {
@@ -48,18 +68,23 @@ public class TaskService {
 				task.setTitle(String.format(featureType.getUsualTask().get(taskKey), feature.getName()));
 				repository.save(task);
 			}
+			projectTouchService.touchByFeatureId(feature.getId());
 		} else {
 			logger.error("no feature type named " + feature.getType());
 		}
 	}
 
 	public Task create(Task task) {
-		return repository.save(task);
+		Task saved = repository.save(task);
+		projectTouchService.touchByTask(saved);
+		return saved;
 	}
 
 	public Task addNewTaskToFeature(String featureId, Task task) {
 		task.setIdReference("feature/" + featureId);
-		return repository.save(task);
+		Task saved = repository.save(task);
+		projectTouchService.touchByFeatureId(featureId);
+		return saved;
 	}
 
 	public Task assignTaskToFeature(String featureId, String taskId) {
@@ -70,7 +95,9 @@ public class TaskService {
 			String taskKey = task.getReference().split("/")[2];
 			task.setReference("feature/" + featureId + "/" + taskKey);
 		}
-		return repository.save(task);
+		Task saved = repository.save(task);
+		projectTouchService.touchByFeatureId(featureId);
+		return saved;
 	}
 
 	public Optional<Task> findById(String id) {
@@ -82,37 +109,122 @@ public class TaskService {
 	}
 
 	public Task update(Task task) {
-		return repository.save(task);
+		Task saved = repository.save(task);
+		projectTouchService.touchByTask(saved);
+		return saved;
 	}
 
 	public void delete(String id) {
-		repository.deleteById(id);
+		repository.findById(id).ifPresent(task -> {
+			repository.delete(task);
+			projectTouchService.touchByTask(task);
+		});
 	}
 
+	private static final Sort LAST_UPDATE_DESC = Sort.by(Sort.Direction.DESC, "lastUpdateDate");
+
+	// ── Recherche par projet (directe + indirecte via feature chain) ──────────
+
 	public List<Task> findByProjectId(String projectId) {
-		return repository.findByProjectId(projectId);
+		return repository.findByProjectIdOrderByLastUpdateDateDesc(projectId);
+	}
+
+	/**
+	 * Retourne toutes les tâches d'un projet identifié par son nom, code ou id
+	 * MongoDB. Inclut les tâches directes (champ projectId) et les tâches
+	 * indirectes liées via la chaîne feature → story → actor → project.
+	 */
+	public List<Task> findByProjectRef(String projectRef) {
+		List<Task> result = new ArrayList<>();
+
+		projectRepository.findByName(projectRef).stream().findFirst()
+				.or(() -> projectRepository.findByCode(projectRef).stream().findFirst())
+				.or(() -> projectRepository.findById(projectRef))
+				.ifPresent(project -> {
+					// tâches directes
+					result.addAll(repository.findByProjectId(project.getId()));
+					// tâches indirectes : actors → stories → features → tasks
+					actorRepository.findByProjectName(project.getName()).forEach(actor ->
+						storyRepository.findByActorId(actor.getId()).forEach(story ->
+							featureRepository.findByStoryId(story.getId()).forEach(feature ->
+								result.addAll(repository.findByIdReference("feature/" + feature.getId()))
+							)
+						)
+					);
+				});
+
+		result.sort(Comparator.comparing(Task::getLastUpdateDate,
+				Comparator.nullsLast(Comparator.reverseOrder())));
+		return result;
+	}
+
+	// ── Recherche par assignee ────────────────────────────────────────────────
+
+	/**
+	 * Retourne toutes les tâches où l'email donné figure dans la liste des
+	 * assignees. Une tâche avec plusieurs assignees est retournée dès qu'un
+	 * des assignees correspond.
+	 */
+	public List<Task> findByAssigneeEmail(String email) {
+		return repository.findByAssigneesContainingOrderByLastUpdateDateDesc(email);
+	}
+
+	// ── Recherche par feature ─────────────────────────────────────────────────
+
+	public List<Task> findByFeatureId(String featureId) {
+		return repository.findByIdReferenceOrderByLastUpdateDateDesc("feature/" + featureId);
+	}
+
+	// ── Recherche par story ───────────────────────────────────────────────────
+
+	public List<Task> findByStoryId(String storyId) {
+		List<Task> result = new ArrayList<>();
+		featureRepository.findByStoryId(storyId).forEach(feature ->
+			result.addAll(repository.findByIdReference("feature/" + feature.getId()))
+		);
+		result.sort(Comparator.comparing(Task::getLastUpdateDate,
+				Comparator.nullsLast(Comparator.reverseOrder())));
+		return result;
+	}
+
+	// ── Recherche par actor ───────────────────────────────────────────────────
+
+	public List<Task> findByActorId(String actorId) {
+		List<Task> result = new ArrayList<>();
+		storyRepository.findByActorId(actorId).forEach(story ->
+			result.addAll(findByStoryId(story.getId()))
+		);
+		result.sort(Comparator.comparing(Task::getLastUpdateDate,
+				Comparator.nullsLast(Comparator.reverseOrder())));
+		return result;
 	}
 
 	public List<Task> findByStatus(String status) {
-		return repository.findByStatus(status);
+		return repository.findByStatusOrderByLastUpdateDateDesc(status);
 	}
 
 	public List<Task> findOverdueTasks() {
-		Query query = new Query(Criteria.where("deadLine").lt(new Date()).and("doneDate").isNull());
+		Query query = new Query(Criteria.where("deadLine").lt(new Date()).and("doneDate").isNull())
+				.with(LAST_UPDATE_DESC);
 		return mongoTemplate.find(query, Task.class);
 	}
 
 	public List<Task> findUpcomingTasks() {
 		Date now = new Date();
 		Date sevenDaysLater = new Date(now.getTime() + 7L * 24 * 60 * 60 * 1000);
-		Query query = new Query(Criteria.where("deadLine").gt(now).lt(sevenDaysLater).and("doneDate").isNull());
+		Query query = new Query(Criteria.where("deadLine").gt(now).lt(sevenDaysLater).and("doneDate").isNull())
+				.with(LAST_UPDATE_DESC);
 		return mongoTemplate.find(query, Task.class);
 	}
 
 	public Page<Task> findAll(Pageable pageable, String search, String filter) {
-		Query query = buildQuery(search, filter);
+		Query baseQuery = buildQuery(search, filter);
 		Query countQuery = buildQuery(search, filter);
-		List<Task> tasks = mongoTemplate.find(query.with(pageable), Task.class);
+		Query dataQuery = Query.of(baseQuery).with(LAST_UPDATE_DESC);
+		if (pageable.isPaged()) {
+			dataQuery.skip(pageable.getOffset()).limit(pageable.getPageSize());
+		}
+		List<Task> tasks = mongoTemplate.find(dataQuery, Task.class);
 		return PageableExecutionUtils.getPage(tasks, pageable,
 				() -> mongoTemplate.count(countQuery, Task.class));
 	}

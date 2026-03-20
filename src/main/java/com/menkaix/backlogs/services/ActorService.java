@@ -23,14 +23,17 @@ public class ActorService {
     private final ActorRepository actorRepository;
     private final StoryRepository storyRepository;
     private final RaciRepository raciRepository;
+    private final ProjectTouchService projectTouchService;
 
     @Autowired
     public ActorService(DataAccessService projectService, ActorRepository actorRepository,
-            StoryRepository storyRepository, RaciRepository raciRepository) {
+            StoryRepository storyRepository, RaciRepository raciRepository,
+            ProjectTouchService projectTouchService) {
         this.projectService = projectService;
         this.actorRepository = actorRepository;
         this.storyRepository = storyRepository;
         this.raciRepository = raciRepository;
+        this.projectTouchService = projectTouchService;
     }
 
     public Actor addNew(String project, Actor actor) throws EntityNotFoundException {
@@ -40,8 +43,9 @@ public class ActorService {
             throw new EntityNotFoundException("no project foun with reference " + project);
 
         actor.setProjectName(prj.name);
-
-        return save(actor);
+        Actor saved = save(actor);
+        projectTouchService.touch(prj);
+        return saved;
     }
 
     private Actor save(Actor actor) {
@@ -63,7 +67,9 @@ public class ActorService {
         for (Actor a : actors) {
             if (a.name.equalsIgnoreCase(name)) {
                 story.setActorId(a.getId());
-                return storyRepository.save(story);
+                Story saved = storyRepository.save(story);
+                projectTouchService.touch(prj);
+                return saved;
             }
         }
 
@@ -76,7 +82,7 @@ public class ActorService {
         if (prj == null)
             throw new EntityNotFoundException("no project found with reference " + project);
 
-        return actorRepository.findByProjectName(prj.name);
+        return actorRepository.findByProjectNameOrderByLastUpdateDateDesc(prj.name);
 
     }
 

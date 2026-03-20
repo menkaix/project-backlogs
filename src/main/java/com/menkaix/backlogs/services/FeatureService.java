@@ -8,6 +8,7 @@ import com.menkaix.backlogs.repositories.FeatureRepository;
 import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -22,12 +23,15 @@ public class FeatureService {
     private final FeatureRepository featureRepository;
     private final StoryService storyService;
     private final TaskService taskService;
+    private final ProjectTouchService projectTouchService;
 
     @Autowired
-    public FeatureService(FeatureRepository featureRepository, StoryService storyService, TaskService taskService) {
+    public FeatureService(FeatureRepository featureRepository, StoryService storyService,
+            TaskService taskService, ProjectTouchService projectTouchService) {
         this.featureRepository = featureRepository;
         this.storyService = storyService;
         this.taskService = taskService;
+        this.projectTouchService = projectTouchService;
     }
 
     public Feature addFeatureToStory(String storyId, Feature feature) throws EntityNotFoundException {
@@ -41,6 +45,7 @@ public class FeatureService {
         feature.setStoryId(story.getId());
         Feature ans = featureRepository.save(feature);
         taskService.createUsualTasks(ans);
+        projectTouchService.touchByStoryId(storyId);
 
         logger.info("Feature added to story with id: {}", storyId);
         return ans;
@@ -60,6 +65,7 @@ public class FeatureService {
         }
 
         Feature savedFeature = featureRepository.save(feature);
+        projectTouchService.touchByStoryId(savedFeature.getStoryId());
         logger.info("Feature added to parent with id: {}", parentId);
         return savedFeature;
     }
@@ -83,6 +89,7 @@ public class FeatureService {
         }
 
         Feature savedChild = featureRepository.save(child);
+        projectTouchService.touchByStoryId(savedChild.getStoryId());
         logger.info("Child feature with id: {} added to parent with id: {}", childId, parentId);
         return savedChild;
     }
@@ -94,9 +101,10 @@ public class FeatureService {
         List<Story> stories = storyService.findByProject(prj);
 
         for (Story story : stories) {
-            ans.addAll(featureRepository.findByStoryId(story.getId()));
+            ans.addAll(featureRepository.findByStoryIdOrderByLastUpdateDateDesc(story.getId()));
         }
 
+        ans.sort(Comparator.comparing(Feature::getLastUpdateDate, Comparator.nullsLast(Comparator.reverseOrder())));
         logger.info("Features retrieved for project with id: {}", prj.getId());
         return ans;
     }

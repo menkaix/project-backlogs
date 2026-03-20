@@ -1,9 +1,12 @@
 package com.menkaix.backlogs.models.entities;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.WeakHashMap;
 
+@Document(collection = "feature")
 public class Feature extends AbstractEntity {
 
     @Id
@@ -13,6 +16,7 @@ public class Feature extends AbstractEntity {
 
     private String type;
 
+    @Indexed
     private String storyId;
 
     private String parentID;

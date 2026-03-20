@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -50,16 +51,21 @@ public class ProjectManagementService {
         return repository.findByName(name).stream().findFirst();
     }
 
+    private static final Sort LAST_UPDATE_DESC = Sort.by(Sort.Direction.DESC, "lastUpdateDate");
+
     public Page<Project> findAll(Pageable pageable, String search, String filter) {
         if (pageable == null) {
             pageable = Pageable.unpaged();
         }
-        Query query = buildQuery(search, filter);
-        Query finalQuery = query;
+        Query baseQuery = buildQuery(search, filter);
         Pageable finalPageable = pageable;
-        List<Project> projects = mongoTemplate.find(query.with(pageable), Project.class);
+        Query dataQuery = Query.of(baseQuery).with(LAST_UPDATE_DESC);
+        if (pageable.isPaged()) {
+            dataQuery.skip(pageable.getOffset()).limit(pageable.getPageSize());
+        }
+        List<Project> projects = mongoTemplate.find(dataQuery, Project.class);
         return PageableExecutionUtils.getPage(projects, finalPageable,
-                () -> mongoTemplate.count(Query.of(finalQuery).limit(-1).skip(-1), Project.class));
+                () -> mongoTemplate.count(Query.of(baseQuery).limit(-1).skip(-1), Project.class));
     }
 
     private Query buildQuery(String search, String filter) {

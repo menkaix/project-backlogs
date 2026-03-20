@@ -1,12 +1,16 @@
 package com.menkaix.backlogs.models.entities;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection = "story")
 public class Story extends AbstractEntity {
 
     @Id
     private String id;
 
+    @Indexed
     private String actorId;
 
     private String action;
