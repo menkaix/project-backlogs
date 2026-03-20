@@ -58,6 +58,35 @@ public class TaskController {
         return ResponseEntity.ok(taskService.findByProjectId(projectId));
     }
 
+    /**
+     * Retourne toutes les tâches d'un projet (directes + indirectes via features).
+     * Accepte le nom, le code ou l'id MongoDB du projet.
+     */
+    @GetMapping("/by-project-ref/{projectRef}")
+    public ResponseEntity<List<Task>> findByProjectRef(@PathVariable String projectRef) {
+        return ResponseEntity.ok(taskService.findByProjectRef(projectRef));
+    }
+
+    @GetMapping("/by-feature/{featureId}")
+    public ResponseEntity<List<Task>> findByFeature(@PathVariable String featureId) {
+        return ResponseEntity.ok(taskService.findByFeatureId(featureId));
+    }
+
+    @GetMapping("/by-story/{storyId}")
+    public ResponseEntity<List<Task>> findByStory(@PathVariable String storyId) {
+        return ResponseEntity.ok(taskService.findByStoryId(storyId));
+    }
+
+    @GetMapping("/by-actor/{actorId}")
+    public ResponseEntity<List<Task>> findByActor(@PathVariable String actorId) {
+        return ResponseEntity.ok(taskService.findByActorId(actorId));
+    }
+
+    @GetMapping("/by-assignee/{email}")
+    public ResponseEntity<List<Task>> findByAssignee(@PathVariable String email) {
+        return ResponseEntity.ok(taskService.findByAssigneeEmail(email));
+    }
+
     @GetMapping("/by-status/{status}")
     public ResponseEntity<List<Task>> findByStatus(@PathVariable String status) {
         return ResponseEntity.ok(taskService.findByStatus(status));

@@ -12,6 +12,7 @@ public class People extends AbstractEntity {
 	private String firstName;
 	private String lastName;
 	private String email;
+	private boolean isActive = true;
 
 	public String getId() {
 		return id;
@@ -43,5 +44,13 @@ public class People extends AbstractEntity {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 }

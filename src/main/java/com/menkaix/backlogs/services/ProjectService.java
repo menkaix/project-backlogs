@@ -1,12 +1,18 @@
 package com.menkaix.backlogs.services;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.menkaix.backlogs.models.dto.*;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Sort;
 import com.menkaix.backlogs.models.entities.Actor;
 import com.menkaix.backlogs.models.entities.Feature;
 import com.menkaix.backlogs.models.entities.Project;
@@ -30,14 +36,18 @@ import com.menkaix.backlogs.repositories.RaciRepository;
 import com.menkaix.backlogs.utilities.exceptions.DataConflictException;
 import com.menkaix.backlogs.utilities.exceptions.DataDefinitionException;
 import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
+import com.menkaix.backlogs.services.ProjectTouchService;
 
 @Service
 public class ProjectService {
 
-	// Logger pour enregistrer les messages de log
+	private static final Gson GSON = new GsonBuilder()
+			.setPrettyPrinting()
+			.setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+			.create();
+
 	private static Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
-	// Déclaration des repositories et services utilisés
 	private final ProjectRepository repo;
 	private final ActorRepository actorRepository;
 	private final TaskRepository taskRepository;
@@ -46,12 +56,17 @@ public class ProjectService {
 	private final FeatureService featureService;
 	private final DataAccessService accessService;
 	private final RaciRepository raciRepository;
+	private final ProjectTouchService projectTouchService;
 
-	// Constructeur avec injection de dépendances
+	// Self-reference pour que @Cacheable soit intercepté par le proxy Spring AOP
+	@Lazy
+	@Autowired
+	private ProjectService self;
+
 	@Autowired
 	public ProjectService(ProjectRepository repo, ActorRepository actorRepository, TaskRepository taskRepository,
 			StoryRepository storyRepository, FeatureRepository featureRepository, FeatureService featureService,
-			DataAccessService accessService, RaciRepository raciRepository) {
+			DataAccessService accessService, RaciRepository raciRepository, ProjectTouchService projectTouchService) {
 		this.repo = repo;
 		this.actorRepository = actorRepository;
 		this.taskRepository = taskRepository;
@@ -60,6 +75,7 @@ public class ProjectService {
 		this.featureService = featureService;
 		this.accessService = accessService;
 		this.raciRepository = raciRepository;
+		this.projectTouchService = projectTouchService;
 	}
 
 	// Méthodes getter pour les repositories et services
@@ -102,6 +118,7 @@ public class ProjectService {
 			throw new NoSuchElementException("Project not found: " + projectRef);
 		}
 		List<Feature> features = featureService.getFeatures(prj);
+		features.sort(Comparator.comparing(Feature::getLastUpdateDate, Comparator.nullsLast(Comparator.reverseOrder())));
 		List<FeatureTreeDTO> allDtos = new ArrayList<>();
 
 		for (Feature feature : features) {
@@ -118,7 +135,7 @@ public class ProjectService {
 
 	// Méthode pour obtenir tous les projets
 	public List<Project> getAll() {
-		return repo.findAll();
+		return repo.findAll(Sort.by(Sort.Direction.DESC, "lastUpdateDate"));
 	}
 
 	// Méthode pour créer un projet en toute sécurité
@@ -145,7 +162,6 @@ public class ProjectService {
 
 	// Méthode pour créer une histoire utilisateur
 	public String createStory(Project project, UserStoryDTO storyDTO) {
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		Story newStory = new Story();
 		List<Actor> actors = actorRepository.findByProjectName(project.getName());
 		boolean actorFound = false;
@@ -167,15 +183,16 @@ public class ProjectService {
 		newStory.setScenario(storyDTO.getScenario());
 		newStory.setObjective(storyDTO.getObjective());
 		Story ans = storyRepository.save(newStory);
+		projectTouchService.touch(project);
 		logger.info("Story created successfully for project {}: {}", project.getName(), newStory.getId());
-		return gson.toJson(ans);
+		return GSON.toJson(ans);
 	}
 
 	// Méthode pour générer un CSV des acteurs d'un projet
 	public String csv(String projectRef) {
 		FullProjectDTO project;
 		try {
-			project = objectTree(projectRef);
+			project = self.objectTree(projectRef);
 		} catch (NoSuchElementException e) {
 			logger.error("Project not found: {}", projectRef, e);
 			throw new NoSuchElementException("Project not found: " + projectRef);
@@ -224,16 +241,12 @@ public class ProjectService {
 	public String tree(String projectRef) {
 		FullProjectDTO tAns;
 		try {
-			tAns = objectTree(projectRef);
+			tAns = self.objectTree(projectRef);
 		} catch (NoSuchElementException e) {
 			logger.error("Project not found: {}", projectRef, e);
 			throw new NoSuchElementException("Project not found: " + projectRef);
 		}
-		Gson gson = new GsonBuilder()
-				.setPrettyPrinting()
-				.setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-				.create();
-		return gson.toJson(tAns);
+		return GSON.toJson(tAns);
 	}
 
 	// Méthode privée pour créer un acteur
@@ -242,39 +255,6 @@ public class ProjectService {
 		actor.setProjectName(p.getName());
 		actor.setName(actorName.toLowerCase());
 		return actorRepository.save(actor);
-	}
-
-	// Méthode privée pour mapper un acteur à un DTO
-	private FullActorDTO mapActorToDTO(Actor a, String projectCode) {
-		FullActorDTO actorDTO = new FullActorDTO();
-		actorDTO.setId(a.getId());
-		actorDTO.setName(a.getName());
-		actorDTO.setDescription(a.getDescription());
-		actorDTO.setType(a.getType());
-
-		List<Story> stories = storyRepository.findByActorId(a.getId());
-		for (Story s : stories) {
-			FullStoryDTO storyDTO = mapStoryToDTO(s, projectCode, actorDTO.getName());
-			actorDTO.getStories().add(storyDTO);
-		}
-		return actorDTO;
-	}
-
-	// Méthode privée pour mapper une fonctionnalité à un DTO
-	private FullFeatureDTO mapFeatureToDTO(Feature f) {
-		FullFeatureDTO fullFeatureDTO = new FullFeatureDTO();
-		fullFeatureDTO.setId(f.getId());
-		fullFeatureDTO.setName(f.getName());
-		fullFeatureDTO.setDescription(f.getDescription());
-		fullFeatureDTO.setType(f.getType());
-		fullFeatureDTO.setParentID(f.getParentID());
-
-		List<Task> tasks = taskRepository.findByIdReference("feature/" + fullFeatureDTO.getId());
-		for (Task task : tasks) {
-			FullTaskDTO taskDTO = mapTaskToDTO(task);
-			fullFeatureDTO.getTasks().add(taskDTO);
-		}
-		return fullFeatureDTO;
 	}
 
 	// Méthode privée pour mapper un projet à un DTO
@@ -287,24 +267,6 @@ public class ProjectService {
 		projectDTO.setCreationDate(p.getCreationDate());
 		projectDTO.setCode(p.getCode());
 		return projectDTO;
-	}
-
-	// Méthode privée pour mapper une histoire à un DTO
-	private FullStoryDTO mapStoryToDTO(Story s, String projectCode, String actorName) {
-		FullStoryDTO storyDTO = new FullStoryDTO();
-		storyDTO.setId(s.getId());
-		storyDTO.setProjectCode(projectCode);
-		storyDTO.setActorName(actorName);
-		storyDTO.setAction(s.getAction());
-		storyDTO.setObjective(s.getObjective());
-		storyDTO.setScenario(s.getScenario());
-
-		List<Feature> features = featureRepository.findByStoryId(s.getId());
-		for (Feature f : features) {
-			FullFeatureDTO fullFeatureDTO = mapFeatureToDTO(f);
-			storyDTO.getFeatures().add(fullFeatureDTO);
-		}
-		return storyDTO;
 	}
 
 	// Méthode privée pour mapper une tâche à un DTO
@@ -325,18 +287,67 @@ public class ProjectService {
 		return taskDTO;
 	}
 
-	// Méthode privée pour obtenir l'arbre d'un projet
-	private FullProjectDTO objectTree(String projectRef) {
+	// Construit l'arbre complet du projet en 4 requêtes MongoDB (bulk loading)
+	// Le résultat est mis en cache pour éviter les recalculs inutiles
+	@Cacheable(value = "projectTree", key = "#projectRef")
+	public FullProjectDTO objectTree(String projectRef) {
 		Project p = accessService.findProject(projectRef);
 		if (p == null) {
 			logger.error("Project not found: {}", projectRef);
 			throw new NoSuchElementException("Project not found: " + projectRef);
 		}
 
-		FullProjectDTO projectDTO = mapProjectToDTO(p);
+		// 4 requêtes au total au lieu de N*M*K
 		List<Actor> actors = actorRepository.findByProjectName(p.getName());
+		List<String> actorIds = actors.stream().map(Actor::getId).toList();
+
+		List<Story> allStories = storyRepository.findByActorIdIn(actorIds);
+		List<String> storyIds = allStories.stream().map(Story::getId).toList();
+		Map<String, List<Story>> storiesByActorId = allStories.stream()
+				.collect(Collectors.groupingBy(Story::getActorId));
+
+		List<Feature> allFeatures = featureRepository.findByStoryIdIn(storyIds);
+		List<String> featureRefs = allFeatures.stream().map(f -> "feature/" + f.getId()).toList();
+		Map<String, List<Feature>> featuresByStoryId = allFeatures.stream()
+				.collect(Collectors.groupingBy(Feature::getStoryId));
+
+		List<Task> allTasks = taskRepository.findByIdReferenceIn(featureRefs);
+		Map<String, List<Task>> tasksByFeatureRef = allTasks.stream()
+				.collect(Collectors.groupingBy(Task::getIdReference));
+
+		// Assemblage en mémoire
+		FullProjectDTO projectDTO = mapProjectToDTO(p);
 		for (Actor a : actors) {
-			FullActorDTO actorDTO = mapActorToDTO(a, projectDTO.getCode());
+			FullActorDTO actorDTO = new FullActorDTO();
+			actorDTO.setId(a.getId());
+			actorDTO.setName(a.getName());
+			actorDTO.setDescription(a.getDescription());
+			actorDTO.setType(a.getType());
+
+			for (Story s : storiesByActorId.getOrDefault(a.getId(), List.of())) {
+				FullStoryDTO storyDTO = new FullStoryDTO();
+				storyDTO.setId(s.getId());
+				storyDTO.setProjectCode(projectDTO.getCode());
+				storyDTO.setActorName(actorDTO.getName());
+				storyDTO.setAction(s.getAction());
+				storyDTO.setObjective(s.getObjective());
+				storyDTO.setScenario(s.getScenario());
+
+				for (Feature f : featuresByStoryId.getOrDefault(s.getId(), List.of())) {
+					FullFeatureDTO featureDTO = new FullFeatureDTO();
+					featureDTO.setId(f.getId());
+					featureDTO.setName(f.getName());
+					featureDTO.setDescription(f.getDescription());
+					featureDTO.setType(f.getType());
+					featureDTO.setParentID(f.getParentID());
+
+					for (Task t : tasksByFeatureRef.getOrDefault("feature/" + f.getId(), List.of())) {
+						featureDTO.getTasks().add(mapTaskToDTO(t));
+					}
+					storyDTO.getFeatures().add(featureDTO);
+				}
+				actorDTO.getStories().add(storyDTO);
+			}
 			projectDTO.getActors().add(actorDTO);
 		}
 		return projectDTO;
@@ -344,7 +355,7 @@ public class ProjectService {
 
 	// Méthode privée pour ordonner une liste de fonctionnalités
 	private List<FeatureTreeDTO> order(List<FeatureTreeDTO> in) {
-		return new ArrayList<>();
+		return in;
 	}
 
 	// Méthode privée pour convertir un acteur en CSV

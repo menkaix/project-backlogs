@@ -154,7 +154,8 @@ public class MCPResourceProvider {
         properties.put("description", Map.of("type", "string"));
         properties.put("projectId", Map.of("type", "string"));
         properties.put("status", Map.of("type", "string"));
-        properties.put("assignee", Map.of("type", "string"));
+        properties.put("assignees", Map.of("type", "array", "items", Map.of("type", "string"),
+                "description", "Liste des emails des personnes assignées"));
         properties.put("estimate", Map.of("type", "string"));
         properties.put("estimatedManHours", Map.of("type", "number", "description", "Estimation en heures homme"));
         properties.put("trackingReference", Map.of("type", "string"));

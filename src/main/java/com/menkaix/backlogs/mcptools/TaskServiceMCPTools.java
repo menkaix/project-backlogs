@@ -60,7 +60,7 @@ public class TaskServiceMCPTools {
         if (details.getTitle() != null) existing.setTitle(details.getTitle());
         if (details.getDescription() != null) existing.setDescription(details.getDescription());
         if (details.getStatus() != null) existing.setStatus(details.getStatus());
-        if (details.getAssignee() != null) existing.setAssignee(details.getAssignee());
+        if (details.getAssignees() != null && !details.getAssignees().isEmpty()) existing.setAssignees(details.getAssignees());
         if (details.getEstimate() != null) existing.setEstimate(details.getEstimate());
         if (details.getEstimatedManHours() != null) existing.setEstimatedManHours(details.getEstimatedManHours());
         if (details.getDueDate() != null) existing.setDueDate(details.getDueDate());

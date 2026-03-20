@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,16 +26,18 @@ public class StoryService {
     private final DataAccessService projectRepository;
     private final FeatureRepository featureRepository;
     private final DataAccessService projectService;
+    private final ProjectTouchService projectTouchService;
 
     @Autowired
     public StoryService(StoryRepository storyRepository, ActorRepository actorRepository,
             DataAccessService projectRepository, FeatureRepository featureRepository,
-            DataAccessService projectService) {
+            DataAccessService projectService, ProjectTouchService projectTouchService) {
         this.storyRepository = storyRepository;
         this.actorRepository = actorRepository;
         this.projectRepository = projectRepository;
         this.featureRepository = featureRepository;
         this.projectService = projectService;
+        this.projectTouchService = projectTouchService;
     }
 
     public StoryRepository getStoryRepository() {
@@ -120,6 +123,7 @@ public class StoryService {
         story.setScenario(storyDTO.getScenario());
 
         storyRepository.save(story);
+        projectTouchService.touch(project);
 
         storyDTO.setId(story.getId());
 
@@ -138,9 +142,10 @@ public class StoryService {
         List<Actor> actors = actorRepository.findByProjectName(prj.getName());
 
         for (Actor actor : actors) {
-            ans.addAll(storyRepository.findByActorId(actor.getId()));
+            ans.addAll(storyRepository.findByActorIdOrderByLastUpdateDateDesc(actor.getId()));
         }
 
+        ans.sort(Comparator.comparing(Story::getLastUpdateDate, Comparator.nullsLast(Comparator.reverseOrder())));
         return ans;
     }
 }

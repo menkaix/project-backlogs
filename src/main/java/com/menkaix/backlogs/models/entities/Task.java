@@ -1,8 +1,11 @@
 package com.menkaix.backlogs.models.entities;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "task")
@@ -11,6 +14,7 @@ public class Task extends AbstractEntity {
 	@Id
 	public String id;
 
+	@Indexed
 	public String projectId;
 	public String reference;
 	public String title;
@@ -20,11 +24,12 @@ public class Task extends AbstractEntity {
 	public Date dueDate;
 	public Date doneDate;
 
+	@Indexed
 	public String idReference;
 
 	// Champs enrichis depuis bug-tracking-janitor
 	public String status;
-	public String assignee;
+	public List<String> assignees = new ArrayList<>();
 	public String estimate;
 	public Double estimatedManHours;
 	public String trackingReference;
@@ -102,12 +107,12 @@ public class Task extends AbstractEntity {
 		this.status = status;
 	}
 
-	public String getAssignee() {
-		return assignee;
+	public List<String> getAssignees() {
+		return assignees;
 	}
 
-	public void setAssignee(String assignee) {
-		this.assignee = assignee;
+	public void setAssignees(List<String> assignees) {
+		this.assignees = assignees != null ? assignees : new ArrayList<>();
 	}
 
 	public String getEstimate() {

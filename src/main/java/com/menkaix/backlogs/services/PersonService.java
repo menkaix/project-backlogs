@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -50,22 +51,29 @@ public class PersonService {
         repository.deleteById(id);
     }
 
+    private static final Sort LAST_UPDATE_DESC = Sort.by(Sort.Direction.DESC, "lastUpdateDate");
+
     public List<People> findAll() {
-        return repository.findAll();
+        Query query = new Query(Criteria.where("isActive").ne(false)).with(LAST_UPDATE_DESC);
+        return mongoTemplate.find(query, People.class);
     }
 
     public Page<People> findAll(Pageable pageable, String search) {
-        Query query = new Query();
+        Criteria activeCriteria = Criteria.where("isActive").ne(false);
+        Query baseQuery = new Query(activeCriteria);
         if (search != null && !search.isBlank()) {
-            List<Criteria> criteria = new ArrayList<>();
-            criteria.add(Criteria.where("firstName").regex(Pattern.quote(search), "i"));
-            criteria.add(Criteria.where("lastName").regex(Pattern.quote(search), "i"));
-            criteria.add(Criteria.where("email").regex(Pattern.quote(search), "i"));
-            query.addCriteria(new Criteria().orOperator(criteria.toArray(new Criteria[0])));
+            List<Criteria> searchCriteria = new ArrayList<>();
+            searchCriteria.add(Criteria.where("firstName").regex(Pattern.quote(search), "i"));
+            searchCriteria.add(Criteria.where("lastName").regex(Pattern.quote(search), "i"));
+            searchCriteria.add(Criteria.where("email").regex(Pattern.quote(search), "i"));
+            baseQuery.addCriteria(new Criteria().orOperator(searchCriteria.toArray(new Criteria[0])));
         }
-        List<People> persons = mongoTemplate.find(query.with(pageable), People.class);
-        Query finalQuery = query;
+        Query dataQuery = Query.of(baseQuery).with(LAST_UPDATE_DESC);
+        if (pageable.isPaged()) {
+            dataQuery.skip(pageable.getOffset()).limit(pageable.getPageSize());
+        }
+        List<People> persons = mongoTemplate.find(dataQuery, People.class);
         return PageableExecutionUtils.getPage(persons, pageable,
-                () -> mongoTemplate.count(Query.of(finalQuery).limit(-1).skip(-1), People.class));
+                () -> mongoTemplate.count(Query.of(baseQuery).limit(-1).skip(-1), People.class));
     }
 }

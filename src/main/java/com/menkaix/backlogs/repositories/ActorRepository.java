@@ -14,4 +14,6 @@ public interface ActorRepository extends MongoRepository<Actor, String> {
 
 	public List<Actor> findByProjectName(String name);
 
+	public List<Actor> findByProjectNameOrderByLastUpdateDateDesc(String name);
+
 }
