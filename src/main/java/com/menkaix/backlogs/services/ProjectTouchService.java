@@ -8,7 +8,9 @@ import com.menkaix.backlogs.repositories.ProjectRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -27,6 +29,10 @@ public class ProjectTouchService {
     private final StoryRepository storyRepository;
     private final FeatureRepository featureRepository;
 
+    @Autowired
+    @Lazy
+    private ProjectTouchService self;
+
     public ProjectTouchService(ProjectRepository projectRepository,
                                ActorRepository actorRepository,
                                StoryRepository storyRepository,
@@ -41,7 +47,7 @@ public class ProjectTouchService {
     public void touchByProjectId(String projectId) {
         if (projectId == null || projectId.isBlank()) return;
         projectRepository.findById(projectId).ifPresentOrElse(
-                this::touch,
+                self::touch,
                 () -> logger.warn("ProjectTouchService: project not found for id={}", projectId));
     }
 
@@ -49,7 +55,7 @@ public class ProjectTouchService {
     public void touchByProjectName(String projectName) {
         if (projectName == null || projectName.isBlank()) return;
         projectRepository.findByName(projectName).stream().findFirst().ifPresentOrElse(
-                this::touch,
+                self::touch,
                 () -> logger.warn("ProjectTouchService: project not found for name={}", projectName));
     }
 
