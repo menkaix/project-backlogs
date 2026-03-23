@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.menkaix.backlogs.models.dto.*;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import com.menkaix.backlogs.models.entities.Actor;
@@ -288,8 +287,6 @@ public class ProjectService {
 	}
 
 	// Construit l'arbre complet du projet en 4 requêtes MongoDB (bulk loading)
-	// Le résultat est mis en cache pour éviter les recalculs inutiles
-	@Cacheable(value = "projectTree", key = "#projectRef")
 	public FullProjectDTO objectTree(String projectRef) {
 		Project p = accessService.findProject(projectRef);
 		if (p == null) {
