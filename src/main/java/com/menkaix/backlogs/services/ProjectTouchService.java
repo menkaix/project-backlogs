@@ -9,7 +9,6 @@ import com.menkaix.backlogs.repositories.StoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -101,7 +100,6 @@ public class ProjectTouchService {
     }
 
     /** Touch directly when the project object is already at hand. */
-    @CacheEvict(value = "projectTree", allEntries = true)
     public void touch(Project project) {
         if (project == null) return;
         projectRepository.save(project);

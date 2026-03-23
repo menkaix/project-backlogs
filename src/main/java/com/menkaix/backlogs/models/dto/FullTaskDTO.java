@@ -8,6 +8,8 @@ public class FullTaskDTO {
 	private String reference;
 	private String title;
 	private String description;
+	private Date plannedStart;
+	private Date startDate;
 	private Date dueDate;
 	private Date doneDate;
 	private String idReference;
@@ -55,6 +57,22 @@ public class FullTaskDTO {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Date getPlannedStart() {
+		return plannedStart;
+	}
+
+	public void setPlannedStart(Date plannedStart) {
+		this.plannedStart = plannedStart;
+	}
+
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
 	}
 
 	public Date getDueDate() {

@@ -159,6 +159,7 @@ public class MCPResourceProvider {
         properties.put("estimate", Map.of("type", "string"));
         properties.put("estimatedManHours", Map.of("type", "number", "description", "Estimation en heures homme"));
         properties.put("trackingReference", Map.of("type", "string"));
+        properties.put("startDate", Map.of("type", "string", "format", "date-time"));
         properties.put("deadLine", Map.of("type", "string", "format", "date-time"));
         properties.put("doneDate", Map.of("type", "string", "format", "date-time"));
         schema.put("properties", properties);
