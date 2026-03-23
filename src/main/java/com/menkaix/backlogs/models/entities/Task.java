@@ -21,6 +21,7 @@ public class Task extends AbstractEntity {
 	public String description;
 
 	public Date plannedStart;
+	public Date startDate;
 	public Date dueDate;
 	public Date doneDate;
 
@@ -172,5 +173,12 @@ public class Task extends AbstractEntity {
 		this.plannedStart = plannedStart;
 	}
 
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
 
 }

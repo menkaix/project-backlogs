@@ -276,6 +276,8 @@ public class ProjectService {
 		taskDTO.setReference(task.getReference());
 		taskDTO.setTitle(task.getTitle());
 		taskDTO.setDescription(task.getDescription());
+		taskDTO.setPlannedStart(task.getPlannedStart());
+		taskDTO.setStartDate(task.getStartDate());
 		taskDTO.setDueDate(task.getDueDate());
 		taskDTO.setDoneDate(task.getDoneDate());
 		taskDTO.setIdReference(task.getIdReference());

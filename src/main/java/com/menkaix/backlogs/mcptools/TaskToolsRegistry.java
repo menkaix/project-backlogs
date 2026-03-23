@@ -25,7 +25,7 @@ public class TaskToolsRegistry {
         this.gson = gson;
     }
 
-    @Tool(name = "create-task", description = "Crée une nouvelle tâche. Champs requis: title (string). Optionnels: projectId, description, status, assignees (liste d'emails), estimate, estimatedManHours (double, heures homme), trackingReference, plannedStart, deadLine (dates ISO-8601).")
+    @Tool(name = "create-task", description = "Crée une nouvelle tâche. Champs requis: title (string). Optionnels: projectId, description, status, assignees (liste d'emails), estimate, estimatedManHours (double, heures homme), trackingReference, plannedStart, startDate, deadLine (dates ISO-8601).")
     public String createTask(String taskJson) {
         try {
             return gson.toJson(tools.createTask(taskJson));
