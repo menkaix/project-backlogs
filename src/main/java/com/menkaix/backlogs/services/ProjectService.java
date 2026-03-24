@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.menkaix.backlogs.models.dto.*;
+import com.menkaix.backlogs.models.values.ProjectState;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import com.menkaix.backlogs.models.entities.Actor;
@@ -265,6 +266,8 @@ public class ProjectService {
 		projectDTO.setClientName(p.getClientName());
 		projectDTO.setCreationDate(p.getCreationDate());
 		projectDTO.setCode(p.getCode());
+		projectDTO.setPhase(p.getPhase());
+		projectDTO.setStatus(ProjectState.compute(taskRepository.findByProjectId(p.getId())));
 		return projectDTO;
 	}
 

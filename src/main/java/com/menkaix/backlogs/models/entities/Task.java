@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.menkaix.backlogs.models.values.TaskStatus;
+
 @Document(collection = "task")
 public class Task extends AbstractEntity {
 
@@ -29,7 +31,7 @@ public class Task extends AbstractEntity {
 	public String idReference;
 
 	// Champs enrichis depuis bug-tracking-janitor
-	public String status;
+	public String status = TaskStatus.NEW.name();
 	public List<String> assignees = new ArrayList<>();
 
 	/** @deprecated Ancien champ — migré vers {@link #assignees}. Conservé pour lecture des anciens documents MongoDB. */
@@ -109,7 +111,8 @@ public class Task extends AbstractEntity {
 	}
 
 	public void setStatus(String status) {
-		this.status = status;
+		TaskStatus normalized = TaskStatus.normalize(status);
+		this.status = normalized != null ? normalized.name() : status;
 	}
 
 	public List<String> getAssignees() {

@@ -23,6 +23,7 @@ import com.menkaix.backlogs.models.entities.Feature;
 import com.menkaix.backlogs.models.entities.FeatureType;
 import com.menkaix.backlogs.models.entities.Story;
 import com.menkaix.backlogs.models.entities.Task;
+import com.menkaix.backlogs.models.values.TaskStatus;
 import com.menkaix.backlogs.repositories.ActorRepository;
 import com.menkaix.backlogs.repositories.FeatureRepository;
 import com.menkaix.backlogs.repositories.ProjectRepository;
@@ -221,7 +222,9 @@ public class TaskService {
 	}
 
 	public List<Task> findByStatus(String status) {
-		return repository.findByStatusOrderByLastUpdateDateDesc(status);
+		TaskStatus normalized = TaskStatus.normalize(status);
+		String key = normalized != null ? normalized.name() : status;
+		return repository.findByStatusOrderByLastUpdateDateDesc(key);
 	}
 
 	public List<Task> findOverdueTasks() {
