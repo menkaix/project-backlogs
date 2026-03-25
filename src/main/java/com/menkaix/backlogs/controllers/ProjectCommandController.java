@@ -3,7 +3,9 @@ package com.menkaix.backlogs.controllers;
 import com.menkaix.backlogs.models.dto.FeatureTreeDTO;
 import com.menkaix.backlogs.models.entities.Actor;
 import com.menkaix.backlogs.models.entities.Project;
+import com.menkaix.backlogs.models.transients.ProjectEnvironment;
 import com.menkaix.backlogs.models.transients.ProjectMember;
+import com.menkaix.backlogs.models.transients.ProjectVersion;
 import com.menkaix.backlogs.services.ActorService;
 import com.menkaix.backlogs.services.ProjectService;
 import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
@@ -187,6 +189,104 @@ public class ProjectCommandController {
             return new ResponseEntity<>(projectService.refreshTeamMemberSkills(projectRef, personId), HttpStatus.OK);
         } catch (NoSuchElementException e) {
             logger.error(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Gestion des versions projet
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    @GetMapping("/{project}/versions")
+    public ResponseEntity<?> getVersions(@PathVariable("project") String projectRef) {
+        try {
+            return new ResponseEntity<>(projectService.getVersions(projectRef), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/{project}/versions")
+    public ResponseEntity<?> addVersion(
+            @PathVariable("project") String projectRef,
+            @RequestBody ProjectVersion version) {
+        try {
+            return new ResponseEntity<>(projectService.addVersion(projectRef, version), HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/{project}/versions/{versionId}")
+    public ResponseEntity<?> updateVersion(
+            @PathVariable("project") String projectRef,
+            @PathVariable("versionId") String versionId,
+            @RequestBody ProjectVersion patch) {
+        try {
+            return new ResponseEntity<>(projectService.updateVersion(projectRef, versionId, patch), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{project}/versions/{versionId}")
+    public ResponseEntity<?> removeVersion(
+            @PathVariable("project") String projectRef,
+            @PathVariable("versionId") String versionId) {
+        try {
+            return new ResponseEntity<>(projectService.removeVersion(projectRef, versionId), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Gestion des environnements projet
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    @GetMapping("/{project}/environments")
+    public ResponseEntity<?> getEnvironments(@PathVariable("project") String projectRef) {
+        try {
+            return new ResponseEntity<>(projectService.getEnvironments(projectRef), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/{project}/environments")
+    public ResponseEntity<?> addEnvironment(
+            @PathVariable("project") String projectRef,
+            @RequestBody ProjectEnvironment environment) {
+        try {
+            return new ResponseEntity<>(projectService.addEnvironment(projectRef, environment), HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/{project}/environments/{environmentId}")
+    public ResponseEntity<?> updateEnvironment(
+            @PathVariable("project") String projectRef,
+            @PathVariable("environmentId") String environmentId,
+            @RequestBody ProjectEnvironment patch) {
+        try {
+            return new ResponseEntity<>(projectService.updateEnvironment(projectRef, environmentId, patch), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{project}/environments/{environmentId}")
+    public ResponseEntity<?> removeEnvironment(
+            @PathVariable("project") String projectRef,
+            @PathVariable("environmentId") String environmentId) {
+        try {
+            return new ResponseEntity<>(projectService.removeEnvironment(projectRef, environmentId), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }

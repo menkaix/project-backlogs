@@ -10,7 +10,9 @@ import java.util.stream.Collectors;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.menkaix.backlogs.models.dto.*;
+import com.menkaix.backlogs.models.transients.ProjectEnvironment;
 import com.menkaix.backlogs.models.transients.ProjectMember;
+import com.menkaix.backlogs.models.transients.ProjectVersion;
 import com.menkaix.backlogs.models.values.ProjectState;
 import com.menkaix.backlogs.repositories.PeopleRepository;
 import org.springframework.context.annotation.Lazy;
@@ -529,6 +531,138 @@ public class ProjectService {
 		member.setEmail(person.getEmail());
 		member.setSkills(person.getSkills());
 
+		Project saved = repo.save(project);
+		projectTouchService.touch(saved);
+		return saved;
+	}
+
+	// ── Gestion des versions projet ───────────────────────────────────────────
+
+	/**
+	 * Retourne la liste des versions d'un projet.
+	 */
+	public List<ProjectVersion> getVersions(String projectRef) {
+		Project project = accessService.findProject(projectRef);
+		return project.getVersions();
+	}
+
+	/**
+	 * Ajoute une version à un projet. Un UUID est généré automatiquement comme ID.
+	 *
+	 * @throws IllegalArgumentException si le nom est absent ou déjà utilisé
+	 */
+	public Project addVersion(String projectRef, ProjectVersion version) {
+		if (version.getName() == null || version.getName().isBlank()) {
+			throw new IllegalArgumentException("Le nom de la version est requis");
+		}
+		Project project = accessService.findProject(projectRef);
+		boolean nameExists = project.getVersions().stream()
+				.anyMatch(v -> v.getName().equalsIgnoreCase(version.getName()));
+		if (nameExists) {
+			throw new IllegalArgumentException("Une version avec ce nom existe déjà : " + version.getName());
+		}
+		version.setId(java.util.UUID.randomUUID().toString());
+		project.getVersions().add(version);
+		Project saved = repo.save(project);
+		projectTouchService.touch(saved);
+		return saved;
+	}
+
+	/**
+	 * Met à jour les champs d'une version (name, creationDate, deploymentDate).
+	 *
+	 * @throws NoSuchElementException si la version n'existe pas
+	 */
+	public Project updateVersion(String projectRef, String versionId, ProjectVersion patch) {
+		Project project = accessService.findProject(projectRef);
+		ProjectVersion existing = project.getVersions().stream()
+				.filter(v -> versionId.equals(v.getId()))
+				.findFirst()
+				.orElseThrow(() -> new NoSuchElementException("Version introuvable : " + versionId));
+		if (patch.getName() != null && !patch.getName().isBlank()) existing.setName(patch.getName());
+		if (patch.getCreationDate() != null) existing.setCreationDate(patch.getCreationDate());
+		if (patch.getDeploymentDate() != null) existing.setDeploymentDate(patch.getDeploymentDate());
+		Project saved = repo.save(project);
+		projectTouchService.touch(saved);
+		return saved;
+	}
+
+	/**
+	 * Supprime une version d'un projet.
+	 *
+	 * @throws NoSuchElementException si la version n'existe pas
+	 */
+	public Project removeVersion(String projectRef, String versionId) {
+		Project project = accessService.findProject(projectRef);
+		boolean removed = project.getVersions().removeIf(v -> versionId.equals(v.getId()));
+		if (!removed) {
+			throw new NoSuchElementException("Version introuvable : " + versionId);
+		}
+		Project saved = repo.save(project);
+		projectTouchService.touch(saved);
+		return saved;
+	}
+
+	// ── Gestion des environnements projet ─────────────────────────────────────
+
+	public List<ProjectEnvironment> getEnvironments(String projectRef) {
+		Project project = accessService.findProject(projectRef);
+		return project.getEnvironments();
+	}
+
+	/**
+	 * Ajoute un environnement au projet. Un UUID est généré automatiquement.
+	 *
+	 * @throws IllegalArgumentException si le nom est absent ou déjà utilisé
+	 */
+	public Project addEnvironment(String projectRef, ProjectEnvironment environment) {
+		if (environment.getName() == null || environment.getName().isBlank()) {
+			throw new IllegalArgumentException("Le nom de l'environnement est requis");
+		}
+		Project project = accessService.findProject(projectRef);
+		boolean nameExists = project.getEnvironments().stream()
+				.anyMatch(e -> e.getName().equalsIgnoreCase(environment.getName()));
+		if (nameExists) {
+			throw new IllegalArgumentException("Un environnement avec ce nom existe déjà : " + environment.getName());
+		}
+		environment.setId(java.util.UUID.randomUUID().toString());
+		project.getEnvironments().add(environment);
+		Project saved = repo.save(project);
+		projectTouchService.touch(saved);
+		return saved;
+	}
+
+	/**
+	 * Met à jour les champs d'un environnement (name, type, url, description).
+	 *
+	 * @throws NoSuchElementException si l'environnement n'existe pas
+	 */
+	public Project updateEnvironment(String projectRef, String environmentId, ProjectEnvironment patch) {
+		Project project = accessService.findProject(projectRef);
+		ProjectEnvironment existing = project.getEnvironments().stream()
+				.filter(e -> environmentId.equals(e.getId()))
+				.findFirst()
+				.orElseThrow(() -> new NoSuchElementException("Environnement introuvable : " + environmentId));
+		if (patch.getName() != null && !patch.getName().isBlank()) existing.setName(patch.getName());
+		if (patch.getType() != null) existing.setType(patch.getType());
+		if (patch.getUrl() != null) existing.setUrl(patch.getUrl());
+		if (patch.getDescription() != null) existing.setDescription(patch.getDescription());
+		Project saved = repo.save(project);
+		projectTouchService.touch(saved);
+		return saved;
+	}
+
+	/**
+	 * Supprime un environnement d'un projet.
+	 *
+	 * @throws NoSuchElementException si l'environnement n'existe pas
+	 */
+	public Project removeEnvironment(String projectRef, String environmentId) {
+		Project project = accessService.findProject(projectRef);
+		boolean removed = project.getEnvironments().removeIf(e -> environmentId.equals(e.getId()));
+		if (!removed) {
+			throw new NoSuchElementException("Environnement introuvable : " + environmentId);
+		}
 		Project saved = repo.save(project);
 		projectTouchService.touch(saved);
 		return saved;

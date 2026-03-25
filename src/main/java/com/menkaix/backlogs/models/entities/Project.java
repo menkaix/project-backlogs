@@ -3,7 +3,9 @@ package com.menkaix.backlogs.models.entities;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
+import com.menkaix.backlogs.models.transients.ProjectEnvironment;
 import com.menkaix.backlogs.models.transients.ProjectMember;
+import com.menkaix.backlogs.models.transients.ProjectVersion;
 import com.menkaix.backlogs.models.values.ProjectPhase;
 import com.menkaix.backlogs.models.values.ProjectState;
 
@@ -27,6 +29,10 @@ public class Project extends AbstractEntity {
 	public ProjectState status;
 
 	private List<ProjectMember> team = new ArrayList<>();
+
+	private List<ProjectVersion> versions = new ArrayList<>();
+
+	private List<ProjectEnvironment> environments = new ArrayList<>();
 
 	public Project() {
 
@@ -98,5 +104,21 @@ public class Project extends AbstractEntity {
 
 	public void setTeam(List<ProjectMember> team) {
 		this.team = team;
+	}
+
+	public List<ProjectVersion> getVersions() {
+		return versions;
+	}
+
+	public void setVersions(List<ProjectVersion> versions) {
+		this.versions = versions;
+	}
+
+	public List<ProjectEnvironment> getEnvironments() {
+		return environments;
+	}
+
+	public void setEnvironments(List<ProjectEnvironment> environments) {
+		this.environments = environments;
 	}
 }

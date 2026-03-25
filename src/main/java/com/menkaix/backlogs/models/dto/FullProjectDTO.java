@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.menkaix.backlogs.models.transients.ProjectEnvironment;
 import com.menkaix.backlogs.models.transients.ProjectMember;
+import com.menkaix.backlogs.models.transients.ProjectVersion;
 import com.menkaix.backlogs.models.values.ProjectPhase;
 import com.menkaix.backlogs.models.values.ProjectState;
 
@@ -19,6 +21,8 @@ public class FullProjectDTO {
     private ProjectState status;
     private List<FullActorDTO> actors = new ArrayList<>();
     private List<ProjectMember> team = new ArrayList<>();
+    private List<ProjectVersion> versions = new ArrayList<>();
+    private List<ProjectEnvironment> environments = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -98,5 +102,21 @@ public class FullProjectDTO {
 
     public void setTeam(List<ProjectMember> team) {
         this.team = team;
+    }
+
+    public List<ProjectVersion> getVersions() {
+        return versions;
+    }
+
+    public void setVersions(List<ProjectVersion> versions) {
+        this.versions = versions;
+    }
+
+    public List<ProjectEnvironment> getEnvironments() {
+        return environments;
+    }
+
+    public void setEnvironments(List<ProjectEnvironment> environments) {
+        this.environments = environments;
     }
 }
