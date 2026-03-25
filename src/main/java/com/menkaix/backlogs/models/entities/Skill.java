@@ -1,20 +1,18 @@
 package com.menkaix.backlogs.models.entities;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "skills")
+@CompoundIndex(name = "skill_name_unique", def = "{'name': 1}", unique = true)
 public class Skill extends AbstractEntity {
 
     @Id
     private String id;
-
-    @Indexed(unique = true)
-    private String name;
 
     private String description;
 
@@ -28,16 +26,6 @@ public class Skill extends AbstractEntity {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getDescription() {

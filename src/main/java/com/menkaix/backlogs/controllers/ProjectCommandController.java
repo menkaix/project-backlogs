@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import com.menkaix.backlogs.models.values.ProjectPhase;
 import com.menkaix.backlogs.models.values.ProjectState;
 
@@ -139,15 +140,15 @@ public class ProjectCommandController {
         return new ResponseEntity<>(projectService.getByState(state), HttpStatus.OK);
     }
 
-    // ─── Gestion de l'équipe ────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Gestion de l'équipe projet
+    // ═══════════════════════════════════════════════════════════════════════════
 
     @GetMapping("/{project}/team")
     public ResponseEntity<?> getTeam(@PathVariable("project") String projectRef) {
         try {
-            List<ProjectMember> team = projectService.getTeam(projectRef);
-            return new ResponseEntity<>(team, HttpStatus.OK);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+            return new ResponseEntity<>(projectService.getTeam(projectRef), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -157,13 +158,12 @@ public class ProjectCommandController {
             @PathVariable("project") String projectRef,
             @PathVariable("personId") String personId) {
         try {
-            Project updated = projectService.addTeamMember(projectRef, personId);
-            return new ResponseEntity<>(updated, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(projectService.addTeamMember(projectRef, personId), HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
             logger.error(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
 
@@ -172,9 +172,8 @@ public class ProjectCommandController {
             @PathVariable("project") String projectRef,
             @PathVariable("personId") String personId) {
         try {
-            Project updated = projectService.removeTeamMember(projectRef, personId);
-            return new ResponseEntity<>(updated, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(projectService.removeTeamMember(projectRef, personId), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
             logger.error(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
@@ -185,9 +184,8 @@ public class ProjectCommandController {
             @PathVariable("project") String projectRef,
             @PathVariable("personId") String personId) {
         try {
-            Project updated = projectService.refreshTeamMemberSkills(projectRef, personId);
-            return new ResponseEntity<>(updated, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(projectService.refreshTeamMemberSkills(projectRef, personId), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
             logger.error(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }

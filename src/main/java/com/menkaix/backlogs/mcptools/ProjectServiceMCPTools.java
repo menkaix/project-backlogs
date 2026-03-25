@@ -108,6 +108,8 @@ public class ProjectServiceMCPTools {
         try {
             ProjectPhase phase = ProjectPhase.valueOf(phaseName.trim().toUpperCase());
             return projectService.updatePhase(projectRef, phase);
+        } catch (com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException e) {
+            throw new RuntimeException("Projet introuvable : " + projectRef);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Phase inconnue: " + phaseName +
                     ". Valeurs valides: INCONNUE, AVANT_VENTE, CADRAGE, CONCEPTION, PREPRODUCTION, PRODUCTION, MAINTENANCE");
