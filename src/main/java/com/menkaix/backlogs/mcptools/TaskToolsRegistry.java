@@ -135,4 +135,42 @@ public class TaskToolsRegistry {
             return gson.toJson(Map.of("error", e.getMessage()));
         }
     }
+
+    @Tool(name = "find-tasks-by-project-ref", description = "Récupère toutes les tâches d'un projet par son nom, code ou ID MongoDB.")
+    public String findTasksByProjectRef(String projectRef) {
+        try {
+            List<Task> tasks = tools.findTasksByProjectRef(projectRef);
+            return gson.toJson(Map.of("tasks", tasks, "count", tasks.size(), "projectRef", projectRef));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "find-tasks-by-assignee", description = "Récupère toutes les tâches assignées à une personne par son email.")
+    public String findTasksByAssignee(String email) {
+        try {
+            List<Task> tasks = tools.findTasksByAssigneeEmail(email);
+            return gson.toJson(Map.of("tasks", tasks, "count", tasks.size(), "assignee", email));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "update-task-status", description = "Met à jour le statut d'une tâche. Statuts valides: NEW, TODO, IN_PROGRESS, PENDING, TO_SPEC, SPECIFYING, RND, TO_STUDY, TO_TEST, TESTING, DONE, CANCELED, UNKNOWN, BLOCKED.")
+    public String updateTaskStatus(String taskId, String status) {
+        try {
+            return gson.toJson(tools.updateTaskStatus(taskId, status));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "get-task-context", description = "Construit le contexte complet d'une tâche pour un LLM: tâche, projet, feature, user story, actor, tâches sœurs et équipe avec skillsets. Utile pour estimer en heures.homme, suggérer une affectation, planifier, générer une description ou des critères d'acceptation.")
+    public String getTaskContext(String taskId) {
+        try {
+            return gson.toJson(tools.buildTaskContext(taskId));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
 }

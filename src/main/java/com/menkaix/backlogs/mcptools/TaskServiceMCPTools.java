@@ -8,17 +8,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
+import com.menkaix.backlogs.models.dto.TaskContextDTO;
 import com.menkaix.backlogs.models.entities.Task;
+import com.menkaix.backlogs.services.TaskContextService;
 import com.menkaix.backlogs.services.TaskService;
 
 @Service
 public class TaskServiceMCPTools {
 
     private final TaskService taskService;
+    private final TaskContextService taskContextService;
     private final Gson gson;
 
-    public TaskServiceMCPTools(TaskService taskService, Gson gson) {
+    public TaskServiceMCPTools(TaskService taskService, TaskContextService taskContextService, Gson gson) {
         this.taskService = taskService;
+        this.taskContextService = taskContextService;
         this.gson = gson;
     }
 
@@ -101,5 +105,36 @@ public class TaskServiceMCPTools {
             throw new IllegalArgumentException("L'ID du projet ne peut pas être vide");
         }
         return taskService.findByProjectId(projectId);
+    }
+
+    public List<Task> findTasksByProjectRef(String projectRef) {
+        if (projectRef == null || projectRef.isBlank()) {
+            throw new IllegalArgumentException("La référence projet ne peut pas être vide");
+        }
+        return taskService.findByProjectRef(projectRef);
+    }
+
+    public List<Task> findTasksByAssigneeEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("L'email ne peut pas être vide");
+        }
+        return taskService.findByAssigneeEmail(email);
+    }
+
+    public Task updateTaskStatus(String taskId, String status) {
+        if (taskId == null || taskId.isBlank()) {
+            throw new IllegalArgumentException("L'ID de la tâche ne peut pas être vide");
+        }
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("Le statut ne peut pas être vide");
+        }
+        return taskService.updateStatus(taskId, status);
+    }
+
+    public TaskContextDTO buildTaskContext(String taskId) {
+        if (taskId == null || taskId.isBlank()) {
+            throw new IllegalArgumentException("L'ID de la tâche ne peut pas être vide");
+        }
+        return taskContextService.buildContext(taskId);
     }
 }

@@ -7,7 +7,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.menkaix.backlogs.models.dto.TaskContextDTO;
 import com.menkaix.backlogs.models.entities.Task;
+import com.menkaix.backlogs.services.TaskContextService;
 import com.menkaix.backlogs.services.TaskService;
 
 @RestController
@@ -15,9 +17,11 @@ import com.menkaix.backlogs.services.TaskService;
 public class TaskController {
 
     private final TaskService taskService;
+    private final TaskContextService taskContextService;
 
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, TaskContextService taskContextService) {
         this.taskService = taskService;
+        this.taskContextService = taskContextService;
     }
 
     @PostMapping
@@ -137,5 +141,15 @@ public class TaskController {
         return taskService.findByTrackingReference(ref)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/context")
+    public ResponseEntity<?> getContext(@PathVariable String id) {
+        try {
+            TaskContextDTO ctx = taskContextService.buildContext(id);
+            return ResponseEntity.ok(ctx);
+        } catch (java.util.NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
