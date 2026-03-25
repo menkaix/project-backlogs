@@ -15,6 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import com.menkaix.backlogs.models.values.ProjectPhase;
+import com.menkaix.backlogs.models.values.ProjectState;
 
 @RestController
 @RequestMapping("/project-command")
@@ -99,6 +102,40 @@ public class ProjectCommandController {
             return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
         }
 
+    }
+
+    @PatchMapping("/{project}/phase")
+    public ResponseEntity<?> updatePhase(
+            @PathVariable("project") String projectRef,
+            @RequestBody Map<String, String> body) {
+        String phaseValue = body.get("phase");
+        if (phaseValue == null || phaseValue.isBlank()) {
+            return new ResponseEntity<>("Le champ 'phase' est obligatoire", HttpStatus.BAD_REQUEST);
+        }
+        ProjectPhase phase;
+        try {
+            phase = ProjectPhase.valueOf(phaseValue.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>("Phase inconnue : " + phaseValue, HttpStatus.BAD_REQUEST);
+        }
+        try {
+            return new ResponseEntity<>(projectService.updatePhase(projectRef, phase), HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/by-status/{state}")
+    public ResponseEntity<?> getByStatus(@PathVariable("state") String stateValue) {
+        ProjectState state;
+        try {
+            state = ProjectState.valueOf(stateValue.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>("État inconnu : " + stateValue + ". Valeurs valides : ACTIVE, STANDBY, CLOSED",
+                    HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(projectService.getByState(state), HttpStatus.OK);
     }
 
 }

@@ -112,7 +112,8 @@ public class Task extends AbstractEntity {
 
 	public void setStatus(String status) {
 		TaskStatus normalized = TaskStatus.normalize(status);
-		this.status = normalized != null ? normalized.name() : status;
+		// normalize() returns null only for blank/null input → fallback to NEW
+		this.status = (normalized != null) ? normalized.name() : TaskStatus.NEW.name();
 	}
 
 	public List<String> getAssignees() {

@@ -102,6 +102,26 @@ public class TaskController {
         return ResponseEntity.ok(taskService.findByStatus(status));
     }
 
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable String id, @RequestBody java.util.Map<String, String> body) {
+        String status = body.get("status");
+        if (status == null || status.isBlank()) {
+            return ResponseEntity.badRequest().body("Le champ 'status' est obligatoire");
+        }
+        try {
+            return ResponseEntity.ok(taskService.updateStatus(id, status));
+        } catch (java.util.NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/statuses")
+    public ResponseEntity<com.menkaix.backlogs.models.values.TaskStatus[]> listStatuses() {
+        return ResponseEntity.ok(com.menkaix.backlogs.models.values.TaskStatus.values());
+    }
+
     @GetMapping("/overdue")
     public ResponseEntity<List<Task>> findOverdue() {
         return ResponseEntity.ok(taskService.findOverdueTasks());

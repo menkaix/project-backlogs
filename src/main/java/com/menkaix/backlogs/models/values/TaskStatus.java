@@ -18,7 +18,8 @@ public enum TaskStatus {
 
     /**
      * Normalise une valeur brute (anciens libellés MongoDB) vers l'enum correspondant.
-     * Retourne {@code null} si aucune correspondance n'est trouvée.
+     * Retourne {@code UNKNOWN} si aucune correspondance reconnue n'est trouvée.
+     * Retourne {@code null} uniquement si {@code raw} est null ou vide.
      */
     public static TaskStatus normalize(String raw) {
         if (raw == null || raw.isBlank()) return null;
@@ -38,5 +39,22 @@ public enum TaskStatus {
             case "canceled", "cancelled"                     -> CANCELED;
             default -> UNKNOWN;
         };
+    }
+
+    /**
+     * Indique si ce statut correspond à un état "terminal" (tâche finie ou annulée).
+     */
+    public boolean isTerminal() {
+        return this == DONE || this == CANCELED;
+    }
+
+    /**
+     * Indique si ce statut correspond à un état "actif" (travail en cours ou à faire).
+     */
+    public boolean isActive() {
+        return this == NEW || this == TODO || this == IN_PROGRESS
+                || this == TO_SPEC || this == SPECIFYING
+                || this == RND || this == TO_STUDY
+                || this == TO_TEST || this == TESTING;
     }
 }
