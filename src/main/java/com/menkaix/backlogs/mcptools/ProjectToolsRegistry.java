@@ -1,6 +1,7 @@
 package com.menkaix.backlogs.mcptools;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.menkaix.backlogs.models.entities.Project;
+import com.menkaix.backlogs.models.transients.ProjectMember;
 
 @Service
 public class ProjectToolsRegistry {
@@ -101,6 +103,62 @@ public class ProjectToolsRegistry {
             Optional<Project> project = tools.findProjectByName(projectName);
             return project.isPresent() ? gson.toJson(project.get())
                     : gson.toJson(Map.of("message", "Aucun projet avec le nom: " + projectName));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "update-project-phase", description = "Met à jour la phase d'un projet. Phases valides: INCONNUE, AVANT_VENTE, CADRAGE, CONCEPTION, PREPRODUCTION, PRODUCTION, MAINTENANCE. La référence peut être le nom, le code ou l'ID MongoDB.")
+    public String updateProjectPhase(String projectRef, String phaseName) {
+        try {
+            return gson.toJson(tools.updateProjectPhase(projectRef, phaseName));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "find-projects-by-state", description = "Récupère les projets selon leur état calculé à partir des tâches. États valides: ACTIVE (tâches en cours), STANDBY (tâches en attente), CLOSED (toutes les tâches terminées).")
+    public String findProjectsByState(String stateName) {
+        try {
+            List<Project> projects = tools.findProjectsByState(stateName);
+            return gson.toJson(Map.of("projects", projects, "count", projects.size(), "state", stateName));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "get-project-team", description = "Récupère l'équipe d'un projet avec les skillsets de chaque membre. La référence peut être le nom, le code ou l'ID MongoDB.")
+    public String getProjectTeam(String projectRef) {
+        try {
+            List<ProjectMember> team = tools.getProjectTeam(projectRef);
+            return gson.toJson(Map.of("team", team, "count", team.size(), "projectRef", projectRef));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "add-project-team-member", description = "Ajoute une personne à l'équipe d'un projet (copie son skillset actuel). La référence projet peut être le nom, le code ou l'ID MongoDB.")
+    public String addProjectTeamMember(String projectRef, String personId) {
+        try {
+            return gson.toJson(tools.addProjectTeamMember(projectRef, personId));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "remove-project-team-member", description = "Retire une personne de l'équipe d'un projet. La référence projet peut être le nom, le code ou l'ID MongoDB.")
+    public String removeProjectTeamMember(String projectRef, String personId) {
+        try {
+            return gson.toJson(tools.removeProjectTeamMember(projectRef, personId));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "refresh-project-team-member-skills", description = "Resynchronise le skillset d'un membre de l'équipe projet depuis son profil People. À utiliser après une mise à jour des compétences d'une personne.")
+    public String refreshProjectTeamMemberSkills(String projectRef, String personId) {
+        try {
+            return gson.toJson(tools.refreshProjectTeamMemberSkills(projectRef, personId));
         } catch (Exception e) {
             return gson.toJson(Map.of("error", e.getMessage()));
         }

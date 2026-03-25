@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.menkaix.backlogs.models.transients.ProjectMember;
 import com.menkaix.backlogs.models.values.ProjectPhase;
 import com.menkaix.backlogs.models.values.ProjectState;
 
@@ -17,6 +18,7 @@ public class FullProjectDTO {
     private ProjectPhase phase;
     private ProjectState status;
     private List<FullActorDTO> actors = new ArrayList<>();
+    private List<ProjectMember> team = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -88,5 +90,13 @@ public class FullProjectDTO {
 
     public void setActors(List<FullActorDTO> actors) {
         this.actors = actors;
+    }
+
+    public List<ProjectMember> getTeam() {
+        return team;
+    }
+
+    public void setTeam(List<ProjectMember> team) {
+        this.team = team;
     }
 }

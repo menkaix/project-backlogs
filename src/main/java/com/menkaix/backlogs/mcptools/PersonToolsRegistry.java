@@ -56,7 +56,7 @@ public class PersonToolsRegistry {
         }
     }
 
-    @Tool(name = "update-person", description = "Met à jour une personne existante. Champ requis: id. Champs modifiables: firstName, lastName, email.")
+    @Tool(name = "update-person", description = "Met à jour une personne existante. Champ requis: id. Champs modifiables: firstName, lastName, email, description.")
     public String updatePerson(String personDetails) {
         try {
             return gson.toJson(tools.updatePerson(personDetails));

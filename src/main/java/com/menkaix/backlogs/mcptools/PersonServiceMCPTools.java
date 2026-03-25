@@ -71,6 +71,7 @@ public class PersonServiceMCPTools {
             }
             existing.setEmail(details.getEmail());
         }
+        if (details.getDescription() != null) existing.setDescription(details.getDescription());
         return personService.update(existing);
     }
 

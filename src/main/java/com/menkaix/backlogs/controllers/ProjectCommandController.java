@@ -3,6 +3,7 @@ package com.menkaix.backlogs.controllers;
 import com.menkaix.backlogs.models.dto.FeatureTreeDTO;
 import com.menkaix.backlogs.models.entities.Actor;
 import com.menkaix.backlogs.models.entities.Project;
+import com.menkaix.backlogs.models.transients.ProjectMember;
 import com.menkaix.backlogs.services.ActorService;
 import com.menkaix.backlogs.services.ProjectService;
 import com.menkaix.backlogs.utilities.exceptions.EntityNotFoundException;
@@ -136,6 +137,60 @@ public class ProjectCommandController {
                     HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(projectService.getByState(state), HttpStatus.OK);
+    }
+
+    // ─── Gestion de l'équipe ────────────────────────────────────────────────────
+
+    @GetMapping("/{project}/team")
+    public ResponseEntity<?> getTeam(@PathVariable("project") String projectRef) {
+        try {
+            List<ProjectMember> team = projectService.getTeam(projectRef);
+            return new ResponseEntity<>(team, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/{project}/team/{personId}")
+    public ResponseEntity<?> addTeamMember(
+            @PathVariable("project") String projectRef,
+            @PathVariable("personId") String personId) {
+        try {
+            Project updated = projectService.addTeamMember(projectRef, personId);
+            return new ResponseEntity<>(updated, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } catch (EntityNotFoundException e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{project}/team/{personId}")
+    public ResponseEntity<?> removeTeamMember(
+            @PathVariable("project") String projectRef,
+            @PathVariable("personId") String personId) {
+        try {
+            Project updated = projectService.removeTeamMember(projectRef, personId);
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/{project}/team/{personId}/refresh-skills")
+    public ResponseEntity<?> refreshTeamMemberSkills(
+            @PathVariable("project") String projectRef,
+            @PathVariable("personId") String personId) {
+        try {
+            Project updated = projectService.refreshTeamMemberSkills(projectRef, personId);
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
 }

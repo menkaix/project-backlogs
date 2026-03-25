@@ -1,25 +1,22 @@
-package com.menkaix.backlogs.models.entities;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+package com.menkaix.backlogs.models.dto;
 
 import com.menkaix.backlogs.models.transients.PersonSkill;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-@Document(collection = "person")
-public class People extends AbstractEntity {
+public class FullPersonDTO {
 
-	@Id
 	private String id;
-
 	private String firstName;
 	private String lastName;
 	private String email;
 	private String description;
-	private boolean isActive = true;
+	private boolean isActive;
 	private List<PersonSkill> skills = new ArrayList<>();
+	private Date creationDate;
+	private Date lastUpdateDate;
 
 	public String getId() {
 		return id;
@@ -27,14 +24,6 @@ public class People extends AbstractEntity {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 
 	public String getFirstName() {
@@ -51,6 +40,14 @@ public class People extends AbstractEntity {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getDescription() {
@@ -75,5 +72,21 @@ public class People extends AbstractEntity {
 
 	public void setSkills(List<PersonSkill> skills) {
 		this.skills = skills;
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public Date getLastUpdateDate() {
+		return lastUpdateDate;
+	}
+
+	public void setLastUpdateDate(Date lastUpdateDate) {
+		this.lastUpdateDate = lastUpdateDate;
 	}
 }

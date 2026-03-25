@@ -10,7 +10,9 @@ import java.util.stream.Collectors;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.menkaix.backlogs.models.dto.*;
+import com.menkaix.backlogs.models.transients.ProjectMember;
 import com.menkaix.backlogs.models.values.ProjectState;
+import com.menkaix.backlogs.repositories.PeopleRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import com.menkaix.backlogs.models.entities.Actor;
@@ -57,6 +59,7 @@ public class ProjectService {
 	private final DataAccessService accessService;
 	private final RaciRepository raciRepository;
 	private final ProjectTouchService projectTouchService;
+	private final PeopleRepository peopleRepository;
 
 	// Self-reference pour que @Cacheable soit intercepté par le proxy Spring AOP
 	@Lazy
@@ -66,7 +69,8 @@ public class ProjectService {
 	@Autowired
 	public ProjectService(ProjectRepository repo, ActorRepository actorRepository, TaskRepository taskRepository,
 			StoryRepository storyRepository, FeatureRepository featureRepository, FeatureService featureService,
-			DataAccessService accessService, RaciRepository raciRepository, ProjectTouchService projectTouchService) {
+			DataAccessService accessService, RaciRepository raciRepository, ProjectTouchService projectTouchService,
+			PeopleRepository peopleRepository) {
 		this.repo = repo;
 		this.actorRepository = actorRepository;
 		this.taskRepository = taskRepository;
@@ -76,6 +80,7 @@ public class ProjectService {
 		this.accessService = accessService;
 		this.raciRepository = raciRepository;
 		this.projectTouchService = projectTouchService;
+		this.peopleRepository = peopleRepository;
 	}
 
 	// Méthodes getter pour les repositories et services
@@ -437,6 +442,62 @@ public class ProjectService {
 			}
 		}
 		return a;
+	}
+
+	// ─── Gestion de l'équipe ─────────────────────────────────────────────────────
+
+	public List<ProjectMember> getTeam(String projectRef) {
+		Project project = accessService.findProject(projectRef);
+		return project.getTeam();
+	}
+
+	public Project addTeamMember(String projectRef, String personId) throws EntityNotFoundException {
+		Project project = accessService.findProject(projectRef);
+
+		boolean alreadyMember = project.getTeam().stream()
+				.anyMatch(m -> m.getPersonId().equals(personId));
+		if (alreadyMember) {
+			throw new IllegalArgumentException("Cette personne est déjà membre de l'équipe");
+		}
+
+		com.menkaix.backlogs.models.entities.People person = peopleRepository.findById(personId)
+				.orElseThrow(() -> new EntityNotFoundException("Personne introuvable : " + personId));
+
+		ProjectMember member = new ProjectMember();
+		member.setPersonId(person.getId());
+		member.setFirstName(person.getFirstName());
+		member.setLastName(person.getLastName());
+		member.setEmail(person.getEmail());
+		member.setSkills(new java.util.ArrayList<>(person.getSkills()));
+
+		project.getTeam().add(member);
+		return repo.save(project);
+	}
+
+	public Project removeTeamMember(String projectRef, String personId) throws EntityNotFoundException {
+		Project project = accessService.findProject(projectRef);
+
+		boolean removed = project.getTeam().removeIf(m -> m.getPersonId().equals(personId));
+		if (!removed) {
+			throw new EntityNotFoundException("Personne non trouvée dans l'équipe : " + personId);
+		}
+
+		return repo.save(project);
+	}
+
+	public Project refreshTeamMemberSkills(String projectRef, String personId) throws EntityNotFoundException {
+		Project project = accessService.findProject(projectRef);
+
+		ProjectMember member = project.getTeam().stream()
+				.filter(m -> m.getPersonId().equals(personId))
+				.findFirst()
+				.orElseThrow(() -> new EntityNotFoundException("Personne non trouvée dans l'équipe : " + personId));
+
+		com.menkaix.backlogs.models.entities.People person = peopleRepository.findById(personId)
+				.orElseThrow(() -> new EntityNotFoundException("Personne introuvable : " + personId));
+
+		member.setSkills(new java.util.ArrayList<>(person.getSkills()));
+		return repo.save(project);
 	}
 
 	// Méthode pour ajouter un RACI à un projet
