@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import com.menkaix.backlogs.models.entities.Feature;
 import com.menkaix.backlogs.models.entities.FeatureType;
+import com.menkaix.backlogs.models.entities.Issue;
 import com.menkaix.backlogs.models.entities.Story;
 import com.menkaix.backlogs.models.entities.Task;
 import com.menkaix.backlogs.models.values.TaskStatus;
@@ -42,6 +44,10 @@ public class TaskService {
 	private final StoryRepository storyRepository;
 	private final ActorRepository actorRepository;
 	private final ProjectRepository projectRepository;
+
+	@Lazy
+	@Autowired
+	private IssueService issueService;
 
 	@Autowired
 	public TaskService(TaskRepository repository, FeatureTypeService featureTypeService,
@@ -214,6 +220,7 @@ public class TaskService {
 					);
 				});
 
+		result.addAll(issueService.findByProjectRef(projectRef));
 		result.sort(Comparator.comparing(Task::getLastUpdateDate,
 				Comparator.nullsLast(Comparator.reverseOrder())));
 		return result;
@@ -222,12 +229,15 @@ public class TaskService {
 	// ── Recherche par assignee ────────────────────────────────────────────────
 
 	/**
-	 * Retourne toutes les tâches où l'email donné figure dans la liste des
-	 * assignees. Une tâche avec plusieurs assignees est retournée dès qu'un
-	 * des assignees correspond.
+	 * Retourne toutes les tâches et issues où l'email donné figure dans la liste
+	 * des assignees.
 	 */
 	public List<Task> findByAssigneeEmail(String email) {
-		return repository.findByAssigneesContainingOrderByLastUpdateDateDesc(email);
+		List<Task> result = new ArrayList<>(repository.findByAssigneesContainingOrderByLastUpdateDateDesc(email));
+		result.addAll(issueService.findByAssigneeEmail(email));
+		result.sort(Comparator.comparing(Task::getLastUpdateDate,
+				Comparator.nullsLast(Comparator.reverseOrder())));
+		return result;
 	}
 
 	// ── Recherche par feature ─────────────────────────────────────────────────

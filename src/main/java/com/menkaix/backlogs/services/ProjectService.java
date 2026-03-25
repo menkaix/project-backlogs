@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import com.menkaix.backlogs.models.entities.Actor;
 import com.menkaix.backlogs.models.entities.Feature;
+import com.menkaix.backlogs.models.entities.Issue;
 import com.menkaix.backlogs.models.entities.Project;
 import com.menkaix.backlogs.models.entities.Raci;
 import com.menkaix.backlogs.models.entities.Story;
@@ -62,6 +63,7 @@ public class ProjectService {
 	private final RaciRepository raciRepository;
 	private final ProjectTouchService projectTouchService;
 	private final PeopleRepository peopleRepository;
+	private final IssueService issueService;
 
 	// Self-reference pour que @Cacheable soit intercepté par le proxy Spring AOP
 	@Lazy
@@ -72,7 +74,7 @@ public class ProjectService {
 	public ProjectService(ProjectRepository repo, ActorRepository actorRepository, TaskRepository taskRepository,
 			StoryRepository storyRepository, FeatureRepository featureRepository, FeatureService featureService,
 			DataAccessService accessService, RaciRepository raciRepository, ProjectTouchService projectTouchService,
-			PeopleRepository peopleRepository) {
+			PeopleRepository peopleRepository, IssueService issueService) {
 		this.repo = repo;
 		this.actorRepository = actorRepository;
 		this.taskRepository = taskRepository;
@@ -83,6 +85,7 @@ public class ProjectService {
 		this.raciRepository = raciRepository;
 		this.projectTouchService = projectTouchService;
 		this.peopleRepository = peopleRepository;
+		this.issueService = issueService;
 	}
 
 	// Méthodes getter pour les repositories et services
@@ -135,6 +138,7 @@ public class ProjectService {
 			tmpDTO.setDescription(feature.getDescription());
 			tmpDTO.setParentID(feature.getParentID());
 			tmpDTO.setType(feature.getType());
+			tmpDTO.setIssues(issueService.findByFeatureId(feature.getId()));
 			allDtos.add(tmpDTO);
 		}
 		return order(allDtos);

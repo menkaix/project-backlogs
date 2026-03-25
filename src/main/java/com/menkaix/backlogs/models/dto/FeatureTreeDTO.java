@@ -1,5 +1,7 @@
 package com.menkaix.backlogs.models.dto;
 
+import com.menkaix.backlogs.models.entities.Issue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,7 @@ public class FeatureTreeDTO {
     private String parentID;
     private String type;
     private List<FeatureTreeDTO> children = new ArrayList<>();
+    private List<Issue> issues = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -57,5 +60,13 @@ public class FeatureTreeDTO {
 
     public void setChildren(List<FeatureTreeDTO> children) {
         this.children = children;
+    }
+
+    public List<Issue> getIssues() {
+        return issues;
+    }
+
+    public void setIssues(List<Issue> issues) {
+        this.issues = issues;
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.menkaix.backlogs.mcptools.IssueToolsRegistry;
 import com.menkaix.backlogs.mcptools.PersonToolsRegistry;
 import com.menkaix.backlogs.mcptools.ProjectToolsRegistry;
 import com.menkaix.backlogs.mcptools.SkillToolsRegistry;
@@ -18,9 +19,10 @@ public class MCPConfiguration {
             ProjectToolsRegistry projectTools,
             TaskToolsRegistry taskTools,
             PersonToolsRegistry personTools,
-            SkillToolsRegistry skillTools) {
+            SkillToolsRegistry skillTools,
+            IssueToolsRegistry issueTools) {
         return MethodToolCallbackProvider.builder()
-                .toolObjects(projectTools, taskTools, personTools, skillTools)
+                .toolObjects(projectTools, taskTools, personTools, skillTools, issueTools)
                 .build();
     }
 }
