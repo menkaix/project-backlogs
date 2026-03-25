@@ -13,6 +13,9 @@ import com.menkaix.backlogs.models.values.TaskStatus;
 @Document(collection = "task")
 public class Task extends AbstractEntity {
 
+	/** Discriminant de type pour les listes mixtes Task/Issue. Surchargé à "ISSUE" dans {@link Issue}. */
+	public String entityType = "TASK";
+
 	@Id
 	public String id;
 

@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.menkaix.backlogs.models.entities.Project;
+import com.menkaix.backlogs.models.transients.ProjectEnvironment;
 import com.menkaix.backlogs.models.transients.ProjectMember;
+import com.menkaix.backlogs.models.transients.ProjectVersion;
 import com.menkaix.backlogs.models.values.ProjectPhase;
 import com.menkaix.backlogs.models.values.ProjectState;
 import com.menkaix.backlogs.services.ProjectManagementService;
@@ -164,6 +166,94 @@ public class ProjectServiceMCPTools {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    // ─── Versions projet ─────────────────────────────────────────────────────────
+
+    public List<ProjectVersion> getProjectVersions(String projectRef) {
+        if (projectRef == null || projectRef.isBlank()) {
+            throw new IllegalArgumentException("La référence projet ne peut pas être vide");
+        }
+        return projectService.getVersions(projectRef);
+    }
+
+    public Project addProjectVersion(String projectRef, String versionJson) {
+        if (projectRef == null || projectRef.isBlank()) {
+            throw new IllegalArgumentException("La référence projet ne peut pas être vide");
+        }
+        if (versionJson == null || versionJson.isBlank()) {
+            throw new IllegalArgumentException("Le JSON de la version ne peut pas être vide");
+        }
+        ProjectVersion version = gson.fromJson(versionJson, ProjectVersion.class);
+        return projectService.addVersion(projectRef, version);
+    }
+
+    public Project updateProjectVersion(String projectRef, String versionId, String patchJson) {
+        if (projectRef == null || projectRef.isBlank()) {
+            throw new IllegalArgumentException("La référence projet ne peut pas être vide");
+        }
+        if (versionId == null || versionId.isBlank()) {
+            throw new IllegalArgumentException("L'ID de la version ne peut pas être vide");
+        }
+        if (patchJson == null || patchJson.isBlank()) {
+            throw new IllegalArgumentException("Le JSON de la version ne peut pas être vide");
+        }
+        ProjectVersion patch = gson.fromJson(patchJson, ProjectVersion.class);
+        return projectService.updateVersion(projectRef, versionId, patch);
+    }
+
+    public Project removeProjectVersion(String projectRef, String versionId) {
+        if (projectRef == null || projectRef.isBlank()) {
+            throw new IllegalArgumentException("La référence projet ne peut pas être vide");
+        }
+        if (versionId == null || versionId.isBlank()) {
+            throw new IllegalArgumentException("L'ID de la version ne peut pas être vide");
+        }
+        return projectService.removeVersion(projectRef, versionId);
+    }
+
+    // ─── Environnements projet ───────────────────────────────────────────────────
+
+    public List<ProjectEnvironment> getProjectEnvironments(String projectRef) {
+        if (projectRef == null || projectRef.isBlank()) {
+            throw new IllegalArgumentException("La référence projet ne peut pas être vide");
+        }
+        return projectService.getEnvironments(projectRef);
+    }
+
+    public Project addProjectEnvironment(String projectRef, String environmentJson) {
+        if (projectRef == null || projectRef.isBlank()) {
+            throw new IllegalArgumentException("La référence projet ne peut pas être vide");
+        }
+        if (environmentJson == null || environmentJson.isBlank()) {
+            throw new IllegalArgumentException("Le JSON de l'environnement ne peut pas être vide");
+        }
+        ProjectEnvironment environment = gson.fromJson(environmentJson, ProjectEnvironment.class);
+        return projectService.addEnvironment(projectRef, environment);
+    }
+
+    public Project updateProjectEnvironment(String projectRef, String environmentId, String patchJson) {
+        if (projectRef == null || projectRef.isBlank()) {
+            throw new IllegalArgumentException("La référence projet ne peut pas être vide");
+        }
+        if (environmentId == null || environmentId.isBlank()) {
+            throw new IllegalArgumentException("L'ID de l'environnement ne peut pas être vide");
+        }
+        if (patchJson == null || patchJson.isBlank()) {
+            throw new IllegalArgumentException("Le JSON de l'environnement ne peut pas être vide");
+        }
+        ProjectEnvironment patch = gson.fromJson(patchJson, ProjectEnvironment.class);
+        return projectService.updateEnvironment(projectRef, environmentId, patch);
+    }
+
+    public Project removeProjectEnvironment(String projectRef, String environmentId) {
+        if (projectRef == null || projectRef.isBlank()) {
+            throw new IllegalArgumentException("La référence projet ne peut pas être vide");
+        }
+        if (environmentId == null || environmentId.isBlank()) {
+            throw new IllegalArgumentException("L'ID de l'environnement ne peut pas être vide");
+        }
+        return projectService.removeEnvironment(projectRef, environmentId);
     }
 
     public Project refreshProjectTeamMemberSkills(String projectRef, String personId) {

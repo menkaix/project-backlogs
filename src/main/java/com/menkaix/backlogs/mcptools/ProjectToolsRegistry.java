@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.menkaix.backlogs.models.entities.Project;
+import com.menkaix.backlogs.models.transients.ProjectEnvironment;
 import com.menkaix.backlogs.models.transients.ProjectMember;
+import com.menkaix.backlogs.models.transients.ProjectVersion;
 
 @Service
 public class ProjectToolsRegistry {
@@ -159,6 +161,84 @@ public class ProjectToolsRegistry {
     public String refreshProjectTeamMemberSkills(String projectRef, String personId) {
         try {
             return gson.toJson(tools.refreshProjectTeamMemberSkills(projectRef, personId));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // ─── Versions projet ─────────────────────────────────────────────────────────
+
+    @Tool(name = "get-project-versions", description = "Retourne la liste des versions d'un projet. La référence peut être le nom, le code ou l'ID MongoDB.")
+    public String getProjectVersions(String projectRef) {
+        try {
+            List<ProjectVersion> versions = tools.getProjectVersions(projectRef);
+            return gson.toJson(Map.of("versions", versions, "count", versions.size(), "projectRef", projectRef));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "add-project-version", description = "Ajoute une version au projet. Champs du JSON: name (requis), creationDate (date de création, ISO 8601), deploymentDate (date de mise en service, ISO 8601).")
+    public String addProjectVersion(String projectRef, String versionJson) {
+        try {
+            return gson.toJson(tools.addProjectVersion(projectRef, versionJson));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "update-project-version", description = "Met à jour une version existante d'un projet. Champs modifiables: name, creationDate, deploymentDate.")
+    public String updateProjectVersion(String projectRef, String versionId, String patchJson) {
+        try {
+            return gson.toJson(tools.updateProjectVersion(projectRef, versionId, patchJson));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "remove-project-version", description = "Supprime une version d'un projet par son ID.")
+    public String removeProjectVersion(String projectRef, String versionId) {
+        try {
+            return gson.toJson(tools.removeProjectVersion(projectRef, versionId));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // ─── Environnements projet ───────────────────────────────────────────────────
+
+    @Tool(name = "get-project-environments", description = "Retourne la liste des environnements d'un projet (développement, qualification, préproduction, production, etc.).")
+    public String getProjectEnvironments(String projectRef) {
+        try {
+            List<ProjectEnvironment> envs = tools.getProjectEnvironments(projectRef);
+            return gson.toJson(Map.of("environments", envs, "count", envs.size(), "projectRef", projectRef));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "add-project-environment", description = "Ajoute un environnement au projet. Champs du JSON: name (requis), type (ex: développement, qualification, préproduction, production), url, description.")
+    public String addProjectEnvironment(String projectRef, String environmentJson) {
+        try {
+            return gson.toJson(tools.addProjectEnvironment(projectRef, environmentJson));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "update-project-environment", description = "Met à jour un environnement existant d'un projet. Champs modifiables: name, type, url, description.")
+    public String updateProjectEnvironment(String projectRef, String environmentId, String patchJson) {
+        try {
+            return gson.toJson(tools.updateProjectEnvironment(projectRef, environmentId, patchJson));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "remove-project-environment", description = "Supprime un environnement d'un projet par son ID.")
+    public String removeProjectEnvironment(String projectRef, String environmentId) {
+        try {
+            return gson.toJson(tools.removeProjectEnvironment(projectRef, environmentId));
         } catch (Exception e) {
             return gson.toJson(Map.of("error", e.getMessage()));
         }
