@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.menkaix.backlogs.models.values.ProjectPhase;
+import com.menkaix.backlogs.models.values.ProjectState;
+
 public class FullProjectDTO {
     private String id;
     private String name;
@@ -11,6 +14,8 @@ public class FullProjectDTO {
     private String clientName;
     private String description;
     private Date creationDate;
+    private ProjectPhase phase;
+    private ProjectState status;
     private List<FullActorDTO> actors = new ArrayList<>();
 
     public String getId() {
@@ -59,6 +64,22 @@ public class FullProjectDTO {
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public ProjectPhase getPhase() {
+        return phase;
+    }
+
+    public void setPhase(ProjectPhase phase) {
+        this.phase = phase;
+    }
+
+    public ProjectState getStatus() {
+        return status;
+    }
+
+    public void setStatus(ProjectState status) {
+        this.status = status;
     }
 
     public List<FullActorDTO> getActors() {

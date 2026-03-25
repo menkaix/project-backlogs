@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.menkaix.backlogs.models.dto.*;
+import com.menkaix.backlogs.models.values.ProjectState;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import com.menkaix.backlogs.models.entities.Actor;
@@ -135,6 +136,43 @@ public class ProjectService {
 	// Méthode pour obtenir tous les projets
 	public List<Project> getAll() {
 		return repo.findAll(Sort.by(Sort.Direction.DESC, "lastUpdateDate"));
+	}
+
+	/**
+	 * Retourne tous les projets dont le statut calculé correspond à l'état demandé.
+	 *
+	 * @param state état cible (ACTIVE, STANDBY ou CLOSED)
+	 * @return liste des projets filtrés
+	 */
+	public List<Project> getByState(ProjectState state) {
+		return repo.findAll(Sort.by(Sort.Direction.DESC, "lastUpdateDate")).stream()
+				.filter(p -> {
+					List<Task> tasks = taskRepository.findByProjectId(p.getId());
+					return ProjectState.compute(tasks) == state;
+				})
+				.collect(java.util.stream.Collectors.toList());
+	}
+
+	/**
+	 * Met à jour la phase d'un projet.
+	 *
+	 * @param projectRef nom, code ou id MongoDB du projet
+	 * @param phase      nouvelle phase
+	 * @return le projet mis à jour
+	 * @throws EntityNotFoundException si le projet n'existe pas
+	 */
+	public Project updatePhase(String projectRef, com.menkaix.backlogs.models.values.ProjectPhase phase)
+			throws EntityNotFoundException {
+		Project project;
+		try {
+			project = accessService.findProject(projectRef);
+		} catch (java.util.NoSuchElementException e) {
+			throw new EntityNotFoundException("Project not found: " + projectRef);
+		}
+		project.setPhase(phase);
+		Project saved = repo.save(project);
+		projectTouchService.touch(saved);
+		return saved;
 	}
 
 	// Méthode pour créer un projet en toute sécurité
@@ -265,6 +303,8 @@ public class ProjectService {
 		projectDTO.setClientName(p.getClientName());
 		projectDTO.setCreationDate(p.getCreationDate());
 		projectDTO.setCode(p.getCode());
+		projectDTO.setPhase(p.getPhase());
+		projectDTO.setStatus(ProjectState.compute(taskRepository.findByProjectId(p.getId())));
 		return projectDTO;
 	}
 

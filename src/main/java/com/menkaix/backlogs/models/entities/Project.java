@@ -1,6 +1,10 @@
 package com.menkaix.backlogs.models.entities;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+
+import com.menkaix.backlogs.models.values.ProjectPhase;
+import com.menkaix.backlogs.models.values.ProjectState;
 
 public class Project extends AbstractEntity {
 
@@ -12,6 +16,11 @@ public class Project extends AbstractEntity {
 	public String group;
 
 	public String description;
+
+	public ProjectPhase phase = ProjectPhase.INCONNUE;
+
+	@Transient
+	public ProjectState status;
 
 	public Project() {
 
@@ -59,5 +68,21 @@ public class Project extends AbstractEntity {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public ProjectPhase getPhase() {
+		return phase;
+	}
+
+	public void setPhase(ProjectPhase phase) {
+		this.phase = phase;
+	}
+
+	public ProjectState getStatus() {
+		return status;
+	}
+
+	public void setStatus(ProjectState status) {
+		this.status = status;
 	}
 }

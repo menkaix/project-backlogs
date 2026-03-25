@@ -23,6 +23,7 @@ import com.menkaix.backlogs.models.entities.Feature;
 import com.menkaix.backlogs.models.entities.FeatureType;
 import com.menkaix.backlogs.models.entities.Story;
 import com.menkaix.backlogs.models.entities.Task;
+import com.menkaix.backlogs.models.values.TaskStatus;
 import com.menkaix.backlogs.repositories.ActorRepository;
 import com.menkaix.backlogs.repositories.FeatureRepository;
 import com.menkaix.backlogs.repositories.ProjectRepository;
@@ -135,6 +136,45 @@ public class TaskService {
 		return saved;
 	}
 
+	/**
+	 * Met à jour uniquement le statut d'une tâche.
+	 * Gère automatiquement les dates associées :
+	 * - startDate : renseignée automatiquement au premier passage en IN_PROGRESS
+	 * - doneDate  : renseignée automatiquement au passage en DONE, effacée si la tâche est rouverte
+	 *
+	 * @param taskId     identifiant de la tâche
+	 * @param rawStatus  valeur brute du nouveau statut (tolerant aux variantes)
+	 * @return la tâche mise à jour
+	 * @throws NoSuchElementException si la tâche n'existe pas
+	 * @throws IllegalArgumentException si le statut fourni est invalide
+	 */
+	public Task updateStatus(String taskId, String rawStatus) {
+		Task task = repository.findById(taskId)
+				.orElseThrow(() -> new NoSuchElementException("Task not found: " + taskId));
+
+		TaskStatus newStatus = TaskStatus.normalize(rawStatus);
+		if (newStatus == null || newStatus == TaskStatus.UNKNOWN) {
+			throw new IllegalArgumentException("Statut inconnu : " + rawStatus);
+		}
+
+		task.setStatus(newStatus.name());
+
+		Date now = new Date();
+		if (newStatus == TaskStatus.IN_PROGRESS && task.getStartDate() == null) {
+			task.setStartDate(now);
+		}
+		if (newStatus == TaskStatus.DONE && task.getDoneDate() == null) {
+			task.setDoneDate(now);
+		}
+		if (newStatus != TaskStatus.DONE && task.getDoneDate() != null) {
+			task.setDoneDate(null);
+		}
+
+		Task saved = repository.save(task);
+		projectTouchService.touchByTask(saved);
+		return saved;
+	}
+
 	public void delete(String id) {
 		repository.findById(id).ifPresent(task -> {
 			repository.delete(task);
@@ -221,11 +261,13 @@ public class TaskService {
 	}
 
 	public List<Task> findByStatus(String status) {
-		return repository.findByStatusOrderByLastUpdateDateDesc(status);
+		TaskStatus normalized = TaskStatus.normalize(status);
+		String key = normalized != null ? normalized.name() : status;
+		return repository.findByStatusOrderByLastUpdateDateDesc(key);
 	}
 
 	public List<Task> findOverdueTasks() {
-		Query query = new Query(Criteria.where("deadLine").lt(new Date()).and("doneDate").isNull())
+		Query query = new Query(Criteria.where("dueDate").lt(new Date()).and("doneDate").isNull())
 				.with(LAST_UPDATE_DESC);
 		return mongoTemplate.find(query, Task.class);
 	}
@@ -233,7 +275,7 @@ public class TaskService {
 	public List<Task> findUpcomingTasks() {
 		Date now = new Date();
 		Date sevenDaysLater = new Date(now.getTime() + 7L * 24 * 60 * 60 * 1000);
-		Query query = new Query(Criteria.where("deadLine").gt(now).lt(sevenDaysLater).and("doneDate").isNull())
+		Query query = new Query(Criteria.where("dueDate").gt(now).lt(sevenDaysLater).and("doneDate").isNull())
 				.with(LAST_UPDATE_DESC);
 		return mongoTemplate.find(query, Task.class);
 	}
