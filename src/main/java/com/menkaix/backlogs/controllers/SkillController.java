@@ -82,6 +82,11 @@ public class SkillController {
         return ResponseEntity.ok(SkillLevel.values());
     }
 
+    @GetMapping("/categories")
+    public ResponseEntity<java.util.List<String>> listCategories() {
+        return ResponseEntity.ok(skillService.findAllCategories());
+    }
+
     // ═══════════════════════════════════════════════════════════════════════════
     // Skillset d'une personne
     // ═══════════════════════════════════════════════════════════════════════════

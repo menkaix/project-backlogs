@@ -444,60 +444,94 @@ public class ProjectService {
 		return a;
 	}
 
-	// ─── Gestion de l'équipe ─────────────────────────────────────────────────────
+	// ── Gestion de l'équipe projet ────────────────────────────────────────────
 
+	/**
+	 * Retourne l'équipe d'un projet.
+	 *
+	 * @param projectRef nom, code ou id MongoDB du projet
+	 */
 	public List<ProjectMember> getTeam(String projectRef) {
 		Project project = accessService.findProject(projectRef);
 		return project.getTeam();
 	}
 
-	public Project addTeamMember(String projectRef, String personId) throws EntityNotFoundException {
+	/**
+	 * Ajoute une personne à l'équipe d'un projet.
+	 * Les informations identitaires et le skillset sont dénormalisés depuis People.
+	 *
+	 * @param projectRef nom, code ou id MongoDB du projet
+	 * @param personId   id MongoDB de la personne à ajouter
+	 * @return le projet mis à jour
+	 */
+	public Project addTeamMember(String projectRef, String personId) {
 		Project project = accessService.findProject(projectRef);
+		com.menkaix.backlogs.models.entities.People person = peopleRepository.findById(personId)
+				.orElseThrow(() -> new java.util.NoSuchElementException("Personne introuvable : " + personId));
 
 		boolean alreadyMember = project.getTeam().stream()
 				.anyMatch(m -> m.getPersonId().equals(personId));
 		if (alreadyMember) {
-			throw new IllegalArgumentException("Cette personne est déjà membre de l'équipe");
+			throw new IllegalArgumentException("Cette personne fait déjà partie de l'équipe du projet");
 		}
-
-		com.menkaix.backlogs.models.entities.People person = peopleRepository.findById(personId)
-				.orElseThrow(() -> new EntityNotFoundException("Personne introuvable : " + personId));
 
 		ProjectMember member = new ProjectMember();
 		member.setPersonId(person.getId());
 		member.setFirstName(person.getFirstName());
 		member.setLastName(person.getLastName());
 		member.setEmail(person.getEmail());
-		member.setSkills(new java.util.ArrayList<>(person.getSkills()));
+		member.setSkills(person.getSkills());
 
 		project.getTeam().add(member);
-		return repo.save(project);
+		Project saved = repo.save(project);
+		projectTouchService.touch(saved);
+		return saved;
 	}
 
-	public Project removeTeamMember(String projectRef, String personId) throws EntityNotFoundException {
+	/**
+	 * Retire une personne de l'équipe d'un projet.
+	 *
+	 * @param projectRef nom, code ou id MongoDB du projet
+	 * @param personId   id MongoDB de la personne à retirer
+	 * @return le projet mis à jour
+	 */
+	public Project removeTeamMember(String projectRef, String personId) {
 		Project project = accessService.findProject(projectRef);
-
 		boolean removed = project.getTeam().removeIf(m -> m.getPersonId().equals(personId));
 		if (!removed) {
-			throw new EntityNotFoundException("Personne non trouvée dans l'équipe : " + personId);
+			throw new java.util.NoSuchElementException("Personne introuvable dans l'équipe du projet : " + personId);
 		}
-
-		return repo.save(project);
+		Project saved = repo.save(project);
+		projectTouchService.touch(saved);
+		return saved;
 	}
 
-	public Project refreshTeamMemberSkills(String projectRef, String personId) throws EntityNotFoundException {
+	/**
+	 * Synchronise les données dénormalisées d'un membre de l'équipe
+	 * (nom, email, skills) depuis le document People en base.
+	 *
+	 * @param projectRef nom, code ou id MongoDB du projet
+	 * @param personId   id MongoDB de la personne à rafraîchir
+	 * @return le projet mis à jour
+	 */
+	public Project refreshTeamMemberSkills(String projectRef, String personId) {
 		Project project = accessService.findProject(projectRef);
+		com.menkaix.backlogs.models.entities.People person = peopleRepository.findById(personId)
+				.orElseThrow(() -> new java.util.NoSuchElementException("Personne introuvable : " + personId));
 
 		ProjectMember member = project.getTeam().stream()
 				.filter(m -> m.getPersonId().equals(personId))
 				.findFirst()
-				.orElseThrow(() -> new EntityNotFoundException("Personne non trouvée dans l'équipe : " + personId));
+				.orElseThrow(() -> new java.util.NoSuchElementException("Personne introuvable dans l'équipe du projet : " + personId));
 
-		com.menkaix.backlogs.models.entities.People person = peopleRepository.findById(personId)
-				.orElseThrow(() -> new EntityNotFoundException("Personne introuvable : " + personId));
+		member.setFirstName(person.getFirstName());
+		member.setLastName(person.getLastName());
+		member.setEmail(person.getEmail());
+		member.setSkills(person.getSkills());
 
-		member.setSkills(new java.util.ArrayList<>(person.getSkills()));
-		return repo.save(project);
+		Project saved = repo.save(project);
+		projectTouchService.touch(saved);
+		return saved;
 	}
 
 	// Méthode pour ajouter un RACI à un projet

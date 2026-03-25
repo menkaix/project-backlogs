@@ -41,6 +41,18 @@ public class SkillService {
         return skillRepository.findByCategory(category);
     }
 
+    /**
+     * Retourne la liste distincte des catégories présentes dans le catalogue.
+     */
+    public List<String> findAllCategories() {
+        return skillRepository.findAll().stream()
+                .map(Skill::getCategory)
+                .filter(c -> c != null && !c.isBlank())
+                .distinct()
+                .sorted()
+                .toList();
+    }
+
     public Skill create(Skill skill) {
         if (skill.getName() == null || skill.getName().isBlank()) {
             throw new IllegalArgumentException("Le nom du skill est obligatoire");

@@ -49,6 +49,14 @@ public class PersonController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Retourne toutes les personnes actives sans pagination (pour les dropdowns / autocomplete).
+     */
+    @GetMapping("/all")
+    public ResponseEntity<java.util.List<People>> findAll() {
+        return ResponseEntity.ok(personService.findAll());
+    }
+
     @GetMapping
     public ResponseEntity<Page<People>> findAll(
             @RequestParam(defaultValue = "0") int page,
