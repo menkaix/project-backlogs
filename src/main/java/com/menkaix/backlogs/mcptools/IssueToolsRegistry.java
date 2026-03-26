@@ -103,6 +103,33 @@ public class IssueToolsRegistry {
         }
     }
 
+    @Tool(name = "get-issue-context", description = "Construit le contexte complet d'une issue pour un LLM: issue (avec type, sévérité, reproduction steps…), projet, feature, user story, actor, issues sœurs et équipe avec skillsets. Utile pour analyser l'impact, suggérer une assignation, générer une description de correctif ou des critères de résolution.")
+    public String getIssueContext(String issueId) {
+        try {
+            return gson.toJson(tools.buildIssueContext(issueId));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "assign-issue-to-project", description = "Affecte une issue à un projet en définissant son projectId. L'issue et le projet doivent exister.")
+    public String assignIssueToProject(String issueId, String projectId) {
+        try {
+            return gson.toJson(tools.assignToProject(issueId, projectId));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Tool(name = "assign-issue-to-feature", description = "Affecte une issue à une feature en définissant son idReference. L'issue et la feature doivent exister.")
+    public String assignIssueToFeature(String issueId, String featureId) {
+        try {
+            return gson.toJson(tools.assignToFeature(issueId, featureId));
+        } catch (Exception e) {
+            return gson.toJson(Map.of("error", e.getMessage()));
+        }
+    }
+
     @Tool(name = "find-issues", description = "Recherche des issues avec pagination. Paramètres: page (défaut 0), size (défaut 10, max 100), search (cherche dans title/description/component), filter (format 'champ:valeur').")
     public String findIssues(int page, int size, String search, String filter) {
         try {

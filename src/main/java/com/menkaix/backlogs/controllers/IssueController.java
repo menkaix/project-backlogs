@@ -1,9 +1,11 @@
 package com.menkaix.backlogs.controllers;
 
+import com.menkaix.backlogs.models.dto.IssueContextDTO;
 import com.menkaix.backlogs.models.entities.Issue;
 import com.menkaix.backlogs.models.values.IssueSeverity;
 import com.menkaix.backlogs.models.values.IssueStatus;
 import com.menkaix.backlogs.models.values.IssueType;
+import com.menkaix.backlogs.services.IssueContextService;
 import com.menkaix.backlogs.services.IssueService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,9 +21,11 @@ import java.util.NoSuchElementException;
 public class IssueController {
 
     private final IssueService issueService;
+    private final IssueContextService issueContextService;
 
-    public IssueController(IssueService issueService) {
+    public IssueController(IssueService issueService, IssueContextService issueContextService) {
         this.issueService = issueService;
+        this.issueContextService = issueContextService;
     }
 
     // ── CRUD ──────────────────────────────────────────────────────────────────
@@ -57,6 +61,18 @@ public class IssueController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String filter) {
         return ResponseEntity.ok(issueService.findAll(PageRequest.of(page, size), search, filter));
+    }
+
+    // ── Contexte ──────────────────────────────────────────────────────────────
+
+    @GetMapping("/{id}/context")
+    public ResponseEntity<?> getContext(@PathVariable String id) {
+        try {
+            IssueContextDTO ctx = issueContextService.buildContext(id);
+            return ResponseEntity.ok(ctx);
+        } catch (java.util.NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // ── Statut ────────────────────────────────────────────────────────────────
@@ -102,6 +118,26 @@ public class IssueController {
     @DeleteMapping("/{id}/assignees/{email}")
     public ResponseEntity<Issue> unassignPerson(@PathVariable String id, @PathVariable String email) {
         return ResponseEntity.ok(issueService.unassignPerson(id, email));
+    }
+
+    // ── Affectation à un projet ou une feature ────────────────────────────────
+
+    @PutMapping("/{id}/project/{projectId}")
+    public ResponseEntity<?> assignToProject(@PathVariable String id, @PathVariable String projectId) {
+        try {
+            return ResponseEntity.ok(issueService.assignToProject(id, projectId));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}/feature/{featureId}")
+    public ResponseEntity<?> assignToFeature(@PathVariable String id, @PathVariable String featureId) {
+        try {
+            return ResponseEntity.ok(issueService.assignToFeature(id, featureId));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // ── Recherche ─────────────────────────────────────────────────────────────

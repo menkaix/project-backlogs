@@ -1,10 +1,12 @@
 package com.menkaix.backlogs.mcptools;
 
 import com.google.gson.Gson;
+import com.menkaix.backlogs.models.dto.IssueContextDTO;
 import com.menkaix.backlogs.models.entities.Issue;
 import com.menkaix.backlogs.models.values.IssueSeverity;
 import com.menkaix.backlogs.models.values.IssueStatus;
 import com.menkaix.backlogs.models.values.IssueType;
+import com.menkaix.backlogs.services.IssueContextService;
 import com.menkaix.backlogs.services.IssueService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +20,12 @@ import java.util.Optional;
 public class IssueServiceMCPTools {
 
     private final IssueService issueService;
+    private final IssueContextService issueContextService;
     private final Gson gson;
 
-    public IssueServiceMCPTools(IssueService issueService, Gson gson) {
+    public IssueServiceMCPTools(IssueService issueService, IssueContextService issueContextService, Gson gson) {
         this.issueService = issueService;
+        this.issueContextService = issueContextService;
         this.gson = gson;
     }
 
@@ -98,6 +102,25 @@ public class IssueServiceMCPTools {
         if (issueId == null || issueId.isBlank()) throw new IllegalArgumentException("L'ID ne peut pas être vide");
         if (email == null || email.isBlank()) throw new IllegalArgumentException("L'email ne peut pas être vide");
         return issueService.assignPerson(issueId, email);
+    }
+
+    public IssueContextDTO buildIssueContext(String issueId) {
+        if (issueId == null || issueId.isBlank()) {
+            throw new IllegalArgumentException("L'ID de l'issue ne peut pas être vide");
+        }
+        return issueContextService.buildContext(issueId);
+    }
+
+    public Issue assignToProject(String issueId, String projectId) {
+        if (issueId == null || issueId.isBlank()) throw new IllegalArgumentException("L'ID de l'issue ne peut pas être vide");
+        if (projectId == null || projectId.isBlank()) throw new IllegalArgumentException("L'ID du projet ne peut pas être vide");
+        return issueService.assignToProject(issueId, projectId);
+    }
+
+    public Issue assignToFeature(String issueId, String featureId) {
+        if (issueId == null || issueId.isBlank()) throw new IllegalArgumentException("L'ID de l'issue ne peut pas être vide");
+        if (featureId == null || featureId.isBlank()) throw new IllegalArgumentException("L'ID de la feature ne peut pas être vide");
+        return issueService.assignToFeature(issueId, featureId);
     }
 
     public Issue unassignPerson(String issueId, String email) {

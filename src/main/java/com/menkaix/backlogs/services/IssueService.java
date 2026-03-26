@@ -128,6 +128,26 @@ public class IssueService {
         return repository.save(issue);
     }
 
+    // ── Affectation à un projet ou une feature ────────────────────────────────
+
+    public Issue assignToProject(String issueId, String projectId) {
+        Issue issue = repository.findById(issueId)
+                .orElseThrow(() -> new NoSuchElementException("Issue non trouvée : " + issueId));
+        projectRepository.findById(projectId)
+                .orElseThrow(() -> new NoSuchElementException("Projet non trouvé : " + projectId));
+        issue.setProjectId(projectId);
+        return repository.save(issue);
+    }
+
+    public Issue assignToFeature(String issueId, String featureId) {
+        Issue issue = repository.findById(issueId)
+                .orElseThrow(() -> new NoSuchElementException("Issue non trouvée : " + issueId));
+        featureRepository.findById(featureId)
+                .orElseThrow(() -> new NoSuchElementException("Feature non trouvée : " + featureId));
+        issue.setIdReference("feature/" + featureId);
+        return repository.save(issue);
+    }
+
     // ── Recherche par projet ──────────────────────────────────────────────────
 
     public List<Issue> findByProjectId(String projectId) {
