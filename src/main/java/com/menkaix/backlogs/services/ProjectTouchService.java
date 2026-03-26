@@ -1,5 +1,6 @@
 package com.menkaix.backlogs.services;
 
+import com.menkaix.backlogs.models.entities.Issue;
 import com.menkaix.backlogs.models.entities.Project;
 import com.menkaix.backlogs.models.entities.Task;
 import com.menkaix.backlogs.repositories.ActorRepository;
@@ -11,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * Touches (saves) the parent project of any entity so that
@@ -31,6 +34,9 @@ public class ProjectTouchService {
     @Autowired
     @Lazy
     private ProjectTouchService self;
+
+    @Autowired(required = false)
+    private Optional<QdrantIndexingService> qdrantIndexingService = Optional.empty();
 
     public ProjectTouchService(ProjectRepository projectRepository,
                                ActorRepository actorRepository,
@@ -97,11 +103,29 @@ public class ProjectTouchService {
             String featureId = task.getIdReference().substring("feature/".length());
             touchByFeatureId(featureId);
         }
+        if (task.getId() != null) {
+            qdrantIndexingService.ifPresent(s -> s.indexTaskContext(task.getId()));
+        }
+    }
+
+    /** Touch via an issue — also triggers async Qdrant indexing. */
+    public void touchByIssue(Issue issue) {
+        if (issue == null) return;
+        if (issue.getProjectId() != null && !issue.getProjectId().isBlank()) {
+            touchByProjectId(issue.getProjectId());
+        } else if (issue.getIdReference() != null && issue.getIdReference().startsWith("feature/")) {
+            String featureId = issue.getIdReference().substring("feature/".length());
+            touchByFeatureId(featureId);
+        }
+        if (issue.getId() != null) {
+            qdrantIndexingService.ifPresent(s -> s.indexIssueContext(issue.getId()));
+        }
     }
 
     /** Touch directly when the project object is already at hand. */
     public void touch(Project project) {
         if (project == null) return;
         projectRepository.save(project);
+        qdrantIndexingService.ifPresent(s -> s.indexProjectTree(project.getId()));
     }
 }
