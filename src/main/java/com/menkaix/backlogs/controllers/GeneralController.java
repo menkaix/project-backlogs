@@ -36,9 +36,18 @@ public class GeneralController {
 
 
     @GetMapping("/me")
-    public ResponseEntity<String> getCurrentUser(HttpServletRequest request) {
-        String email = GcpUserInfoExtractor.extractEmail(request).orElse("anonymous");
-        return ResponseEntity.ok(email);
+    public ResponseEntity<java.util.Map<String, String>> getCurrentUser(HttpServletRequest request) {
+        var claims = GcpUserInfoExtractor.extractClaims(request);
+        var result = new java.util.HashMap<String, String>();
+
+        claims.ifPresentOrElse(c -> {
+            if (c.has("email"))       result.put("email",      c.get("email").getAsString());
+            if (c.has("given_name"))  result.put("firstName",  c.get("given_name").getAsString());
+            if (c.has("family_name")) result.put("lastName",   c.get("family_name").getAsString());
+            if (c.has("picture"))     result.put("picture",    c.get("picture").getAsString());
+        }, () -> result.put("email", "anonymous"));
+
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/featuretypes")
