@@ -4,7 +4,9 @@ package com.menkaix.backlogs.controllers;
 import com.menkaix.backlogs.models.entities.FeatureType;
 import com.menkaix.backlogs.repositories.FeatureTypeRepository;
 import com.menkaix.backlogs.repositories.TaskRepository;
+import com.menkaix.backlogs.utilities.GcpUserInfoExtractor;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -32,6 +34,12 @@ public class GeneralController {
     private MongoTemplate mongoTemplate ;
 
 
+
+    @GetMapping("/me")
+    public ResponseEntity<String> getCurrentUser(HttpServletRequest request) {
+        String email = GcpUserInfoExtractor.extractEmail(request).orElse("anonymous");
+        return ResponseEntity.ok(email);
+    }
 
     @GetMapping("/featuretypes")
     public ResponseEntity<List<FeatureType>> getFeatureTypes(){
