@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.menkaix.backlogs.models.transients.PersonSkill;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Document(collection = "person")
@@ -19,6 +20,17 @@ public class People extends AbstractEntity {
 	private String email;
 	private String description;
 	private boolean isActive = true;
+
+	private Date lastAccess ;
+
+	public Date getLastAccess() {
+		return lastAccess;
+	}
+
+	public void setLastAccess(Date lastAccess) {
+		this.lastAccess = lastAccess;
+	}
+
 	private List<PersonSkill> skills = new ArrayList<>();
 
 	public String getId() {

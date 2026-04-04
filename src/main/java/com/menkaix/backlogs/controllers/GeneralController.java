@@ -2,6 +2,7 @@ package com.menkaix.backlogs.controllers;
 
 
 import com.menkaix.backlogs.models.entities.FeatureType;
+import com.menkaix.backlogs.models.entities.People;
 import com.menkaix.backlogs.repositories.FeatureTypeRepository;
 import com.menkaix.backlogs.repositories.PeopleRepository;
 import com.menkaix.backlogs.repositories.TaskRepository;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -52,6 +54,10 @@ public class GeneralController {
         if (email == null || peopleRepository.findByEmailAndIsActive(email, true).isEmpty()) {
             //return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+
+        People person = peopleRepository.findByEmail(email).get() ;
+        person.setLastAccess(new Date());
+        peopleRepository.save(person) ;
 
         var result = new java.util.HashMap<String, String>();
         result.put("email", email);
