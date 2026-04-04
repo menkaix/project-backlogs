@@ -8,4 +8,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface PeopleRepository extends MongoRepository<People, String> {
 
     Optional<People> findByEmail(String email);
+    Optional<People> findByEmailAndIsActive(String email, boolean isActive);
 }
