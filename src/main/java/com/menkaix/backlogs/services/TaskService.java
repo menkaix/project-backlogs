@@ -23,11 +23,15 @@ import org.springframework.stereotype.Service;
 import com.menkaix.backlogs.models.entities.Feature;
 import com.menkaix.backlogs.models.entities.FeatureType;
 import com.menkaix.backlogs.models.entities.Issue;
+import Project;
 import com.menkaix.backlogs.models.entities.Story;
 import com.menkaix.backlogs.models.entities.Task;
 import com.menkaix.backlogs.models.values.TaskStatus;
+import com.menkaix.backlogs.models.entities.People;
+import com.menkaix.backlogs.models.transients.ProjectMember;
 import com.menkaix.backlogs.repositories.ActorRepository;
 import com.menkaix.backlogs.repositories.FeatureRepository;
+import com.menkaix.backlogs.repositories.PeopleRepository;
 import com.menkaix.backlogs.repositories.ProjectRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;
 import com.menkaix.backlogs.repositories.TaskRepository;
@@ -44,6 +48,7 @@ public class TaskService {
 	private final StoryRepository storyRepository;
 	private final ActorRepository actorRepository;
 	private final ProjectRepository projectRepository;
+	private final PeopleRepository peopleRepository;
 
 	@Lazy
 	@Autowired
@@ -53,7 +58,8 @@ public class TaskService {
 	public TaskService(TaskRepository repository, FeatureTypeService featureTypeService,
 			MongoTemplate mongoTemplate, ProjectTouchService projectTouchService,
 			FeatureRepository featureRepository, StoryRepository storyRepository,
-			ActorRepository actorRepository, ProjectRepository projectRepository) {
+			ActorRepository actorRepository, ProjectRepository projectRepository,
+			PeopleRepository peopleRepository) {
 		this.repository = repository;
 		this.featureTypeService = featureTypeService;
 		this.mongoTemplate = mongoTemplate;
@@ -62,6 +68,7 @@ public class TaskService {
 		this.storyRepository = storyRepository;
 		this.actorRepository = actorRepository;
 		this.projectRepository = projectRepository;
+		this.peopleRepository = peopleRepository;
 	}
 
 	public void createUsualTasks(Feature feature) {
@@ -114,9 +121,43 @@ public class TaskService {
 			task.getAssignees().add(email);
 			Task saved = repository.save(task);
 			projectTouchService.touchByTask(saved);
+			peopleRepository.findByEmail(email).ifPresent(person -> {
+				person.setActive(true);
+				peopleRepository.save(person);
+				resolveProject(saved).ifPresent(project -> addToTeam(project, person));
+			});
 			return saved;
 		}
 		return task;
+	}
+
+	private Optional<Project> resolveProject(Task task) {
+		if (task.getProjectId() != null && !task.getProjectId().isBlank()) {
+			return projectRepository.findById(task.getProjectId());
+		}
+		if (task.getIdReference() != null && task.getIdReference().startsWith("feature/")) {
+			String featureId = task.getIdReference().substring("feature/".length());
+			return featureRepository.findById(featureId)
+					.flatMap(f -> storyRepository.findById(f.getStoryId()))
+					.flatMap(s -> actorRepository.findById(s.getActorId()))
+					.flatMap(a -> projectRepository.findByName(a.getProjectName()).stream().findFirst());
+		}
+		return Optional.empty();
+	}
+
+	private void addToTeam(Project project, People person) {
+		boolean alreadyMember = project.getTeam().stream()
+				.anyMatch(m -> person.getEmail().equals(m.getEmail()));
+		if (!alreadyMember) {
+			ProjectMember member = new ProjectMember();
+			member.setPersonId(person.getId());
+			member.setFirstName(person.getFirstName());
+			member.setLastName(person.getLastName());
+			member.setEmail(person.getEmail());
+			member.setSkills(person.getSkills());
+			project.getTeam().add(member);
+			projectRepository.save(project);
+		}
 	}
 
 	public Task unassignPerson(String taskId, String email) {

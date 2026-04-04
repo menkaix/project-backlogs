@@ -1,12 +1,16 @@
 package com.menkaix.backlogs.services;
 
 import com.menkaix.backlogs.models.entities.Issue;
+import com.menkaix.backlogs.models.entities.People;
+import com.menkaix.backlogs.models.entities.Project;
+import com.menkaix.backlogs.models.transients.ProjectMember;
 import com.menkaix.backlogs.models.values.IssueSeverity;
 import com.menkaix.backlogs.models.values.IssueStatus;
 import com.menkaix.backlogs.models.values.IssueType;
 import com.menkaix.backlogs.repositories.ActorRepository;
 import com.menkaix.backlogs.repositories.FeatureRepository;
 import com.menkaix.backlogs.repositories.IssueRepository;
+import com.menkaix.backlogs.repositories.PeopleRepository;
 import com.menkaix.backlogs.repositories.ProjectRepository;
 import com.menkaix.backlogs.repositories.StoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +42,13 @@ public class IssueService {
     private final StoryRepository storyRepository;
     private final ActorRepository actorRepository;
     private final ProjectRepository projectRepository;
+    private final PeopleRepository peopleRepository;
 
     @Autowired
     public IssueService(IssueRepository repository, MongoTemplate mongoTemplate,
             ProjectTouchService projectTouchService, FeatureRepository featureRepository,
             StoryRepository storyRepository, ActorRepository actorRepository,
-            ProjectRepository projectRepository) {
+            ProjectRepository projectRepository, PeopleRepository peopleRepository) {
         this.repository = repository;
         this.mongoTemplate = mongoTemplate;
         this.projectTouchService = projectTouchService;
@@ -51,6 +56,7 @@ public class IssueService {
         this.storyRepository = storyRepository;
         this.actorRepository = actorRepository;
         this.projectRepository = projectRepository;
+        this.peopleRepository = peopleRepository;
     }
 
     // ── CRUD de base ──────────────────────────────────────────────────────────
@@ -116,9 +122,45 @@ public class IssueService {
                 .orElseThrow(() -> new NoSuchElementException("Issue non trouvée : " + issueId));
         if (!issue.getAssignees().contains(email)) {
             issue.getAssignees().add(email);
-            return repository.save(issue);
+            Issue saved = repository.save(issue);
+            projectTouchService.touchByIssue(saved);
+            peopleRepository.findByEmail(email).ifPresent(person -> {
+                person.setActive(true);
+                peopleRepository.save(person);
+                resolveProject(saved).ifPresent(project -> addToTeam(project, person));
+            });
+            return saved;
         }
         return issue;
+    }
+
+    private Optional<Project> resolveProject(Issue issue) {
+        if (issue.getProjectId() != null && !issue.getProjectId().isBlank()) {
+            return projectRepository.findById(issue.getProjectId());
+        }
+        if (issue.getIdReference() != null && issue.getIdReference().startsWith("feature/")) {
+            String featureId = issue.getIdReference().substring("feature/".length());
+            return featureRepository.findById(featureId)
+                    .flatMap(f -> storyRepository.findById(f.getStoryId()))
+                    .flatMap(s -> actorRepository.findById(s.getActorId()))
+                    .flatMap(a -> projectRepository.findByName(a.getProjectName()).stream().findFirst());
+        }
+        return Optional.empty();
+    }
+
+    private void addToTeam(Project project, People person) {
+        boolean alreadyMember = project.getTeam().stream()
+                .anyMatch(m -> person.getEmail().equals(m.getEmail()));
+        if (!alreadyMember) {
+            ProjectMember member = new ProjectMember();
+            member.setPersonId(person.getId());
+            member.setFirstName(person.getFirstName());
+            member.setLastName(person.getLastName());
+            member.setEmail(person.getEmail());
+            member.setSkills(person.getSkills());
+            project.getTeam().add(member);
+            projectRepository.save(project);
+        }
     }
 
     public Issue unassignPerson(String issueId, String email) {
