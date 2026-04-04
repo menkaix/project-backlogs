@@ -50,7 +50,7 @@ public class GeneralController {
         String email = c.has("email") ? c.get("email").getAsString() : null;
 
         if (email == null || peopleRepository.findByEmailAndIsActive(email, true).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            //return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         var result = new java.util.HashMap<String, String>();
