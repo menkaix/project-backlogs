@@ -45,14 +45,14 @@ public class GeneralController {
     public ResponseEntity<java.util.Map<String, String>> getCurrentUser(HttpServletRequest request) {
         var claims = GcpUserInfoExtractor.extractClaims(request);
         if (claims.isEmpty()) {
-            //return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         var c = claims.get();
         String email = c.has("email") ? c.get("email").getAsString() : null;
 
         if (email == null || peopleRepository.findByEmailAndIsActive(email, true).isEmpty()) {
-            //return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         People person = peopleRepository.findByEmail(email).get() ;
